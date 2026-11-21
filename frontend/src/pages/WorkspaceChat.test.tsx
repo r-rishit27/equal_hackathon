@@ -1,18 +1,18 @@
-﻿import { fireEvent, render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import { MemoryRouter } from 'react-router-dom'
 import { ConversationProvider, WorkspaceChat } from './WorkspaceChat'
 
 afterEach(() => vi.unstubAllGlobals())
 
-it('sends a document and reply language and retains context for a follow-up', async () => {
+it('sends a document without a language setting and retains context for a follow-up', async () => {
   const fetcher = vi.fn().mockImplementation(async () => Response.json({
     message: 'Checked the bill.', context_id: 'turn-one',
     sources: [{ id: 'S1', title: 'Bill details', domain: 'bills', path: '/bills/123', values: {} }],
   }))
   vi.stubGlobal('fetch', fetcher)
   render(<MemoryRouter><ConversationProvider><WorkspaceChat /></ConversationProvider></MemoryRouter>)
-  fireEvent.change(screen.getByLabelText('Reply language'), {target: {value: 'Hindi'}})
+  expect(screen.queryByRole('combobox')).toBeNull()
   const file = new File(['invoice_total\n15'], 'invoice.csv', {type: 'text/csv'})
   fireEvent.change(screen.getByLabelText('Attach a finance document'), {target: {files: [file]}})
   fireEvent.click(screen.getByLabelText('Send message'))
@@ -22,7 +22,7 @@ it('sends a document and reply language and retains context for a follow-up', as
   const data = fetcher.mock.calls[0][1].body as FormData
   expect((data.get('document') as File).name).toBe('invoice.csv')
   const first = JSON.parse(String(data.get('payload')))
-  expect(first.language).toBe('Hindi')
+  expect(first).not.toHaveProperty('language')
   fireEvent.change(screen.getByLabelText('Message Reckon Copilot'), {target: {value: 'Explain that difference'}})
   fireEvent.click(screen.getByLabelText('Send message'))
   expect(JSON.parse(fetcher.mock.calls[1][1].body.get('payload'))).toMatchObject({

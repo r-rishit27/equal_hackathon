@@ -9,13 +9,11 @@ import './workspace-chat.css'
 interface Source { id: string; title: string; path: string | null; domain: string; values: Record<string, unknown> }
 interface Turn { moreBills?: boolean; contextId?: string; question: string; message?: string; sources?: Source[]; file?: string; error?: boolean }
 const prompts = ['Give me a workspace overview', 'Which bills need attention?', 'Explain reconciliation differences', 'Show supplier relationships for pending bills.', 'Which pending bills are overdue?', 'Show bills and decision history I can access.']
-const languages = ['Auto','English','Hindi','Spanish','French','Tamil','Telugu','Marathi','Bengali']
 const endpoint = (import.meta.env.VITE_API_URL ?? '') + '/api/finance-desk/assistant/chat'
 
 function useConversation() {
   const [turns,setTurns] = useState<Turn[]>([])
   const [text,setText] = useState('')
-  const [lang,setLang] = useState('Auto')
   const [file,setFile] = useState<File | null>(null)
   const [busy,setBusy] = useState(false)
   const [notice,setNotice] = useState('')
@@ -30,7 +28,7 @@ function useConversation() {
     if ((!question && !file) || busy) return
     const wording=question || 'Review this document and check its calculations.'
     const data=new FormData()
-    data.set('payload', JSON.stringify({question:wording,language:lang,context_id:turns[turns.length-1]?.contextId,previous_questions:turns.slice(-4).map(t=>t.question),...options}))
+    data.set('payload', JSON.stringify({question:wording,context_id:turns[turns.length-1]?.contextId,previous_questions:turns.slice(-4).map(t=>t.question),...options}))
     if (file) data.set('document',file)
     const abort=new AbortController()
     controller.current=abort
@@ -52,7 +50,7 @@ function useConversation() {
       if (!abort.signal.aborted) setTurns(t=>[...t.slice(0,-1),{question:wording,error:true,message:e instanceof Error?e.message:'Connection failed.'}])
     } finally { if (!abort.signal.aborted) setBusy(false) }
   }
-  return {turns,text,setText,lang,setLang,file,setFile,busy,notice,setNotice,reset,send}
+  return {turns,text,setText,file,setFile,busy,notice,setNotice,reset,send}
 }
 
 const Conversation = createContext<ReturnType<typeof useConversation> | null>(null)
@@ -79,7 +77,7 @@ function Reply({ turn }: { turn: Turn }) {
     })}</p>)}</div>
 }
 
-function ChatView({ turns,text,setText,lang,setLang,file,setFile,busy,notice,setNotice,reset,send }: ReturnType<typeof useConversation>) {
+function ChatView({ turns,text,setText,file,setFile,busy,notice,setNotice,reset,send }: ReturnType<typeof useConversation>) {
   const input = useRef<HTMLInputElement>(null)
   const scroll = useRef<HTMLDivElement>(null)
   useEffect(() => {
@@ -92,8 +90,7 @@ function ChatView({ turns,text,setText,lang,setLang,file,setFile,busy,notice,set
   }, [turns,busy])
   function submit(e:FormEvent) { e.preventDefault(); void send(text) }
   return <div className="workspace-chat">
-    <div className="wc-toolbar"><label>Reply language <select value={lang} onChange={e=>setLang(e.target.value)}>
-      {languages.map(l=><option key={l} value={l}>{l==='Auto'?'Match my language':l}</option>)}</select></label>
+    <div className="wc-toolbar">
       <button type="button" onClick={reset} aria-label="New conversation"><RotateCcw size={15} /> New chat</button></div>
     <div ref={scroll} className="wc-feed" role="log" aria-label="Conversation">
       {!turns.length && <div className="wc-welcome"><img src="/favicon.svg" alt="" /><h2>How can I help?</h2>

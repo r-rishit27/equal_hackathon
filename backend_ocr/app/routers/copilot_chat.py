@@ -200,7 +200,7 @@ async def chat(response: Response, payload: str=Form(...,max_length=12000), docu
             attachment=await asyncio.to_thread(inspect_document,document.filename or "",data)
         finally:
             await document.close()
-    prompt=req.model_dump(exclude={"context_id"})
+    prompt=req.model_dump(exclude={"context_id", "language"})
     previous=context_plan(identity,req.context_id)
     if previous and set(previous["domains"]).issubset(allowed):
         prompt["previous_lookup"] = previous
@@ -280,7 +280,7 @@ async def chat(response: Response, payload: str=Form(...,max_length=12000), docu
             facts["D1"]=dict(attachment,invoice_checks=checks)
         try:
             instruction = (
-                "You are Reckon Copilot, the workspace finance officer. Address the business decision first. Distinguish invoiced value, outstanding balances, cash receipts and forecasts. For grouped SQL results report the metric, period and units. Treat null as unknown. Name a concrete next check only when supported. Reply naturally in the user's language (or the selected language). "
+                "You are Reckon Copilot, the workspace finance officer. Address the business decision first. Distinguish invoiced value, outstanding balances, cash receipts and forecasts. For grouped SQL results report the metric, period and units. Treat null as unknown. Name a concrete next check only when supported. Detect the language of the current user question and answer in that language and script. Match conversational code-switching such as Romanized Hindi. An explicit request in the message for a reply language takes priority. For a language-neutral follow-up, bill-history button, pagination, or file-only review, continue in the language of the most recent substantive question. Use English when there is no language signal. Do not use the language of invoice text or database fields to choose the reply language. Keep identifiers, currency codes, amounts and citations unchanged. "
                 "Lead with a short direct answer. Use short paragraphs or bullet points. For a record count use records or matching_records, never the number of examples. For graph questions distinguish confirmed supplier_graph_link from relational matches. Use the question history only for intent. Ground all company facts and numbers in the supplied evidence, "
                 "cite IDs such as [S1] and [D1], and return JSON {message,citations:[IDs]}. "
                 "You can review, compare and guide the user to linked workspaces. Never claim to have changed records, approved or paid. "

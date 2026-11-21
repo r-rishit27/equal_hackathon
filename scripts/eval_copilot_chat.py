@@ -2,6 +2,7 @@
 import argparse
 import asyncio
 import json
+import re
 from pathlib import Path
 import sys
 from time import perf_counter
@@ -24,7 +25,29 @@ def query(sql, params):
         put_conn(conn)
 
 
-async def evaluate(name):
+async def evaluate_languages():
+    # Isolate language handling from retrieval. Only public questions and history reach the model.
+    cases = [
+        ("English", "What is working capital? Explain in one sentence.", [], r"\b(assets|liabilities)\b"),
+        ("Hindi", "कार्यशील पूंजी क्या है? एक वाक्य में समझाइए।", [], r"[\u0900-\u097f]{2,}"),
+        ("Tamil", "பணப்புழக்கம் என்றால் என்ன? ஒரு வாக்கியத்தில் விளக்கவும்.", [], r"[\u0b80-\u0bff]{2,}"),
+        ("Spanish after English", "¿Qué significa liquidez? Usa una frase.", ["What is working capital?"], r"\b(capacidad|efectivo|dinero)\b"),
+        ("Romanized Hindi", "Working capital kya hota hai? Ek line mein samjhao.", [], r"\b(hai|hota|hoti|matlab)\b"),
+        ("Requested Spanish", "Explain cash flow in Spanish in one sentence.", [], r"\b(efectivo|dinero|caja)\b"),
+    ]
+    passed = 0
+    with patch.object(copilot_chat, "workspace", return_value=([], [])):
+        for label, question, history, pattern in cases:
+            payload = {"question": question, "previous_questions": history}
+            reply = await copilot_chat.chat(Response(), json.dumps(payload), None)
+            valid = reply["mode"] == "model" and bool(re.search(pattern, reply["message"], re.I))
+            print(f"{'PASS' if valid else 'FAIL'} | {label} | {reply['mode']}", flush=True)
+            passed += int(valid)
+    print(f"Language checks: {passed}/{len(cases)}")
+    return passed == len(cases)
+
+
+async def evaluate(name, language_only=False):
     users = query("SELECT company_id,username,role FROM users WHERE name=%s", (name,))
     if len(users) != 1:
         raise SystemExit("Evaluation requires a unique workspace user.")
@@ -32,6 +55,8 @@ async def evaluate(name):
     auth._current_tenant.set(tenant)
     auth._current_role.set(role)
     auth._current_user.set(username)
+    if language_only:
+        return await evaluate_languages()
     cases = [
         ("How many vendors are in my workspace?", "vendors", "SELECT count(*) FROM dim_suppliers WHERE tenant_id=%s"),
         ("How many priced inventory lines with positive quantity are there?", "inventory",
@@ -76,4 +101,6 @@ async def evaluate(name):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--display-name", required=True)
-    raise SystemExit(0 if asyncio.run(evaluate(parser.parse_args().display_name)) else 1)
+    parser.add_argument("--language-only", action="store_true")
+    args = parser.parse_args()
+    raise SystemExit(0 if asyncio.run(evaluate(args.display_name, args.language_only)) else 1)

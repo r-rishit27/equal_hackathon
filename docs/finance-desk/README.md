@@ -4,6 +4,8 @@ Design package for extending Reckon.ai's `uat2` payables and receivables baselin
 
 ## Reckon Copilot on dev
 
+Copilot detects the language of each message automatically. See the [Copilot evaluation metrics](COPILOT_EVALUATION.md) for measured results and repeatable checks.
+
 Open **Insights / Reckon Copilot** at `/finance-desk/copilot`. Workspace chat is available from the floating Reckon.ai logo throughout the signed-in application. It reads `OPENAI_MODEL` or the existing `OPENAI_DECISION_MODEL` setting for tool selection and replies in the user's language. Tenant roles and live module entitlements determine the available context, including payables, receivables, cash application, inventory, purchasing, reconciliation, payments, review, tax, FX, vendor records and administrative configuration. Source relationships are projected from PostgreSQL at query time. Existing Fact Graph supplier-to-bill edges are verified against invoice ownership. Open a source to continue in its owning workflow.
 
 Attach a UTF-8 CSV, text file or text PDF up to 2 MB (PDF limit 12 pages). CSV columns `quantity,unit_price,line_total` trigger decimal pre-tax line checks. Supply `invoice_number,invoice_total,currency` to compare up to eight distinct references with visible bills. Files are processed in memory and bounded excerpts are sent to the configured model. Each turn rereads source authorization before releasing an answer. Four previous questions supply conversational context within the open chat.
