@@ -168,6 +168,7 @@ _RULES: tuple[tuple[str, str, str], ...] = (
     ("*", "/api/users", "users"),
     ("*", "/api/brands", "brands"),
     ("*", "/api/settings", "settings"),
+    ("POST", "/api/finance-desk/assistant/query", "fact_graph"),
     ("*", "/api/finance-desk/inventory", "reports"),
     ("*", "/api/reports", "reports"),
     ("*", "/api/ledgers", "ledger"),

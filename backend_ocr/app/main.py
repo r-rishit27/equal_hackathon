@@ -40,6 +40,7 @@ from .security.licensing import impersonation_gate, license_gate, require_servic
 from .routers import auth as auth_routes, bank_logos, bill_approvals, bill_attachments, bill_export, bill_tds, bills, categories, invoices, ledgers, item_mapping, org, reports, review_hub, settings as settings_routes, system, users, vendor_activity, vendor_banking, vendor_contacts, vendor_doc_classify, vendor_documents, vendor_gstins, vendor_logos, vendors
 
 # Feature routers that already lived in their own modules.
+from .routers.copilot import router as copilot_router
 from .routers.inventory import router as inventory_router
 from .routers.admin import router as admin_router
 from .routers.agent import router as agent_router
@@ -151,6 +152,7 @@ for _router_module in (
 # agent_router both hang routes off /api/vendors/{id}/contacts, and
 # tally_agent_router serves the public agent-update manifest. license_gate handles
 # those per route.
+app.include_router(copilot_router)
 app.include_router(inventory_router)
 app.include_router(tally_agent_router)
 app.include_router(tds_router, dependencies=[Depends(require_service("tds"))])

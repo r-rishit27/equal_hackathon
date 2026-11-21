@@ -2,6 +2,14 @@
 
 Design package for extending Reckon.ai's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The broader Finance Desk is proposed. The inventory planner is available at `/finance-desk/inventory` under Insights for users with payables viewing access and the Reports entitlement. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
 
+## Reckon Copilot on dev
+
+Open **Insights / Reckon Copilot** at `/finance-desk/copilot`. The first read-only workflow covers current approval queues, overdue pending bills and supplier relationships. Each answer shows up to 12 bills with dated evidence and links to the source records. Select **Focus on bill** to narrow a follow-up to one invoice.
+
+The API verifies the signed-in user and the Bills, Approvals and Fact Graph entitlements on each retrieval. It uses the current department chain, falling back to the tenant chain and then the application's default chain. Admins see configured pending steps across the tenant. Other eligible roles see their current steps, subject to named assignments. Members and impersonated sessions cannot use this workflow. Ambiguous display names cannot satisfy named assignments.
+
+PostgreSQL supplies the knowledge graph through `fact_graph_nodes` and `fact_graph_edges`. A supplier link must match both endpoints, the authorized invoice, its source supplier and the tenant. Approval-stage and latest-action evidence comes from the operational tables. Free-text questions use the existing budgeted model wrapper for intent and citation selection over minimized graph context. Preset questions and final source-grounded wording run locally. The in-process answer cache holds up to 128 derived results for 90 seconds. Fresh authorized evidence, actor identity, role, query scope and source values determine cache reuse.
+
 ## Inventory planner on dev
 
 The planner reads the signed-in tenant's INR supplier bill lines from `onsumm_db`. Each price is tied to its bill date, quantity, unit and supplier. A planner selects a bill line and enters current stock, reserved units, daily demand, any confirmed inbound, lead time, MOQ, pack size and cash available after commitments and reserve. A confirmed landed price can replace the historical unit price for the calculation.

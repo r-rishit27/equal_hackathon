@@ -20,6 +20,7 @@ const PRIMARY: { icon: React.ElementType; label: string; page: NavPage; perm: st
 const OVERFLOW: { label: string; page: NavPage; perm: string | string[]; service?: ServiceKey }[] = [
   { label: 'Review', page: 'review', perm: 'payables.view', service: 'review_hub' },
   { label: 'Payment Hub', page: 'payments', perm: ['payables.view', 'payables.approve'], service: 'disbursement' },
+  { label: 'Reckon Copilot', page: 'copilot', perm: ['payables.view', 'payables.approve'], service: 'fact_graph' },
   { label: 'Inventory optimization', page: 'inventory', perm: 'payables.view', service: 'reports' },
   { label: 'Reports', page: 'reports', perm: 'payables.view' },
   { label: 'Data Extraction', page: 'data-extraction', perm: 'payables.view', service: 'data_extraction' },
@@ -51,7 +52,7 @@ export default function MobileNav({ pendingCount = 0 }: { pendingCount?: number 
   const allowed = (perm: string | string[]) =>
     (Array.isArray(perm) ? perm : [perm]).some(p => can(user.role, p as Parameters<typeof can>[1]))
   const primary = PRIMARY.filter(i => allowed(i.perm))
-  const overflow = OVERFLOW.filter(i => allowed(i.perm) && (!i.service || has(i.service)))
+  const overflow = OVERFLOW.filter(i => (i.page !== 'copilot' || (user?.role !== 'member' && has('bills') && has('approvals'))) && allowed(i.perm) && (!i.service || has(i.service)))
 
   return (
     <>

@@ -14,6 +14,7 @@ export type NavPage =
   | 'vendors'
   | 'settings'
   | 'dashboard'
+  | 'copilot'
   | 'inventory'
   | 'reports'
   | 'integrations'
@@ -45,6 +46,7 @@ export const PATHS: Record<NavPage, string> = {
   bills:             '/bills',
   dashboard:         '/dashboard',
   vendors:           '/vendors',
+  copilot:           '/finance-desk/copilot',
   inventory:         '/finance-desk/inventory',
   reports:           '/reports',
   'data-extraction': '/data-extraction',
@@ -230,6 +232,7 @@ const TITLES: Record<string, string> = {
   [PATHS.bills]:             'Bills',
   [PATHS.dashboard]:         'Dashboard',
   [PATHS.vendors]:           'Vendors',
+  [PATHS.copilot]:           'Reckon Copilot',
   [PATHS.inventory]:         'Inventory optimization',
   [PATHS.reports]:           'Reports',
   [PATHS['data-extraction']]:'Data Extraction',

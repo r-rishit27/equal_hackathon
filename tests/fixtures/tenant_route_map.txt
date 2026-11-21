@@ -85,6 +85,7 @@ GET     /api/disbursements/queue                                                
 GET     /api/disbursements/recent                                                scoped
 GET     /api/disbursements/stats                                                 scoped
 GET     /api/docs/{upload_id}                                                    scoped
+GET     /api/finance-desk/inventory/prices                                       scoped
 GET     /api/fx/agent-briefing                                                   scoped
 GET     /api/fx/agent-note                                                       scoped
 GET     /api/fx/alerts                                                           scoped
@@ -229,6 +230,8 @@ POST    /api/disbursements/{disbursement_id}/refresh-status                     
 POST    /api/disbursements/{disbursement_id}/resend-otp                          scoped
 POST    /api/disbursements/{disbursement_id}/verify-otp                          scoped
 POST    /api/enrich-invoice                                                      scoped
+POST    /api/finance-desk/assistant/query                                        scoped
+POST    /api/finance-desk/inventory/compare                                      scoped
 POST    /api/fx/alerts/{alert_id}/dismiss                                        scoped
 POST    /api/invoices/ingest                                                     scoped
 POST    /api/invoices/ocr                                                        scoped

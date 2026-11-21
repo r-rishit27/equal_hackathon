@@ -83,6 +83,7 @@ const NAV: NavGroup[] = [
   {
     title: 'Insights',
     items: [
+      { icon: Bot, label: 'Reckon Copilot', page: 'copilot', requiredService: 'fact_graph' },
       { icon: Package, label: 'Inventory optimization', page: 'inventory', requiredPermission: 'payables.view', requiredService: 'reports' },
       { icon: BarChart2, label: 'Reports', page: 'reports', requiredPermission: 'payables.view' },
       {
@@ -181,6 +182,7 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
   const isVisible = (item: NavItem) => {
     // has() is false while entitlements are still loading, so a licensed-only item
     // never flashes into view and then disappears.
+    if (item.page === 'copilot' && (!user || user.role === 'member' || (!has('bills') || !has('approvals')))) return false
     if (item.requiredService && !has(item.requiredService)) return false
     if (!item.requiredPermission) return true
     if (!user) return false
