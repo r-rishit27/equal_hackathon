@@ -10,6 +10,7 @@ Reckon.ai brings invoice capture, vendor reconciliation, tax review, approvals, 
 
 1. [Product Overview](#1-product-overview)
 2. [System Architecture](#2-system-architecture)
+   - [Application architecture](#application-architecture)
    - [Components and integrations](#components-and-integrations)
    - [Payables flow](#payables-flow)
    - [Receivables flow](#receivables-flow)
@@ -115,6 +116,12 @@ Vendor reconciliation and its dashboard are available from the vendor card's **D
 ## 2. System Architecture
 
 The React workspace calls FastAPI over REST and multipart uploads. FastAPI and a separate Python worker process coordinate through PostgreSQL. The API also hosts background agents and status sweepers. Tenant configuration and service flags control which integrations and optional workers are available.
+
+### Application architecture
+
+![Onsumm application architecture showing invoice intake, payables, vendor reconciliation, cash application, and tenant-enabled services](docs/aws-deploy/system-architecture.png)
+
+[Open the interactive application diagram](docs/aws-deploy/system-architecture.html) to highlight a workflow, inspect its steps, or pause the animation.
 
 ### Components and integrations
 
