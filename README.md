@@ -1383,6 +1383,8 @@ Fiscal period is stored on every `fact_invoices`, `fact_bills`, and `fact_paymen
 
 ## 10. Testing
 
+[Consolidated application stress-testing report](docs/APPLICATION_STRESS_TEST_REPORT.md) covers feature tests, load measurements, Copilot evaluations and outstanding failures.
+
 ### Unit tests (no live DB required)
 
 ```bash
