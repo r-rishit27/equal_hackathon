@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp } from 'lucide-react'
 import './inventory.css'
@@ -9,7 +9,7 @@ interface Price {
   supplier: string; bill_date: string; bill_number: string | null
 }
 interface Projection {
-  units: number; spend_paise: number; reasons: string[]; price_basis: string
+  additional_demand_covered: number; remaining_paise: number; units: number; spend_paise: number; reasons: string[]; price_basis: string
   days: { date: string; incoming: number; closing: number; unmet: number; no_order_closing: number }[]
 }
 interface Run { result: Projection; price: Price; start: string; budget: number }
@@ -25,7 +25,8 @@ function Planner() {
   const [vendor, setVendor] = useState('')
   const [allocation, setAllocation] = useState('stock')
   const [selected, setSelected] = useState('')
-  const [runs, setRuns] = useState<Run[]>([])
+  const [run, setRun] = useState<Run | null>(null)
+  const revision = useRef(0)
   const [busy, setBusy] = useState(false)
   useEffect(() => {
     const controller = new AbortController()
@@ -51,9 +52,20 @@ function Planner() {
   const lines = prices.filter(p => p.supplier_id === vendor)
   const price = lines.find(p => p.id === selected)
 
+  function selectLine(id: string) {
+    revision.current++
+    setSelected(id)
+    setAllocation('stock')
+    setRun(null)
+    setError('')
+    setBusy(false)
+  }
+
   async function calculate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (!price) return
+    const current = ++revision.current
+    setRun(null)
     const fields = new FormData(event.currentTarget)
     const number = (key: string) => Number(fields.get(key))
     const start = String(fields.get('start'))
@@ -77,9 +89,9 @@ function Planner() {
         throw new Error(typeof body.detail === 'string' ? body.detail : 'Check the quantities, dates, and amounts.')
       }
       const result: Projection = await response.json()
-      setRuns(previous => [{ price, result, start, budget }, ...previous])
-    } catch (e) { setError(e instanceof Error ? e.message : 'Unable to calculate the order.') }
-    finally { setBusy(false) }
+      if (current === revision.current) setRun({ price, result, start, budget })
+    } catch (e) { if (current === revision.current) setError(e instanceof Error ? e.message : 'Unable to calculate the order.') }
+    finally { if (current === revision.current) setBusy(false) }
   }
   return <main className="inventory-desk">
     <header className="inventory-heading"><span className="inventory-mark"><Package size={26} /></span><div><p>Finance Desk</p><h1>Inventory optimization</h1>
@@ -90,11 +102,11 @@ function Planner() {
     {prices.length > 0 && <section className="inventory-card">
       <h2><Building2 size={19} /> Vendor and invoice</h2>
       <div className="inventory-pickers">
-        <label>Vendor<select value={vendor} onChange={e => { setVendor(e.target.value); setSelected(''); setAllocation('stock'); setError('') }}>
+        <label>Vendor<select value={vendor} onChange={e => { setVendor(e.target.value); selectLine('') }}>
           <option value="">Choose a vendor</option>
           {vendors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
         </select></label>
-        <label>Invoice line item<select value={selected} disabled={!vendor} onChange={e => { setSelected(e.target.value); setAllocation('stock'); setError('') }}>
+        <label>Invoice line item<select value={selected} disabled={!vendor} onChange={e => selectLine(e.target.value)}>
           <option value="">{vendor ? 'Choose an invoice line' : 'Select a vendor first'}</option>
           {lines.map(p => <option key={p.id} value={p.id}>{p.item} · {p.bill_number || p.bill_date} · {money(Number(p.price))}/{p.unit}</option>)}
         </select></label>
@@ -131,18 +143,22 @@ function Planner() {
         <label>Quote valid through<input name="expiry" type="date" /></label>
         </div></section>
       <p>Assumes full payment at order and delivery before demand on arrival day. Review the unit rate, order minimum and pack size before comparing.</p>
-      <button type="submit" disabled={busy}>{busy ? 'Calculating…' : 'Compare projection'} <ChevronRight size={16} /></button>
+      <button type="submit" disabled={busy}>{busy ? 'Calculating…' : 'Optimize stock order'} <ChevronRight size={16} /></button>
     </form>}
-    {runs.map(({ result, price: source, start, budget }, i) => <section className="inventory-run" key={runs.length - i}>
+    {run && <Recommendation {...run} />}
+  </main>
+}
+
+function Recommendation({ result, price: source, start, budget }: Run) {
+  return <section className="inventory-run" aria-label="Recommended order">
       <h2>{source.item} · {source.supplier}</h2>
       <p>{start} · Bill {source.bill_number || source.id} · {result.price_basis === 'historical' ? 'Historical price estimate' : 'Entered planning rate'}</p>
-      <h3>{result.units ? result.units + ' ' + source.unit + ' · ' + money(result.spend_paise / 100) : (result.days.some(d => d.unmet > 0) ? 'Order cannot cover the shortage in time' : 'Stock covers the horizon')}</h3>
-      <p>Available purchasing cash {money(budget)}</p>
+      <h3>{result.units ? result.units + ' ' + source.unit + ' · ' + money(result.spend_paise / 100) : (result.days.some(d => d.unmet > 0) ? 'No feasible reorder' : 'Stock covers the horizon')}</h3>
+      <p>Invest {money(result.spend_paise / 100)} of {money(budget)} to cover {result.additional_demand_covered} additional {source.unit} of demand. Cash remaining: {money(result.remaining_paise / 100)}.</p>
       {result.reasons.map(reason => <p className="inventory-risk" key={reason}>{reason}</p>)}
       <div className="inventory-scroll"><table><thead><tr><th>Date</th><th>Without order</th><th>Incoming</th><th>With order</th><th>Unmet demand</th></tr></thead>
         <tbody>{result.days.map(d => <tr key={d.date}><th scope="row">{d.date}</th><td>{d.no_order_closing}</td><td>{d.incoming}</td><td>{d.closing}</td><td>{d.unmet}</td></tr>)}</tbody></table></div>
-    </section>)}
-  </main>
+    </section>
 }
 
 export default function InventoryPage() {

@@ -6,7 +6,7 @@ Design package for extending Reckon.ai's `uat2` payables and receivables baselin
 
 The planner reads the signed-in tenant's INR supplier bill lines from `onsumm_db`. Each price is tied to its bill date, quantity, unit and supplier. A planner selects a bill line and enters current stock, reserved units, daily demand, any confirmed inbound, lead time, MOQ, pack size and cash available after commitments and reserve. A confirmed landed price can replace the historical unit price for the calculation.
 
-The seven-day preview shows the pack-rounded order, projected spend, closing stock with and without the order, and unmet demand. It flags arrival delays, expired confirmed quotes and spend above the entered cash budget. Compare further scenarios in the same page session. The preview is read-only. Automated demand feeds, dated cash forecasting and persisted purchase decisions remain planned.
+The seven-day preview shows the pack-rounded order, projected spend, closing stock with and without the order, and unmet demand. It flags arrival delays, expired confirmed quotes and quantities constrained by the entered cash budget. The planner maximizes seven-day demand covered within available purchasing cash and chooses the least spend for that coverage. A classical single-item QUBO solver selects pack counts on the API worker thread. Its binary encoding enforces the cash cap and minimum order. Changing the vendor or bill line clears the projection. The preview is read-only. Automated demand feeds, dated cash forecasting and persisted purchase decisions remain planned.
 
 ## Read in this order
 

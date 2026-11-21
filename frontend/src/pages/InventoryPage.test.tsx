@@ -1,4 +1,4 @@
-﻿import { fireEvent, render, screen, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { afterEach, expect, it, vi } from 'vitest'
 import InventoryPage from './InventoryPage'
 
@@ -24,4 +24,28 @@ it('filters invoice lines by vendor and allocates billed units once', async () =
   expect(screen.getByLabelText(/Firm inbound units/)).toHaveValue(8.75)
   fireEvent.change(vendor, { target: { value: 'b' } })
   expect(screen.queryByLabelText('Stock on hand')).toBeNull()
+})
+
+it('clears the current recommendation and ignores responses for an earlier bill line', async () => {
+  const line = { id: 'first', supplier_id: 'v', supplier: 'Vendor', item: 'Cable', bill_date: '2026-09-08',
+    unit: 'm', billed_units: 10, price: 20, payment_terms_days: 30 }
+  const projection = { units: 2, spend_paise: 4000, remaining_paise: 0, additional_demand_covered: 2,
+    price_basis: 'historical', reasons: [], days: [] }
+  let finish!: (value: Response) => void
+  vi.stubGlobal('fetch', vi.fn()
+    .mockResolvedValueOnce(Response.json([line, { ...line, id: 'second', item: 'Wire' }]))
+    .mockResolvedValueOnce(Response.json(projection))
+    .mockReturnValueOnce(new Promise<Response>(resolve => { finish = resolve })))
+  render(<InventoryPage />)
+  fireEvent.change(await screen.findByLabelText('Vendor'), { target: { value: 'v' } })
+  const picker = screen.getByLabelText('Invoice line item')
+  fireEvent.change(picker, { target: { value: 'first' } })
+  fireEvent.submit(screen.getByText('Optimize stock order').closest('form')!)
+  await screen.findByRole('region', { name: 'Recommended order' })
+  fireEvent.change(picker, { target: { value: 'second' } })
+  expect(screen.queryByRole('region', { name: 'Recommended order' })).toBeNull()
+  fireEvent.submit(screen.getByText('Optimize stock order').closest('form')!)
+  fireEvent.change(screen.getByLabelText('Vendor'), { target: { value: '' } })
+  await act(async () => finish(Response.json(projection)))
+  expect(screen.queryByRole('region', { name: 'Recommended order' })).toBeNull()
 })
