@@ -1,0 +1,31 @@
+{
+  "_source": "ACHS by Bosch/: Show purchase order.pdf, 26GJKMWSI15224.pdf, POD- SI15224.png, MEMO.pdf",
+  "po": {
+    "po_number": "PPO00030541-1", "po_date": "2026-09-14",
+    "vendor": {"name": "BOSCH HOME COMFORT INDIA LIMITED", "gstin": "24AABCA2392K1ZR", "account": "V00128609"},
+    "buyer_gstin": "29AABCB1043Q1ZI", "store_sn": "9648", "store_name": "Temple Road Mysore",
+    "payment_terms": "60%Advance_40%_IMM", "delivery_date": "2026-09-29",
+    "subtotal": "572400.00", "total": "572400.00",
+    "lines": [[1, "4 TR Cassette Unit Inverter AC (Hitachi)", "NO", 6, "95400.00"]]
+  },
+  "invoice": {
+    "invoice_no": "26GJ/KMW/SI15224", "invoice_date": "2026-09-16",
+    "vendor": {"name": "BOSCH HOME COMFORT INDIA LIMITED", "gstin": "24AABCA2392K1ZR"},
+    "buyer_gstin": "29AABCB1043Q1ZI", "place_of_supply": "KA-29", "po_ref": "PPO00030541-1",
+    "payment_terms": "100% - 30 DAYS",
+    "header_lines": [[1, "SPLIT AC - 4.0TR CLASS HITACHI INVERTER CASSETTE - R32 - RAG348HIEOQ(W/O CONN. KIT)", null, 6, "95400.00", "572400.00", {"hsn": "84151010"}]],
+    "taxable": "572400.00", "tax": {"regime": "IGST", "igst": "103032.00", "rate": "18"}, "total": "675432.00"
+  },
+  "pods": [{
+    "waybill_no": "100041284608", "carrier": "Safexpress", "invoice_nos": ["26GJ/KMW/SI15224"],
+    "total_invoice_value": "675432.00", "packages": 18, "weight": "696", "ship_date": "2026-09-16",
+    "receipt": {"stamp_text": "Bata India Ltd, Bata Shoe Store Livin Corner, #10 Temple Road, V.V. Mohalla, Mysuru 570002", "receiver": "Ravindra", "date": "2026-09-21"}
+  }],
+  "memos": [{
+    "memo_ref": "MEMO/20261105/026171", "subject": "Capex-Bosch- Temple Road Mysore 9648", "store_sn": "9648",
+    "vendor_name": "BOSCH HOME COMFORT INDIA LIMITED-ACHS",
+    "approvals": [["Satish Dadge", "Approved", "2026-11-06", "Dear Anup, Machine installed"],
+                  ["Sumit Joshi", "Approved", "2026-11-11", "machine installed"],
+                  ["Anil Kumar Malhotra", "Approved", "2026-11-11"]]
+  }]
+}
