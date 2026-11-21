@@ -151,11 +151,14 @@ export default function ReviewHubPage() {
     reviewActions.reset()
   }, [activeBrand?.id])
 
+  // The brand is part of what is loaded (api/review.ts scopes every read to
+  // it), so a brand switch reloads here — after the reset above, which runs
+  // first because it is declared first.
   useEffect(() => {
     void reviewActions.loadCounts()
     // Activity is the audit log, not a queue — nothing to load here.
     if (view !== 'activity') void reviewActions.loadQueue(query)
-  }, [query, view])
+  }, [query, view, activeBrand?.id])
 
   // A card opened over the queue (a bill's corrections) changed findings.
   useEffect(() => {

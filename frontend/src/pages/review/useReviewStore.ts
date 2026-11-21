@@ -577,6 +577,8 @@ export const reviewActions = {
 
   /** Brand switching must not leave the previous brand's findings on screen. */
   reset() {
+    // A page still in flight for the previous brand must not land after this.
+    queryToken++
     state.byId = new Map()
     state.pinned = new Set()
     state.order = []

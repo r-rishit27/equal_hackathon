@@ -190,3 +190,21 @@ describe('clearing a finding', () => {
     expect(ids()).toEqual(['a', 'b', 'c'])
   })
 })
+
+describe('switching brand', () => {
+  it("drops a page still in flight for the previous brand", async () => {
+    await load([finding('a')])
+    let finishOld: (v: unknown) => void = () => {}
+    api.fetchFindings.mockReturnValueOnce(new Promise(r => { finishOld = r }))
+    const oldPage = reviewActions.loadQueue({})
+
+    act(() => { reviewActions.reset() })
+    await act(async () => {
+      finishOld({ items: [finding('old-brand')], next_cursor: null, scope: 'actionable', lane: null })
+      await oldPage
+    })
+
+    const { result } = renderHook(() => useQueue())
+    expect(result.current.items.map(f => f.finding_id)).toEqual([])
+  })
+})
