@@ -47,3 +47,10 @@ def test_late_delivery_and_expired_quote():
     assert result["reasons"]
     result = evaluate(plan(landed_unit_paise=2000, quote_expiry=date(2026, 11, 20)), Decimal("25"))
     assert "expired" in result["reasons"][0]
+
+def test_fractional_invoice_quantity_rounds_up_to_whole_packs():
+    result = evaluate(plan(on_hand=Decimal("8.75"), reserved=0, daily_demand=Decimal("2.25"),
+                           pack=Decimal("2.5"), lead_days=0), Decimal("42.50"))
+    assert result["units"] == Decimal("7.5")
+    assert result["spend_paise"] == 31_875
+    assert result["days"][-1]["closing"] == Decimal("0.5")

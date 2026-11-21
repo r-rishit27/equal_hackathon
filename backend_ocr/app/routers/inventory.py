@@ -1,10 +1,11 @@
 """Tenant-scoped inventory planning using bill-line evidence from the operational DB."""
 
 from datetime import date, timedelta
-from decimal import Decimal, ROUND_HALF_UP
+from decimal import Decimal, ROUND_CEILING, ROUND_HALF_UP
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException
+from fastapi.encoders import jsonable_encoder
 from pydantic import BaseModel, ConfigDict, Field
 from psycopg2.extras import RealDictCursor
 
@@ -16,7 +17,8 @@ router = APIRouter(prefix="/api/finance-desk/inventory", tags=["Finance Desk"])
 # The source line is the selectable identity. Descriptions are labels, never join keys.
 EVIDENCE = """
     SELECT l.line_item_id AS id, l.product_name AS item, l.sap_item_code AS sku,
-           l.unit, l.quantity AS billed_units, l.unit_price AS price, b.bill_number, b.bill_date, s.name AS supplier
+           l.unit, l.quantity AS billed_units, l.unit_price AS price, b.bill_number, b.bill_date, b.due_date, s.supplier_id, s.name AS supplier,
+           s.payment_terms_days
     FROM stg_bill_line_items l
     JOIN stg_bills b ON (b.tenant_id, b.stg_bill_id) = (l.tenant_id, l.stg_bill_id)
     JOIN dim_suppliers s ON (s.tenant_id, s.supplier_id) = (b.tenant_id, b.supplier_id)
@@ -48,14 +50,14 @@ class Plan(BaseModel):
     model_config = ConfigDict(extra="forbid")
     line_id: UUID
     start: date = Field(le=date(9999, 12, 24))
-    on_hand: int = Field(ge=0, le=10**8)
-    reserved: int = Field(ge=0, le=10**8)
-    daily_demand: int = Field(gt=0, le=10**7)
+    on_hand: Decimal = Field(ge=0, le=10**8)
+    reserved: Decimal = Field(ge=0, le=10**8)
+    daily_demand: Decimal = Field(gt=0, le=10**7)
     lead_days: int = Field(ge=0, le=365)
-    pack: int = Field(gt=0, le=10**7)
-    minimum_order: int = Field(ge=1, le=10**8)
+    pack: Decimal = Field(gt=0, le=10**7)
+    minimum_order: Decimal = Field(ge=1, le=10**8)
     spendable_paise: int = Field(ge=0, le=10**14)
-    inbound_units: int = Field(default=0, ge=0, le=10**8)
+    inbound_units: Decimal = Field(default=0, ge=0, le=10**8)
     inbound_date: date | None = None
     quote_expiry: date | None = None
     landed_unit_paise: int | None = Field(default=None, gt=0, le=10**11)
@@ -80,7 +82,7 @@ def evaluate(plan, recorded_price):
         baseline.append((firm, stock, shortage))
         if offset >= plan.lead_days:
             gap += shortage
-    units = ((max(gap, plan.minimum_order) + plan.pack - 1) // plan.pack) * plan.pack if gap else 0
+    units = (max(gap, plan.minimum_order) / plan.pack).to_integral_value(rounding=ROUND_CEILING) * plan.pack if gap else 0
     rate = Decimal(plan.landed_unit_paise) if plan.landed_unit_paise else recorded_price * 100
     spend = int((units * rate).quantize(Decimal("1"), rounding=ROUND_HALF_UP))
     stock = opening
@@ -118,4 +120,4 @@ def compare_inventory(plan: Plan):
         raise HTTPException(404, "Bill line unavailable.")
     if prices[0]["bill_date"] > plan.start:
         raise HTTPException(422, "Start date precedes the supplier bill.")
-    return evaluate(plan, prices[0]["price"])
+    return jsonable_encoder(evaluate(plan, prices[0]["price"]))

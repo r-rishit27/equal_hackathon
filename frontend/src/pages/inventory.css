@@ -1,14 +1,44 @@
-.inventory-desk { height: 100%; overflow: auto; padding: clamp(16px, 3vw, 40px); }
-.inventory-desk h1 { margin: 4px 0; font-size: clamp(26px, 3vw, 38px); }
-.inventory-desk p { margin: 10px 0; }
-.inventory-desk form { max-width: 880px; margin: 24px 0; }
-.inventory-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 14px; margin: 20px 0; padding: 16px; border: 1px solid #cbd5d6; border-radius: 8px; }
-.inventory-desk select, .inventory-controls input { display: block; width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #bac6cb; border-radius: 5px; color: #20323a; background: white; font: inherit; }
-.inventory-desk button { padding: 9px 16px; border: 0; border-radius: 5px; color: white; background: #275e54; cursor: pointer; }
-.inventory-run { margin: 24px 0; border-top: 1px solid #cbd5d6; }
-.inventory-risk { color: #964211; }
+﻿.inventory-desk {
+  height: 100%;
+  overflow: auto;
+  padding: clamp(18px, 3.5vw, 52px) max(20px, calc((100% - 1120px) / 2));
+  color: #19314b;
+  background: linear-gradient(145deg, #edf4fb 0, #f7f9fc 390px);
+  scrollbar-gutter: stable;
+}
+.inventory-heading { display: flex; align-items: center; gap: 18px; margin-bottom: 26px; }
+.inventory-mark { display: grid; place-items: center; flex: 0 0 52px; height: 52px; border-radius: 15px; background: #dceaff; color: #194f89; }
+.inventory-heading h1 { margin: 4px 0; font-size: clamp(25px, 3vw, 38px); letter-spacing: -.035em; line-height: 1.15; }
+.inventory-desk p { margin: 8px 0; line-height: 1.5; color: #50647b; }
+.inventory-heading p:first-child { font-size: 13px; font-weight: 650; color: #38668c; }
+.inventory-card, .inventory-run { background: white; border: 1px solid #d9e3ef; border-radius: 15px; padding: clamp(16px, 2vw, 25px); margin: 16px 0; box-shadow: 0 3px 14px #17395e08; }
+.inventory-desk h2 { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; font-size: 18px; color: #203d5f; }
+.inventory-desk h2 svg { flex: none; color: #4075a7; }
+.inventory-pickers, .inventory-controls { display: grid; gap: 16px 20px; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.inventory-pickers { grid-template-columns: minmax(0, 2fr) minmax(0, 3fr); }
+.inventory-controls { margin-top: 18px; }
+.inventory-desk label { display: block; font-size: 13px; font-weight: 600; color: #354c64; }
+.inventory-desk input, .inventory-desk select { display: block; box-sizing: border-box; width: 100%; min-width: 0; min-height: 40px; padding: 8px 11px; margin-top: 6px; border: 1px solid #bdcde0; border-radius: 7px; background: #fbfdff; color: #183855; font: inherit; font-weight: 450; }
+.inventory-desk :is(input,select,button):focus-visible { outline: 3px solid #88b7e8; outline-offset: 2px; }
+.inventory-desk select:disabled { background: #f1f4f8; color: #708397; }
+.inventory-source { background: linear-gradient(110deg, #fff, #f1f7ff); }
+.inventory-source dl { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 14px; margin: 18px 0 0; border-top: 1px solid #dce7f2; padding-top: 16px; }
+.inventory-source dt { font-size: 12px; color: #52667e; }
+.inventory-source dd { margin: 4px 0 0; font-weight: 650; font-size: 18px; overflow-wrap: anywhere; }
+.inventory-desk button { display: inline-flex; align-items: center; gap: 8px; padding: 11px 17px; border: 0; border-radius: 8px; color: white; background: #144d84; font: inherit; font-weight: 600; cursor: pointer; }
+.inventory-desk button:hover { background: #103b64; }
+.inventory-desk button:disabled { opacity: .65; }
+.inventory-desk .inventory-risk, .inventory-desk [role=alert] { color: #924318; }
 .inventory-scroll { overflow-x: auto; }
 .inventory-desk table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
-.inventory-desk th, .inventory-desk td { padding: 9px; text-align: right; border-bottom: 1px solid #d5dede; }
+.inventory-desk th, .inventory-desk td { padding: 10px; text-align: right; border-bottom: 1px solid #dbe5ee; }
+.inventory-desk thead { background: #eef4fa; }
 .inventory-desk th:first-child { text-align: left; }
-.inventory-evidence { margin: 16px 0; padding: 12px 18px; background: #edf4f2; border-left: 3px solid #286b60; color: #1b4039; }
+@media (max-width: 740px) {
+  .inventory-controls, .inventory-source dl { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .inventory-pickers { grid-template-columns: 1fr; }
+}
+@media (max-width: 450px) {
+  .inventory-controls { grid-template-columns: 1fr; }
+  .inventory-mark { display: none; }
+}
