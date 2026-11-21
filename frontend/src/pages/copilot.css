@@ -1,13 +1,4 @@
-﻿.reckon-copilot { height: 100%; overflow: auto; padding: clamp(20px,4vw,48px) max(20px,calc((100% - 960px) / 2)); background: #f8fbff; color: #203d5f; }
-.reckon-copilot header, .reckon-copilot button, .reckon-copilot article > div, .reckon-copilot article p { display: flex; align-items: center; gap: 9px; }
-.reckon-copilot h1 { margin: 0; font-size: clamp(28px,3vw,38px); }
-.reckon-copilot h2 { font-size: 19px; }
-.reckon-copilot form, .reckon-copilot section { margin: 20px 0; padding: 20px; background: white; border: 1px solid #d9e3ef; border-radius: 12px; }
-.reckon-copilot textarea { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 12px; border-radius: 7px; border: 1px solid #adc4dc; font: inherit; }
-.reckon-copilot button { cursor: pointer; background: white; color: #235487; border: 1px solid #bad1e9; padding: 7px 12px; border-radius: 7px; }
-.reckon-copilot button[type=submit] { background: #235487; color: white; }
-.reckon-copilot button:disabled { opacity: .6; cursor: default; }
-.copilot-prompts { display: flex; flex-wrap: wrap; gap: 8px; }
-.reckon-copilot article { padding: 16px 0; border-top: 1px solid #d9e3ef; }
-.reckon-copilot article > div { justify-content: space-between; flex-wrap: wrap; }
-.reckon-copilot article p { margin: 7px 0; font-size: 14px; }
+.reckon-copilot { height:100%; overflow:auto; box-sizing:border-box; background:#f6f9fe; color:#163657; padding:clamp(14px,3vw,32px) max(14px,calc((100% - 980px) / 2)); }
+.reckon-copilot > header { display:flex; align-items:center; gap:12px; margin:0 0 18px; }
+.reckon-copilot h1 { margin:0; font-size:clamp(24px,3vw,34px); letter-spacing:-.035em; }
+.reckon-copilot .workspace-chat { box-shadow:0 8px 32px #193c6510; }

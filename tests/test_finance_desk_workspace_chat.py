@@ -46,7 +46,7 @@ def test_model_cannot_choose_unlicensed_tool_or_citation(monkeypatch):
         calls.extend(domains)
         return ["vendors"], [dict(title="A",path="/vendors",domain="vendors")] if domains else []
     monkeypatch.setattr(chat,"workspace",read)
-    model=AsyncMock(side_effect=[chat.Tools(domains=["vendors","payments"]), chat.Answer(message="See [S8]",citations=["S8"])])
+    model=AsyncMock(side_effect=[chat.Tools(domains=["vendors","payments"]), chat.Answer(message="See [S8]",citations=["S8"]), chat.Answer(message="See [S8]",citations=["S8"])])
     monkeypatch.setattr(chat,"completion",model)
     reply=asyncio.run(chat.chat(Response(),json.dumps(dict(question="Suppliers?")),None))
     assert set(calls)=={"vendors"} and reply["mode"]=="evidence"
@@ -95,3 +95,26 @@ def test_empty_and_unlicensed_approval_queue_are_distinct():
     assert chat.approval_summary({})[1] == []
     message, sources = chat.approval_summary({"S1": {"matching_records": 0}})
     assert "no pending bills" in message and sources == ["S1"]
+
+def test_chat_repairs_citation_once(monkeypatch):
+    monkeypatch.setattr(chat, "require_tenant", lambda: "t")
+    monkeypatch.setattr(chat, "actor", lambda tenant: (tenant, "user", "admin"))
+    monkeypatch.setattr(chat, "workspace", lambda *args, **kwargs: (["vendors"], [
+        {"title": "vendors", "domain": "vendors", "matching_records": 2}]))
+    provider = AsyncMock(side_effect=[
+        chat.Answer(message="12 vendors [S1]", citations=["S2"]),
+        chat.Answer(message="2 vendors [S1]", citations=["S1"]),
+    ])
+    monkeypatch.setattr(chat, "completion", provider)
+    result = asyncio.run(chat.chat(Response(), '{"question":"How many vendors do we have?"}', None))
+    assert result["mode"] == "model" and provider.await_count == 2
+    assert result["sources"][0]["id"] == "S1"
+
+
+def test_chat_pagination_requires_previous_authorized_bill_plan(monkeypatch):
+    monkeypatch.setattr(chat, "require_tenant", lambda: "t")
+    monkeypatch.setattr(chat, "actor", lambda tenant: (tenant, "user", "admin"))
+    monkeypatch.setattr(chat, "workspace", lambda *args: (["approvals"], []))
+    with pytest.raises(HTTPException) as error:
+        asyncio.run(chat.chat(Response(), '{"question":"next","more_bills":true}', None))
+    assert error.value.status_code == 409

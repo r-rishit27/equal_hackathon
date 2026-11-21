@@ -30,3 +30,18 @@ it('sends a document and reply language and retains context for a follow-up', as
   })
   await screen.findAllByText('Checked the bill.')
 })
+
+it('links inline citations and carries the selected bill into the next turn', async () => {
+  const fetcher = vi.fn().mockImplementation(async () => Response.json({
+    message: 'Review this bill [S1].', context_id: 'queue', more_bills: true,
+    sources: [{id: 'S1', title: 'INV-1', domain: 'approvals', path: '/bills/123', values: {stage:'Pending'}}],
+  }))
+  vi.stubGlobal('fetch', fetcher)
+  render(<MemoryRouter><ConversationProvider><WorkspaceChat /></ConversationProvider></MemoryRouter>)
+  fireEvent.click(screen.getByRole('button', {name: 'Which bills need attention?'}))
+  expect(await screen.findByRole('link', {name: 'Open INV-1'})).toHaveAttribute('href','/bills/123')
+  fireEvent.click(screen.getByText('Sources (1)'))
+  fireEvent.click(screen.getByRole('button', {name:'Review bill history'}))
+  expect(JSON.parse(fetcher.mock.calls[1][1].body.get('payload')).bill_id).toBe('123')
+  await screen.findAllByText('Sources (1)')
+})

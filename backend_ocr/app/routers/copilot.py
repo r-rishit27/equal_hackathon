@@ -14,7 +14,7 @@ from psycopg2.extras import Json, RealDictCursor
 from pydantic import BaseModel, ConfigDict, Field
 
 from ..ai.llm import complete_json, LLMError, LLMRefused
-from ..config import get_conn, put_conn
+from ..config import COPILOT_MODEL, get_conn, put_conn
 from ..core.approval_chain import _step_idx_to_status
 from ..domain.tenant_defaults import DEFAULT_APPROVAL_CHAIN
 from ..security.auth import current_actor, current_role, current_username, is_impersonating, require_tenant
@@ -225,7 +225,7 @@ async def query_copilot(body: Query, response: Response):
             hints.append({"citation": index, "relationships": edges})
         try:
             route = await asyncio.wait_for(complete_json(
-                tenant_id=identity[0], purpose="finance_copilot_intent", model="gpt-6-luna",
+                tenant_id=identity[0], purpose="finance_copilot_intent", model=COPILOT_MODEL,
                 system="Classify the question. Return JSON with intent queue, overdue, relationships, records or unsupported. "
                        "General bill visibility or decision history uses records. Pending approval queues, overdue pending bills and supplier links "
                        "are supported. Specific invoice references without an attached bill, amounts, time ranges, "

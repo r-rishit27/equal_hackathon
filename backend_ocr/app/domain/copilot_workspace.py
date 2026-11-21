@@ -9,7 +9,7 @@ import json
 import time
 
 from psycopg2.extras import RealDictCursor
-from ..config import get_conn, put_conn
+from ..config import COPILOT_MODEL as MODEL, get_conn, put_conn
 from ..routers.copilot import verify_actor, retrieve, grounded_answer
 
 
@@ -50,7 +50,7 @@ SOURCES = {
     "automation": Source("agent_hub","/agent-hub","SELECT tenant_id id,'Agent settings' title,enabled,updated_at FROM agent_settings WHERE tenant_id=%s", ADMIN),
     "team": Source("users","/settings","SELECT id,username title,role,department FROM users WHERE company_id=%s", ADMIN),
 }
-MODEL = "gpt-6-luna"
+
 
 
 def access(cur, identity):
@@ -70,7 +70,7 @@ def serialize_projection(identity, revision_window, encoded):
     return json.dumps(rows, ensure_ascii=False, separators=(",", ":"))
 
 
-def workspace(identity, domains=(), search="", overview=False):
+def workspace(identity, domains=(), search="", overview=False, *, approval_intent=None, bill_id=None, offset=0, counts_only=False):
     conn = get_conn()
     evidence = []
     try:
@@ -80,13 +80,13 @@ def workspace(identity, domains=(), search="", overview=False):
             allowed = access(cur, identity)
             chosen = allowed if overview else [k for k in domains if k in allowed]
             modules = [(k,SOURCES[k]) for k in chosen if k in SOURCES]
-            if overview and modules:
+            if (overview or counts_only) and modules:
                 sql = " UNION ALL ".join("SELECT %s AS domain,count(*) AS records FROM ("+s.sql+") q" for k,s in modules)
                 params = [value for k,s in modules for value in (k,identity[0])]
                 cur.execute(sql,params)
                 for row in cur.fetchall():
                     k=row["domain"]
-                    evidence.append(dict(domain=k,title=k.replace("_"," "),path=SOURCES[k].path,records=row["records"]))
+                    evidence.append(dict(domain=k,title=k.replace("_"," "),path=SOURCES[k].path,**{"matching_records" if counts_only else "records":row["records"]}))
             elif modules:
                 for key,source in modules:
                     totals = {
@@ -107,12 +107,13 @@ def workspace(identity, domains=(), search="", overview=False):
         put_conn(conn)
     for key in chosen:
         if key in {"bills","approvals"}:
-            intent = "queue" if key=="approvals" else "records"
-            rows = retrieve(identity,intent,search=search)
+            intent = (approval_intent or "queue") if key=="approvals" else "records"
+            rows = retrieve(identity,intent,bill_id=bill_id,offset=offset,search=search)
             for row in grounded_answer(identity,intent,None,rows)["evidence"][:8]:
                 evidence.append(dict(domain=key,title=row["invoice_number"] or row["id"],path=row["path"],
                     supplier=row["supplier"], supplier_graph_link=row["graph_link"],stage=row["stage"],
-                    amount=row["total_amount"],currency=row["currency_code"],due=row["due_date"],last_action=row["latest_action"]))
+                    amount=row["total_amount"],currency=row["currency_code"],due=row["due_date"],last_action=row["latest_action"],
+                    decision_history=row["decision_history"],more_bills=len(rows)>8))
             if not rows:
                 evidence.append(dict(domain=key,title=key,path="/bills",matching_records=0))
     for record in evidence:

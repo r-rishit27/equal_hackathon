@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 _root = Path(__file__).resolve().parents[2]  # backend_ocr/app/config.py -> project root
 load_dotenv(_root / ".env")
 
+COPILOT_MODEL = (os.getenv("OPENAI_MODEL") or os.getenv("openai_model") or os.getenv("OPENAI_DECISION_MODEL") or "gpt-6-luna").strip()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
 # TypeSafe Jev: the classifier that files vendor documents (routers/vendor_doc_classify.py).
 JEV_API_KEY = os.getenv("JEV_API_KEY", "")
