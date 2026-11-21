@@ -203,7 +203,7 @@ async def complete_json(
 
     Raises LLMRefused when we chose not to call, LLMError when the call failed.
     """
-    allowed, reason = check_budget(tenant_id)
+    allowed, reason = await asyncio.to_thread(check_budget, tenant_id)
     if not allowed:
         raise LLMRefused(reason)
 
@@ -230,7 +230,7 @@ async def complete_json(
 
             # Recorded before the content is inspected: the tokens were spent
             # whether or not we end up liking the answer.
-            record_usage(tenant_id, cost)
+            await asyncio.to_thread(record_usage, tenant_id, cost)
 
             choice = resp.choices[0]
             text = choice.message.content or ""

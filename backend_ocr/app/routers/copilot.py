@@ -15,6 +15,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from ..ai.llm import complete_json, LLMError, LLMRefused
 from ..config import COPILOT_MODEL, get_conn, put_conn
+from ..domain.copilot_sql import compile_query
 from ..core.approval_chain import _step_idx_to_status
 from ..domain.tenant_defaults import DEFAULT_APPROVAL_CHAIN
 from ..security.auth import current_actor, current_role, current_username, is_impersonating, require_tenant
@@ -91,7 +92,7 @@ EVIDENCE_SQL = """
         AS r(dept text,status text,label text,step_role text)),
     visible AS (
         SELECT fi.invoice_id, fi.tenant_id, fi.supplier_id, fi.invoice_number, fi.total_amount::text AS total_amount, fi.currency_code, fi.due_date,
-               fi.status, coalesce(r.label, fi.status::text) AS stage, r.step_role,
+               fi.invoice_type, fi.invoice_date, fi.amount_paid, fi.outstanding_amount, fi.status, coalesce(r.label, fi.status::text) AS stage, r.step_role,
                coalesce(fi.soft_status, 'active') AS record_state
         FROM fact_invoices fi LEFT JOIN stages r ON r.status=fi.status::text
          AND r.dept IS NOT DISTINCT FROM
@@ -112,7 +113,7 @@ EVIDENCE_SQL = """
         ORDER BY fi.due_date NULLS LAST, fi.invoice_id LIMIT %(limit)s OFFSET %(offset)s
     )
     SELECT v.invoice_id::text AS id, v.invoice_number, v.total_amount, v.currency_code, v.due_date, v.stage, v.step_role, v.record_state,
-           s.name AS supplier, history.action AS latest_action, history.created_at AS action_at,
+           /* reporting_fields */ s.name AS supplier, history.action AS latest_action, history.created_at AS action_at,
            CASE WHEN %(bill)s::uuid IS NOT NULL AND %(records)s THEN
                (SELECT coalesce(jsonb_agg(jsonb_build_object('action',a.action,'role',a.actor_role,
                         'at',a.created_at) ORDER BY a.created_at,a.id), '[]'::jsonb)
@@ -141,20 +142,30 @@ def bill_scope(config, role, name, intent):
                 include_archived=role=="admin" and intent=="records")
 
 
-def retrieve(identity, intent, bill_id=None, offset=0, search="", exact=False):
+def retrieve(identity, intent, bill_id=None, offset=0, search="", exact=False, analysis=None):
     tenant, username, role = identity
     conn = get_conn()
     try:
         with conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
-            cur.execute("SET LOCAL statement_timeout='4s'")
+            cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY; SET LOCAL statement_timeout='4s'")
             name = verify_actor(cur, tenant, username, role)
             cur.execute("""SELECT department,label,role,locked,assignees FROM tenant_chain_config
                            WHERE tenant_id=%s AND is_snapshot=false ORDER BY department,step_order,id""", (tenant,))
             scope = bill_scope(cur.fetchall(), role, name, intent)
-            cur.execute(EVIDENCE_SQL, dict(**scope, tenant=tenant, bill=str(bill_id) if bill_id else None,
-                                          overdue=intent=="overdue", limit=LIMIT+1, offset=offset, search=search, exact=exact))
-            return jsonable_encoder(cur.fetchall())
+            params = dict(**scope, tenant=tenant, bill=str(bill_id) if bill_id else None,
+                                          overdue=intent=="overdue", limit=LIMIT+1, offset=offset, search=search, exact=exact)
+            sql = EVIDENCE_SQL
+            if analysis:
+                params["limit"] = None
+                sql = sql.replace("/* reporting_fields */", "v.invoice_type, v.invoice_date, v.amount_paid, v.outstanding_amount,")
+                scope_filter = "invoice_type='AP'"
+                if not any(f.field == "record_state" for f in analysis.filters):
+                    scope_filter += " AND record_state='active'"
+                sql, extra = compile_query(analysis, f"SELECT * FROM ({sql}) visible_bills WHERE {scope_filter}")
+                params.update(extra)
+            cur.execute(sql, params)
+            rows = cur.fetchall()
+            return rows if analysis else jsonable_encoder(rows)
     finally:
         put_conn(conn)
 

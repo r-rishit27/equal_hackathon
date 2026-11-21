@@ -34,3 +34,6 @@ cryptography>=43.0.0
 # Metrics exposed at /metrics (app/core/observability.py). Gated on
 # METRICS_TOKEN; the endpoint 503s when that is unset rather than serving openly.
 prometheus-client>=0.20.0
+
+langgraph==0.6.11
+langchain-core==0.3.86

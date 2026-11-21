@@ -1,6 +1,8 @@
 asyncpg==0.29.0
 python-dotenv==1.0.1
-pydantic==2.7.1
+pydantic>=2.10.3,<3
+langgraph==0.6.11
+langchain-core==0.3.86
 
 # OCR engine (UploadOcrWorker)
 openai>=1.58.1

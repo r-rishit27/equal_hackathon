@@ -4,13 +4,13 @@ Only the static source catalog below can supply SQL fragments. Retrieved entitie
 carry their source, relationship, authorization boundary and navigation target.
 """
 from dataclasses import dataclass
-from functools import lru_cache
 import json
-import time
 
 from psycopg2.extras import RealDictCursor
 from ..config import COPILOT_MODEL as MODEL, get_conn, put_conn
-from ..routers.copilot import verify_actor, retrieve, grounded_answer
+from fastapi import HTTPException
+from .copilot_sql import compile_query
+from ..routers.copilot import retrieve, grounded_answer
 
 
 @dataclass(frozen=True)
@@ -54,33 +54,32 @@ SOURCES = {
 
 
 def access(cur, identity):
-    verify_actor(cur, *identity, services=("fact_graph",))
-    cur.execute("""SELECT c.service_key FROM service_catalog c LEFT JOIN tenant_service t
-        ON t.service_key=c.service_key AND t.tenant_id=%s WHERE c.retired_at IS NULL
-        AND coalesce(t.enabled,c.default_enabled)""", (identity[0],))
+    cur.execute("""SELECT c.service_key FROM users u CROSS JOIN service_catalog c
+        LEFT JOIN tenant_service t ON t.service_key=c.service_key AND t.tenant_id=%s
+        WHERE u.company_id=%s AND u.username=%s AND u.role=%s AND c.retired_at IS NULL
+        AND coalesce(t.enabled,c.default_enabled)""", (identity[0], *identity))
     enabled = {r["service_key"] for r in cur.fetchall()}
+    if "fact_graph" not in enabled:
+        raise HTTPException(403, "Copilot access is unavailable.")
     return sorted([k for k,s in SOURCES.items() if identity[2] in s.roles and s.service in enabled]
                   + (["bills","approvals"] if {"bills","approvals"} <= enabled else []))
 
 
-@lru_cache(maxsize=128)
-def serialize_projection(identity, revision_window, encoded):
-    # Keyed by actor and exact reauthorized source values; no prompts or uploads.
-    rows = json.loads(encoded)
-    return json.dumps(rows, ensure_ascii=False, separators=(",", ":"))
-
-
-def workspace(identity, domains=(), search="", overview=False, *, approval_intent=None, bill_id=None, offset=0, counts_only=False):
+def workspace(identity, domains=(), search="", overview=False, *, approval_intent=None, bill_id=None, offset=0, counts_only=False, analysis=None):
     conn = get_conn()
     evidence = []
     try:
         with conn, conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY")
-            cur.execute("SET LOCAL statement_timeout='5s'")
+            cur.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ, READ ONLY; SET LOCAL statement_timeout='5s'")
             allowed = access(cur, identity)
             chosen = allowed if overview else [k for k in domains if k in allowed]
             modules = [(k,SOURCES[k]) for k in chosen if k in SOURCES]
-            if (overview or counts_only) and modules:
+            if analysis and modules:
+                key, source = modules[0]
+                sql, params = compile_query(analysis, source.sql.replace("%s","%(tenant)s"))
+                cur.execute(sql, dict(params, tenant=identity[0]))
+                evidence.extend(analysis_rows(analysis, cur.fetchall(), source.path))
+            elif (overview or counts_only) and modules:
                 sql = " UNION ALL ".join("SELECT %s AS domain,count(*) AS records FROM ("+s.sql+") q" for k,s in modules)
                 params = [value for k,s in modules for value in (k,identity[0])]
                 cur.execute(sql,params)
@@ -108,6 +107,10 @@ def workspace(identity, domains=(), search="", overview=False, *, approval_inten
     for key in chosen:
         if key in {"bills","approvals"}:
             intent = (approval_intent or "queue") if key=="approvals" else "records"
+            if analysis:
+                rows = retrieve(identity,intent,analysis=analysis)
+                evidence.extend(analysis_rows(analysis, rows, "/bills"))
+                continue
             rows = retrieve(identity,intent,bill_id=bill_id,offset=offset,search=search)
             for row in grounded_answer(identity,intent,None,rows)["evidence"][:8]:
                 evidence.append(dict(domain=key,title=row["invoice_number"] or row["id"],path=row["path"],
@@ -124,5 +127,11 @@ def workspace(identity, domains=(), search="", overview=False, *, approval_inten
                 edges.append({"relation":relation,"target":record[field]})
         if edges:
             record["relationships"]=edges
-    encoded = json.dumps(evidence,default=str,sort_keys=True,ensure_ascii=False)
-    return allowed, json.loads(serialize_projection(identity,int(time.monotonic()//90),encoded))
+    return allowed, json.loads(json.dumps(evidence,default=str))
+
+
+def analysis_rows(plan, rows, path):
+    title = f"{plan.operation} {plan.metric or 'records'}"
+    if not rows:
+        return [dict(domain=plan.domain, title=title, path=path, matching_groups=0)]
+    return [dict(domain=plan.domain, title=title, path=path, **row) for row in rows]

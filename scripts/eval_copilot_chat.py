@@ -1,4 +1,4 @@
-﻿"""Evaluate local finance answers against independent SQL. Never send tenant records to a model."""
+"""Evaluate local finance answers against independent SQL. Never send tenant records to a model."""
 import argparse
 import asyncio
 import json
@@ -43,7 +43,8 @@ async def evaluate(name):
     for question, domain, sql in cases:
         start = perf_counter()
         with patch.object(copilot_chat, "completion", AsyncMock(side_effect=copilot_chat.LLMRefused("local evaluation"))):
-            reply = await copilot_chat.chat(Response(), json.dumps({"question": question}), None)
+            response = Response()
+            reply = await copilot_chat.chat(response, json.dumps({"question": question}), None)
         sources = reply["sources"]
         message = reply["message"]
         valid = bool(sources) and all(s["domain"] == domain for s in sources)
@@ -67,7 +68,7 @@ async def evaluate(name):
                     valid &= bool(row[0][1]) if "overdue" in question else row[0][2] == source["values"]["supplier_graph_link"]
         valid &= all("[" + s["id"] + "]" in message for s in sources)
         passed += int(valid)
-        print(f"{'PASS' if valid else 'FAIL'} | {question} | {len(sources)} sources | {perf_counter()-start:.1f}s", flush=True)
+        print(f"{'PASS' if valid else 'FAIL'} | {question} | {len(sources)} sources | {perf_counter()-start:.1f}s including SQL audit | {response.headers.get('Server-Timing','')}", flush=True)
     print(f"Local answer checks: {passed}/{len(cases)}")
     return passed == len(cases)
 
