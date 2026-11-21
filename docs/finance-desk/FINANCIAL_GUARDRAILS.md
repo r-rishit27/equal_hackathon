@@ -1,0 +1,18 @@
+# Financial guardrails
+
+The desk supports planning and evidence discovery. The forecast, inventory evaluator and assistant have no permission to release payment, place a vendor order, post tax, send messages or mutate the ledger. The only business mutation defined here is a versioned plan decision. Existing payment and procurement workflows retain their independent controls.
+
+| Area | Enforced policy | Release evidence |
+|---|---|---|
+| Identity and tenancy | Resolve tenant from verified auth. Enforce service entitlement, role/capability, record ownership and row visibility on API entry and retrieval. Never use a tenant supplied by OpenAI or embedded data. | Cross-tenant source IDs, graph traversal, aggregates, caches and individual citations reveal no protected records. |
+| Money and timing | Use integer paise, source timestamps, INR-only pilot and explicit timezone. Distinguish confirmed, estimated, held and unknown events. Never count a settlement twice. Flag overdue undated bills and disputed AP separately. | Partial receipt, snapshot cutoff and duplicate hold tests. Source events sum to daily results. |
+| Cash eligibility | Require an opening balance and coverage appropriate to the decision. Use selected view, reserve, schedule constraints, settlement status and freshness. Surface downside and assumptions during approval. | Test below, exactly at and above reserve. Out-of-window or stale approval fails. |
+| Inventory eligibility | Use approved offers and comparable units. Check SKU/location, effective dates, MOQ, packs, capacity, lead time and all payment milestones after rounding. Unknown material terms require review. | Infeasible and missing-input scenarios return explicit refusal reasons. Price or lead-time changes require re-preview. |
+| Assistant tool access | Allow typed read functions only. Treat document and graph text as untrusted input. Validate arguments and output; use parameterized scoped lookups. Do not expose unrestricted queries or bank instructions to the model. | Model cannot execute payment, write or export tools. Fabricated citation, prompt-injection fixture and unauthorized follow-up tests pass. |
+| Approval integrity | Use submitter and approver capabilities, with distinct actors in the pilot. Recompute server-side from the authoritative normalized scenario and applicable snapshot. Match expected plan version and an equivalent idempotent payload. | Stale, unauthorized, self-approval and concurrent decisions are refused. Replay of the same request produces one persisted decision. |
+| Evidence and audit | Persist actor, tenant, plan and version, source revision, input hash, decision, reason and calculated summary. Dedicate log permissions and omit secrets, full accounts and raw sensitive prompts. | Decision history can reproduce calculations from retained inputs. Access is restricted and tested. |
+| Reliability and fail-closed behavior | Unavailable bank balance blocks eligible plans. Assistant/model outage falls back to source-based templates. Stale inputs allow labeled read-only review. Protect worker deduplication, tenant budgets and retry limits. | Simulate model failure, degraded source and duplicate job. No status transition or side effect is implied by a preview. |
+
+### Operational ownership
+
+Finance owns reserve policy, exception windows and reconciliation readiness. Procurement owns by-SKU and vendor terms. Engineering owns tenant isolation, observability, secrets rotation, backups and rollback. Product owns forecast thresholds and communicates when estimates depend on customer receipts. Establish a review path before broadening roles or enabling new integrations.

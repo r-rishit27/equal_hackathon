@@ -1,0 +1,357 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recon Architecture Research</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --ink: #1c2230; --muted: #5d6677; --line: #e3e5ea;
+    --navy: #1f3a68; --good: #1e7b4c; --good-bg: #e6f4ec; --bad: #b03a2e; --bad-bg: #fbeae8;
+    --mid: #8a6100; --mid-bg: #fcf3dc; --code: #eef0f4;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151c; --card: #1a1f29; --ink: #e8eaef; --muted: #a2a9b7; --line: #2c3341;
+      --navy: #8fb0e8; --good: #6fd19c; --good-bg: #173326; --bad: #f08a7e; --bad-bg: #3a1d1a;
+      --mid: #e6c36a; --mid-bg: #352b12; --code: #232a36;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151c; --card: #1a1f29; --ink: #e8eaef; --muted: #a2a9b7; --line: #2c3341;
+    --navy: #8fb0e8; --good: #6fd19c; --good-bg: #173326; --bad: #f08a7e; --bad-bg: #3a1d1a;
+    --mid: #e6c36a; --mid-bg: #352b12; --code: #232a36;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 960px; margin: 0 auto; padding: 32px 16px 56px; }
+  h1 { font-size: 26px; margin: 0 0 4px; }
+  h2 { font-size: 19px; margin: 36px 0 10px; color: var(--navy); border-bottom: 1px solid var(--line); padding-bottom: 6px; }
+  h3 { font-size: 16px; margin: 20px 0 6px; }
+  p { margin: 8px 0; }
+  .sub { color: var(--muted); margin: 0 0 18px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 16px 20px; margin: 12px 0; }
+  .verdict { border-left: 4px solid var(--good); }
+  .assume { border-left: 4px solid var(--navy); }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .plan h3 { margin-top: 0; }
+  .plan .tag { display: inline-block; font-size: 12px; color: var(--muted); margin-bottom: 6px; }
+  .score { font-size: 28px; font-weight: 700; }
+  .win { border-color: var(--good); }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--card); margin: 10px 0; }
+  table { border-collapse: collapse; width: 100%; min-width: 680px; font-size: 14px; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  td.c { text-align: center; white-space: nowrap; }
+  .g { background: var(--good-bg); color: var(--good); font-weight: 600; }
+  .b { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+  .m { background: var(--mid-bg); color: var(--mid); font-weight: 600; }
+  .total td { font-weight: 700; }
+  .note { color: var(--muted); font-size: 13px; }
+  ul, ol { margin: 6px 0; padding-left: 22px; }
+  li { margin: 5px 0; }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: 13px; }
+  nav ol { columns: 2; font-size: 14px; }
+  @media (max-width: 680px) { .grid3 { grid-template-columns: 1fr; } nav ol { columns: 1; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Reconciliation architecture: Plan A vs Plan B vs Plan C</h1>
+  <p class="sub">Research and bake-off for Onsumm's reconciliation workflow builder (PO ↔ audit report ↔ invoice, plus delivery receipts). Prototypes were built and tested on real Bata documents. November 2026.</p>
+
+  <div class="card verdict">
+    <p><strong>Recommendation: Plan C (hybrid).</strong> All three plans calculate the payable correctly. They differ in what happens after the first run: whether reviewers' decisions survive, whether a past verdict can be replayed, and how many systems must stay up. Plan C was the only plan to pass every test: 16 of 16, against 13 for A and 8 for B.</p>
+    <p>With a graph database in the stack, the rule that matters is this: <strong>the graph can be the place we search for matches, but it must never be the only place a human decision is stored.</strong> Plan C follows that rule; Plan B does not.</p>
+  </div>
+
+  <div class="card assume">
+    <p><strong>Assumption for this document: a graph database (e.g. TigerGraph) is part of the stack.</strong></p>
+    <p>Each plan is described as it would work with one. In the tests the graph was simulated in memory behind the same interface; no real graph database was installed. All of B's failures come from where data lives and what gets deleted, so a real graph database behaves the same way. A real one only adds network time on each query.</p>
+  </div>
+
+  <nav class="card">
+    <strong>Contents</strong>
+    <ol>
+      <li>The three plans</li>
+      <li>How we tested</li>
+      <li>Scores and metric comparison</li>
+      <li>Findings</li>
+      <li>Review findings: confirmed or refuted</li>
+      <li>Speed and storage</li>
+      <li>Advantages of each plan</li>
+      <li>Weaknesses of each plan</li>
+      <li>Using a graph database safely</li>
+      <li>Recommendation and changes needed</li>
+      <li>Open questions and what is untested</li>
+    </ol>
+  </nav>
+
+  <h2>1. The three plans</h2>
+  <div class="grid3">
+    <div class="card plan">
+      <span class="tag">Plan A · "ours"</span>
+      <h3>Relational tables + vocabulary learning</h3>
+      <ul>
+        <li>Documents, lines and quantities in separate Postgres tables (9 tables, rev 1 schema).</li>
+        <li>Codes enforced by database foreign keys.</li>
+        <li>Two-tier vocabulary loop: unknown column labels are searched in the dictionary. Safe ones are auto-added; anything that affects payment goes to a person.</li>
+        <li><strong>Graph DB role:</strong> optional, read-only copy for traversal. Decisions stay in Postgres rows, but they are overwritten in place.</li>
+      </ul>
+    </div>
+    <div class="card plan">
+      <span class="tag">Plan B · engineer's</span>
+      <h3>One JSON row per document + graph as match surface</h3>
+      <ul>
+        <li>Each document is a single Postgres row; lines and quantities sit inside as JSON.</li>
+        <li>A trigger checks codes inside the JSON.</li>
+        <li><strong>Graph DB role:</strong> the core. Line matches are graph edges, and reviewer confirmations and precedents ("memory graph") are stored in the graph.</li>
+        <li>The graph is described as "rebuildable from Postgres". Settled invoices are pruned from it.</li>
+        <li>New client labels are added as manual alias rows.</li>
+      </ul>
+    </div>
+    <div class="card plan">
+      <span class="tag">Plan C · hybrid</span>
+      <h3>JSON row + permanent decision log + graph as a copy</h3>
+      <ul>
+        <li>Plan B's one-row-per-document storage, but the extraction is never edited.</li>
+        <li>Every human action (confirmed match, correction, precedent) is a new row in an append-only Postgres table, keyed by a stable line ID that survives re-reading the document.</li>
+        <li><strong>Graph DB role:</strong> a projection rebuilt from Postgres. It can be wiped and rebuilt with nothing lost, and Postgres SQL can answer the same queries if the graph is down.</li>
+        <li>Plan A's vocabulary loop on top.</li>
+      </ul>
+    </div>
+  </div>
+
+  <h2>2. How we tested</h2>
+  <ul>
+    <li><strong>Real documents:</strong>
+      <ul>
+        <li>the Bata purchase order PPO00024046-1 (₹7,54,596, Anjle MEP)</li>
+        <li>the J P Chawla audit report for Thane store 8255</li>
+        <li>Anjle's tax invoice AMP/26-27/070</li>
+        <li>a Safexpress delivery receipt</li>
+        <li>the Matolia Rai audit report for Mangalore store 9621</li>
+      </ul></li>
+    <li><strong>Same inputs and same rules for all three plans.</strong> Documents were turned into structured data by script, with no AI calls, so extraction quality is held constant. All plans use one shared rules engine; only storage and decision handling differ.</li>
+    <li><strong>Synthetic data where needed:</strong> a goods PO and invoice for the delivery-receipt test, a fictional "client 2", and 1,000- and 10,000-document scale data built from the real line items.</li>
+    <li><strong>Environment:</strong> SQLite with JSON support, since no Postgres was installed. The graph was an in-memory stand-in. Nothing was sent outside the laptop.</li>
+  </ul>
+
+  <h2>3. Scores and metric comparison</h2>
+  <div class="grid3">
+    <div class="card"><div class="score">78.6</div><div class="note">Plan A · 13 / 16 tests passed</div></div>
+    <div class="card"><div class="score">48.4</div><div class="note">Plan B · 8 / 16 tests passed</div></div>
+    <div class="card win"><div class="score">89.2</div><div class="note">Plan C · 16 / 16 tests passed</div></div>
+  </div>
+  <p class="note">Weighted score out of 100. Each metric is scored 1–5 (5 = best). Weights reflect a 3-person team paying real vendor money.</p>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Metric</th><th>Weight</th><th>A</th><th>B</th><th>C</th><th>What we saw</th></tr></thead>
+    <tbody>
+      <tr><td>Correctness</td><td class="c">15</td><td class="c g">5</td><td class="c g">5</td><td class="c g">5</td><td>All three got Thane exactly right and caught 12/12 flags.</td></tr>
+      <tr><td>Safety (silent wrong payment)</td><td class="c">15</td><td class="c m">3</td><td class="c b">2</td><td class="c g">5</td><td>A and B silently lose reviewer corrections when a document is re-read. B misreads an ambiguous "QTY" column and loses one of two simultaneous edits.</td></tr>
+      <tr><td>Decisions survive / replayable</td><td class="c">15</td><td class="c b">2</td><td class="c b">1</td><td class="c g">5</td><td>A and B lose 22 of 26 confirmed matches on re-read. B's graph rebuild loses every confirmation.</td></tr>
+      <tr><td>Operational complexity</td><td class="c">12</td><td class="c g">5</td><td class="c b">1</td><td class="c g">4</td><td>In B, a graph outage stops payments and reviews. In A and C the graph is optional.</td></tr>
+      <tr><td>Fit for a 3-person team</td><td class="c">10</td><td class="c g">4</td><td class="c b">1</td><td class="c g">4</td><td>B makes the graph DB critical, so it needs on-call skills in a second system.</td></tr>
+      <tr><td>Onboarding a new client</td><td class="c">8</td><td class="c g">4</td><td class="c m">3</td><td class="c g">4</td><td>Human steps 5 / 6 / 5; no schema changes; B needs one code update.</td></tr>
+      <tr><td>Analytics across stores</td><td class="c">6</td><td class="c g">5</td><td class="c b">2</td><td class="c m">3</td><td>JSON storage is 1.3–12× slower; B's pruned graph can't see settled invoices.</td></tr>
+      <tr><td>Concurrent reviewers</td><td class="c">6</td><td class="c g">5</td><td class="c b">2</td><td class="c g">5</td><td>B lost one of two simultaneous edits.</td></tr>
+      <tr><td>Schema changes needed</td><td class="c">5</td><td class="c m">3</td><td class="c g">4</td><td class="c g">5</td><td>A can't hold a list rate and a net rate on one line. B needs a code update per new field.</td></tr>
+      <tr><td>Speed &amp; storage</td><td class="c">4</td><td class="c g">4</td><td class="c g">4</td><td class="c g">4</td><td>Within 2× on size and save time. Not a deciding factor.</td></tr>
+      <tr><td>Code size</td><td class="c">4</td><td class="c g">5</td><td class="c g">4</td><td class="c m">3</td><td>Prototype about 380 / 390 / 490 lines. B's real graph code would add more.</td></tr>
+      <tr class="total"><td>Weighted total</td><td class="c">100</td><td class="c">78.6</td><td class="c">48.4</td><td class="c">89.2</td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">If analytics were given about 32 weight points (roughly a quarter of the total) with everything else unchanged, A would overtake C. B is last under every weighting tried.</p>
+
+  <h2>4. Findings</h2>
+
+  <h3>4.1 Correctness: all three plans are equal</h3>
+  <ul>
+    <li><strong>Thane payable reproduced exactly by all three:</strong> ₹6,06,740.50 payable, ₹30,000 held, ₹1,850 unbilled, ₹6,34,890.50 invoiced. 6,06,740.50 + 30,000 − 1,850 = 6,34,890.50.</li>
+    <li><strong>All 12 expected flags caught by all three:</strong>
+      <ul>
+        <li>AHU billed as 8.5 TR, but the signed sheet says 7 TR</li>
+        <li>buyer GSTIN typo on the e-invoice (<code>27AABC1043Q1ZM</code> vs <code>27AABCB1043Q1ZM</code>)</li>
+        <li>60% advance not netted</li>
+        <li>late-delivery penalty exposure: work evidenced 175 days after the 30-03-2026 due date</li>
+        <li>3 out-of-audit lines held, including scaffolding with no photo</li>
+        <li>MCP hooter verified but not billed</li>
+        <li>battery count differs between the audit table and the signed sheet</li>
+      </ul></li>
+    <li><strong>Mangalore "rate after 5%":</strong> all three paid at the discounted rate, ₹21,29,134.95. Using the list rate would have over-paid ₹93,586.</li>
+    <li><strong>Delivery receipt (POD):</strong> all three treated it as proof that 18 packages arrived, never as item counts, and didn't fail the invoice for lacking line items. All three flagged the receiver's stamp address (#10 Temple Road) not matching the consignee (#2951).</li>
+  </ul>
+
+  <h3>4.2 Human decisions: where the plans differ most</h3>
+  <ul>
+    <li><strong>Re-reading a document after a parser fix:</strong> A and B lost 22 of 26 matches a reviewer had confirmed, plus the reviewer's correction. C kept all of them.</li>
+    <li><strong>Graph rebuild (B):</strong> 0 of 23 confirmations and 0 of 23 precedents survived. The graph is "rebuildable" from document data, but the decisions were only ever stored in the graph.</li>
+    <li><strong>Pruning (B):</strong> once a settled invoice is pruned, its verdict can't be replayed. That defeats the "replay for the auditor a year later" feature.</li>
+    <li><strong>"As of" replay:</strong> in A and B, replaying an old run shows today's decisions, not the ones in force at the time. C replays exactly what was recorded.</li>
+    <li><strong>Re-running after a decision:</strong> A and B return the old stored result, because the run's fingerprint ignores decisions. C produces a fresh result.</li>
+    <li><strong>A tempting quick fix is unsafe.</strong> Carrying decisions forward by line position would have put the battery correction on the wrong line (the MCP hooter) without any warning.</li>
+  </ul>
+
+  <h3>4.3 Running a graph database as a dependency</h3>
+  <ul>
+    <li><strong>In B, when the graph is down, reconciliation stops and reviewers can't confirm matches.</strong> This is by design ("graph unreachable: post nothing").</li>
+    <li>The questions the rules ask are only 1–2 hops (e.g. "how much has been billed against this PO line?"). Postgres SQL gave the same answer in about 1.5 ms.</li>
+  </ul>
+
+  <h3>4.4 Safety of the vocabulary loop</h3>
+  <ul>
+    <li>When we turned off the rule that payment-related labels need a person, a misleading header ("Qty Verified by Vendor", which is really the vendor's claim) was auto-mapped as the audited quantity. <strong>It silently over-paid ₹18,660 on 3 lines.</strong> With the rule on, A and C sent it to a person.</li>
+    <li><strong>B silently mapped a bare "QTY" column on a goods receipt to "ordered quantity".</strong> The dictionary seeder had created a global entry for that ambiguous word. A and C flag ambiguous words for review.</li>
+    <li>An unknown extra column made B reject the whole document. A and C saved the document and put the unknown column in a review queue with its values.</li>
+    <li><strong>Onboarding effort was similar</strong> (5 / 6 / 5 human steps). The loop's value is the safety guard, not saved time.</li>
+  </ul>
+
+  <h3>4.5 Editing and code changes</h3>
+  <ul>
+    <li><strong>Two reviewers editing different lines of one document:</strong> B lost one edit, because the whole document's JSON is rewritten on save. A single-statement update would avoid this.</li>
+    <li><strong>Retiring a code (e.g. a unit):</strong> in B, every old document using that code can no longer be corrected. In C, old documents stay editable and only new use is blocked. In A, new documents can still use the retired code.</li>
+    <li><strong>New field such as <code>bin_location</code>:</strong> B's claim that it "costs nothing" is false. With strict checks, it is rejected until the dictionary and code are updated. Without them, a misspelling like <code>bin_locaton</code> slips through.</li>
+  </ul>
+
+  <h3>4.6 Problems in the documents themselves</h3>
+  <ul>
+    <li><strong>Five terms the schemas use are missing from the dictionary:</strong> <code>evidence_layer</code>, <code>date_role</code>, <code>quantity_legend</code>, <code>role_alias_raw</code> and <code>RECEIPT_DATE</code>. Seeded as written, <strong>all three plans reject the Thane audit report</strong>. More kinds and keys are missing too, e.g. the check codes and the signature fields on delivery receipts.</li>
+    <li><strong>Evidence-layer conflict.</strong> The agreed ₹6,06,740.50 only comes out if the typed audit table sets the payable. The extraction spec says the signed site sheet should, which gives ₹6,08,143.50.</li>
+    <li><strong>Errors in the engineer's scalability doc:</strong>
+      <ul>
+        <li>"Six of eight are configuration": the table has 7 rows, of which 5 need no migration.</li>
+        <li>The worked invoice doesn't add up (₹7,49,171.00 vs ₹7,49,170.79).</li>
+        <li>The examples mix a Thane store with a Mysuru delivery and use a different PO number and vendor.</li>
+        <li>Its storage arithmetic is correct, but it doesn't matter at this scale.</li>
+      </ul></li>
+    <li><strong>GSTIN checksum failures:</strong> the consignor GSTIN on the delivery receipt, and the dictionary's "corrected" Karnataka GSTIN.</li>
+  </ul>
+
+  <h2>5. Review findings: confirmed or refuted</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>#</th><th>Concern raised about Plan B</th><th>Result</th></tr></thead>
+    <tbody>
+      <tr><td>1</td><td>The graph is a second DB, and AP stops when it's down. Postgres could serve the 1–2 hop queries.</td><td class="b">Confirmed. Reviews stop too.</td></tr>
+      <tr><td>2</td><td>Human decisions live in the "rebuildable" graph and are lost on rebuild or prune.</td><td class="b">Confirmed. A history copy survives in results and the audit log, but nothing restores it into the graph.</td></tr>
+      <tr><td>3</td><td>"As of" replay conflicts with pruning.</td><td class="b">Confirmed. Replay isn't "as of" even before pruning.</td></tr>
+      <tr><td>4</td><td>Re-extraction breaks decision links (also applies to Plan A).</td><td class="b">Confirmed for both A and B.</td></tr>
+      <tr><td>5</td><td>Line edits rewrite the whole document, so concurrent edits get lost.</td><td class="m">Confirmed for the usual save pattern. Avoidable with single-statement updates.</td></tr>
+      <tr><td>6</td><td>Retired codes make old documents uneditable.</td><td class="b">Confirmed.</td></tr>
+      <tr><td>7</td><td>"A new field costs nothing" contradicts strict field checking.</td><td class="b">Confirmed.</td></tr>
+      <tr><td>8</td><td>Five terms are missing from the dictionary, so inserts would fail.</td><td class="b">Confirmed, and it affects all three plans.</td></tr>
+      <tr><td>9</td><td>Arithmetic and claim errors in the scalability doc.</td><td class="b">Confirmed. The storage maths is right but immaterial.</td></tr>
+      <tr><td>10</td><td>Cross-store analytics are awkward with JSON lines and a pruned graph.</td><td class="m">Confirmed but moderate: 1.3–12× slower. Fixable with a summary table.</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>6. Speed and storage (measured, 10,000 documents, ~600,000 lines)</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Measure</th><th>A</th><th>B</th><th>C</th></tr></thead>
+    <tbody>
+      <tr><td>Save a document (ms)</td><td class="c">6.5</td><td class="c">4.7</td><td class="c">7.1</td></tr>
+      <tr><td>Re-read a document after a parser fix (ms)</td><td class="c">12.0</td><td class="c">6.5</td><td class="c">9.6</td></tr>
+      <tr><td>Reconcile one invoice, typical / slow (ms)</td><td class="c">108 / 179</td><td class="c">210 / 579</td><td class="c">223 / 792</td></tr>
+      <tr><td>Cross-store rate check / duplicate-billing check (s)</td><td class="c">0.9 / 1.8</td><td class="c">1.7 / 2.3</td><td class="c">2.0 / 2.6</td></tr>
+      <tr><td>Database size (MB)</td><td class="c">574</td><td class="c">484</td><td class="c">577</td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="note">Measured on SQLite. Real Postgres compresses stored JSON, so B and C would likely be smaller there (estimate). B and C's slower reconciliation is probably a SQLite effect; this is unverified and worth re-checking on Postgres. None of these numbers is a constraint at Bata's volume.</p>
+
+  <h2>7. Advantages of each plan</h2>
+  <div class="grid3">
+    <div class="card"><h3>Plan A</h3><ul>
+      <li>Simplest and fastest analytics: plain SQL across stores.</li>
+      <li>Simultaneous edits to different lines are safe by nature.</li>
+      <li>Database-enforced codes.</li>
+      <li>Least code.</li>
+      <li>Vocabulary loop guards payments.</li>
+    </ul></div>
+    <div class="card"><h3>Plan B</h3><ul>
+      <li>Simplest write path: one row per document.</li>
+      <li>Fastest to save and re-read documents.</li>
+      <li>Smallest storage.</li>
+      <li>New fields and quantity types fit without schema changes.</li>
+      <li>Graph makes match traversal natural, with fast in-memory lookups.</li>
+    </ul></div>
+    <div class="card"><h3>Plan C</h3><ul>
+      <li>Every human decision is permanent and auditable.</li>
+      <li>Decisions survive re-reads, rebuilds and pruning.</li>
+      <li>Exact "as of" replay for auditors.</li>
+      <li>The graph can be wiped and rebuilt safely, and Postgres covers for a graph outage.</li>
+      <li>Retired codes never freeze old documents.</li>
+      <li>Vocabulary loop guards payments.</li>
+    </ul></div>
+  </div>
+
+  <h2>8. Weaknesses of each plan</h2>
+  <div class="grid3">
+    <div class="card"><h3>Plan A</h3><ul>
+      <li>Decisions and corrections are lost when a document is re-read.</li>
+      <li>Decisions are overwritten in place, so there is no "as of" replay.</li>
+      <li>Re-runs ignore new decisions.</li>
+      <li>Retired codes still accepted on new documents.</li>
+      <li>One rate per line (can't hold list + net rate).</li>
+    </ul></div>
+    <div class="card"><h3>Plan B</h3><ul>
+      <li>Graph outage stops payments and reviews.</li>
+      <li>Decisions and precedents are lost on graph rebuild.</li>
+      <li>Pruning breaks replay.</li>
+      <li>Concurrent edits can be lost.</li>
+      <li>Retired codes freeze old documents.</li>
+      <li>Unknown columns block whole documents.</li>
+      <li>Ambiguous labels are mapped silently.</li>
+      <li>Slower analytics.</li>
+    </ul></div>
+    <div class="card"><h3>Plan C</h3><ul>
+      <li>Most tables and code.</li>
+      <li>Analytics slower than A without an extra summary table.</li>
+      <li>Slowest reconciliation in this SQLite test.</li>
+      <li>Stable line IDs depend on printed line numbers; if a parser fix changes them, a person must re-confirm (flagged, not silent).</li>
+    </ul></div>
+  </div>
+
+  <h2>9. Using a graph database safely</h2>
+  <p>If the graph database stays, use it the Plan C way:</p>
+  <ol>
+    <li><strong>Postgres is the source of truth</strong> for documents and for every human decision. The graph only holds copies.</li>
+    <li><strong>Rebuild the graph from Postgres documents <em>and</em> decisions.</strong> A rebuild should then produce an identical graph.</li>
+    <li><strong>Don't block on the graph.</strong> If it is down, answer the 1–2 hop questions from a Postgres edges table, or queue without stopping reviews.</li>
+    <li><strong>Prune only the graph copy, never the history.</strong> Replay always reads from Postgres.</li>
+    <li><strong>Keep precedents ("memory") in Postgres</strong> and copy them into the graph for fast lookup.</li>
+  </ol>
+
+  <h2>10. Recommendation and changes needed</h2>
+  <ol>
+    <li><strong>Build Plan C.</strong> Store extractions as one row per document and never edit them; a re-read creates a new version.</li>
+    <li><strong>Make decisions permanent.</strong> Add append-only tables for corrections, confirmed matches and precedents, keyed by stable line IDs. A missing line becomes a visible "please re-confirm" task.</li>
+    <li><strong>Treat the graph (or a Postgres edges table) as a rebuildable copy</strong>, following section 9.</li>
+    <li><strong>Include decision history in each run's fingerprint</strong>, so re-runs reflect new decisions and replays are exact.</li>
+    <li><strong>Check codes only on new data or on changed codes</strong>, so old documents stay correctable.</li>
+    <li><strong>Keep the vocabulary loop with its payment guard.</strong> Ambiguous words never auto-map, and unknown columns go to a review queue.</li>
+    <li><strong>Add a summary table of lines</strong> for cross-store rate checks and duplicate-billing checks.</li>
+    <li><strong>Fix the dictionary before seeding:</strong> add the missing terms and stop global entries for ambiguous words.</li>
+    <li><strong>Decide which evidence layer pays</strong>: the typed audit table or the signed site sheet.</li>
+  </ol>
+
+  <h2>11. Open questions and what is untested</h2>
+  <ul>
+    <li><strong>Business decision:</strong> does the typed audit table or the signed site sheet set the payable? (₹6,06,740.50 vs ₹6,08,143.50)</li>
+    <li><strong>Data check:</strong> confirm the two GSTINs that fail the checksum against Bata's master data.</li>
+    <li><strong>Real Postgres:</strong> not tested (none installed). Worth a quick re-run to confirm storage sizes and whether B/C's slower reconciliation was a SQLite effect.</li>
+    <li><strong>Real graph database:</strong> not tested. It wouldn't change B's design failures and would only add network time.</li>
+    <li><strong>AI extraction and AI judge:</strong> not tested, since no external calls were allowed. This doesn't affect the storage choice, but it matters for how often the vocabulary loop maps labels correctly. It needs approval to use client documents and about 200 labelled examples.</li>
+    <li><strong>Lines without printed numbers</strong> (some invoices, emails): how should stable line IDs be formed?</li>
+  </ul>
+
+  <p class="note">Detailed test-by-test evidence: docs/research/RECON_APPROACH_BAKEOFF.md · Short summary: docs/research/RECON_APPROACH_BAKEOFF_SUMMARY.html</p>
+</main>
+</body>
+</html>

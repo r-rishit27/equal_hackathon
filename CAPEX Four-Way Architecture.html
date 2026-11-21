@@ -1,0 +1,810 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>CAPEX Four-Way Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap">
+<style>
+/* Layout: an engineering design that reads top to bottom — the thesis and its scope, the system as
+   one clickable picture, an invoice followed through it step by step with the audit entry each step
+   writes, the classes behind it, where it runs, the pillars it is held to, and the record itself.
+   Palette and type are Onsumm's own tokens (frontend/src/styles/tokens.css): white surfaces, the
+   brand navy #004080, the onsumm.ai teal #00696b, one page canvas. The console is light; so is this. */
+:root {
+  --brand-900:#00234a; --brand-800:#002a58; --brand-700:#003a70; --brand-600:#004080;
+  --brand-500:#0b56a4; --brand-400:#3b82c4; --brand-100:#e6eefa; --brand-50:#f2f6fd;
+  --accent-700:#005152; --accent-600:#00696b; --accent-400:#5cd8da; --accent-50:#effbfb;
+  --ink-900:#0b1c30; --ink-800:#1f2937; --ink-700:#374151; --ink-600:#4b5563;
+  --ink-500:#5b6473; --ink-400:#67707e; --ink-300:#9ca3af;
+  --line-300:#d0d7e2; --line-200:#e2e8f0; --line-100:#eef2f7;
+  --surface-0:#fff; --surface-1:#f8fafc; --surface-2:#f1f5f9; --canvas:#f5f7fb;
+  --success-700:#046c4e; --success-600:#047857; --success-100:#d1fae5; --success-50:#ecfdf5;
+  --warn-700:#92400e; --warn-600:#b45309; --warn-100:#fef3c7; --warn-50:#fffbeb;
+  --danger-700:#991b1b; --danger-600:#b91c1c; --danger-100:#fee2e2; --danger-50:#fef2f2;
+  --info-700:#1d4ed8; --info-600:#2563eb; --info-100:#dbeafe; --info-50:#eff6ff;
+  --font-sans:Inter,system-ui,-apple-system,sans-serif;
+  --font-display:"Public Sans",Inter,system-ui,sans-serif;
+  --font-mono:"JetBrains Mono",ui-monospace,"SF Mono",menlo,monospace;
+  --r-sm:4px; --r-md:8px; --r-lg:12px;
+  --e-1:0 1px 2px rgb(15 23 42 / 6%); --e-2:0 2px 8px rgb(15 23 42 / 8%);
+  color-scheme: light;
+}
+* { box-sizing: border-box }
+html { scroll-behavior: smooth }
+@media (prefers-reduced-motion: reduce){ html{scroll-behavior:auto} *,*::before,*::after{animation:none!important;transition:none!important} }
+body { background: var(--canvas); color: var(--ink-800); font: 15px/1.55 var(--font-sans); margin: 0 }
+:focus-visible { outline: 2px solid var(--brand-600); outline-offset: 2px }
+button { font: inherit; color: inherit; cursor: pointer }
+.mono { font-family: var(--font-mono); font-size: .86em }
+.wrap { max-width: 1240px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left,0px)); padding-right: max(16px, env(safe-area-inset-right,0px)) }
+h1,h2,h3 { margin: 0; font-family: var(--font-display); letter-spacing: -.015em; text-wrap: balance; color: var(--ink-900) }
+h1 { font-size: clamp(1.95rem, 4.3vw, 3rem); line-height: 1.06; font-weight: 700 }
+h2 { font-size: 1.5rem; font-weight: 700 } h3 { font-size: 1rem; font-weight: 600 }
+p { margin: 0; max-width: 68ch }
+.eyebrow { font-size: .72rem; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--accent-600) }
+.muted { color: var(--ink-600) }
+
+body::before { content:""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top,0px); z-index: 20; background: var(--surface-0) }
+.mast { position: sticky; top: env(safe-area-inset-top,0px); z-index: 15; background: var(--surface-0); border-bottom: 1px solid var(--line-200) }
+.mast .wrap { display: flex; align-items: center; gap: 8px 22px; flex-wrap: wrap; padding-block: 10px }
+.brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; text-decoration: none; color: var(--brand-700) }
+.mark { width: 22px; height: 22px; border-radius: 6px; background: var(--brand-600); position: relative; flex: none }
+.mark::after { content:""; position: absolute; inset: 5px 4px; border: 2px solid var(--accent-400); border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px,-2px) }
+nav.sections { display: flex; gap: 2px; flex-wrap: wrap }
+nav.sections a { padding: 5px 9px; border-radius: var(--r-md); color: var(--ink-600); text-decoration: none; font-size: .88rem; font-weight: 500 }
+nav.sections a:hover { background: var(--brand-50); color: var(--brand-700) }
+
+section { padding-block: 44px; border-bottom: 1px solid var(--line-200) }
+.sec-head { display: grid; gap: 8px; margin-bottom: 22px }
+
+.hero { padding-block: 40px 34px; display: grid; gap: 22px }
+.hero .lede { font-size: 1.1rem; color: var(--ink-600); max-width: 66ch }
+.stats { display: grid; grid-template-columns: repeat(auto-fit,minmax(168px,1fr)); gap: 1px; background: var(--line-200); border: 1px solid var(--line-200); border-radius: var(--r-lg); overflow: hidden }
+.stat { background: var(--surface-0); padding: 14px 16px; display: grid; gap: 4px }
+.stat b { font-family: var(--font-display); font-size: 1.6rem; line-height: 1.1; font-variant-numeric: tabular-nums; letter-spacing: -.02em; color: var(--brand-700) }
+.stat b small { font-size: .88rem; color: var(--ink-500); font-weight: 500 }
+.stat span { font-size: .84rem; color: var(--ink-600) }
+.stat .src { font: .7rem var(--font-mono); color: var(--ink-400) }
+.scopenote { font-size: .84rem; color: var(--warn-700); background: var(--warn-50); border: 1px solid var(--warn-100); border-radius: var(--r-md); padding: 10px 13px; max-width: none }
+.flowline { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: .86rem }
+.flowline span { padding: 3px 10px; border-radius: 999px; background: var(--surface-0); border: 1px solid var(--line-300) }
+.flowline i { color: var(--ink-400); font-style: normal }
+
+.figure { background: var(--surface-0); border: 1px solid var(--line-200); border-radius: var(--r-lg); box-shadow: var(--e-1); overflow: hidden }
+.figure .scroll { overflow-x: auto }
+.figure svg { display: block; width: 100%; min-width: 860px; height: auto; color: var(--ink-800) }
+figcaption { padding: 12px 16px; border-top: 1px solid var(--line-200); font-size: .86rem; color: var(--ink-600); background: var(--surface-1) }
+.split { display: grid; grid-template-columns: minmax(0,1fr) 336px; gap: 16px; align-items: start }
+@media (max-width: 1000px){ .split{grid-template-columns:1fr} }
+.detail { background: var(--surface-0); border: 1px solid var(--line-200); border-radius: var(--r-lg); padding: 16px; display: grid; gap: 10px; position: sticky; top: 72px }
+@media (max-width: 1000px){ .detail{position:static} }
+.detail h3 { display: flex; gap: 8px; align-items: center }
+.detail dl { margin: 0; display: grid; gap: 8px }
+.detail dt { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-400) }
+.detail dd { margin: 0; font-size: .9rem; overflow-wrap: anywhere; color: var(--ink-700) }
+.detail .file { font: .78rem var(--font-mono); color: var(--accent-700); background: var(--accent-50); padding: 2px 6px; border-radius: var(--r-sm); display: inline-block }
+.hint { font-size: .8rem; color: var(--ink-400) }
+
+svg .node { cursor: pointer }
+svg .node rect.box { transition: fill .15s, stroke .15s }
+svg .node:hover rect.box, svg .node.sel rect.box { stroke: var(--brand-600); stroke-width: 2 }
+svg .edge.lit path, svg .edge.lit line { stroke: var(--brand-600); stroke-width: 2.4 }
+svg .edge.lit text { fill: var(--brand-600); font-weight: 600 }
+svg .edge.mem text { fill: var(--accent-700) }
+svg text { font-family: var(--font-sans) }
+svg .t-label { font-size: 12.5px; font-weight: 600; fill: var(--ink-900) }
+svg .t-sub { font-size: 10.5px; fill: var(--ink-600) }
+svg .t-edge { font-size: 10px; fill: var(--ink-500) }
+svg .t-head { font-size: 10.5px; font-weight: 600; letter-spacing: .1em; fill: var(--ink-400) }
+svg .t-mono { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-600) }
+
+.scen { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 14px }
+.scen button { border: 1px solid var(--line-300); background: var(--surface-0); border-radius: 999px; padding: 6px 14px; font-weight: 600; font-size: .86rem; display: inline-flex; gap: 8px; align-items: center; color: var(--ink-700) }
+.scen button[aria-pressed="true"] { background: var(--brand-600); color: #fff; border-color: var(--brand-600) }
+.dot { width: 9px; height: 9px; border-radius: 50%; display: inline-block; flex: none }
+.player { display: grid; grid-template-columns: minmax(0,1fr) 388px; gap: 16px; align-items: start }
+@media (max-width: 1060px){ .player{grid-template-columns:1fr} }
+.stepcard { background: var(--surface-0); border: 1px solid var(--line-200); border-radius: var(--r-lg); padding: 16px; display: grid; gap: 12px }
+.stepcard .num { font: 600 .74rem var(--font-mono); color: var(--accent-700) }
+.stepcard h3 { font-size: 1.06rem }
+.ctrl { display: flex; gap: 8px; align-items: center; flex-wrap: wrap }
+.btn { border: 1px solid var(--line-300); background: var(--surface-0); border-radius: var(--r-md); padding: 6px 12px; font-weight: 600; font-size: .86rem; color: var(--ink-700) }
+.btn:hover { border-color: var(--brand-600); color: var(--brand-700) }
+.btn.primary { background: var(--brand-600); border-color: var(--brand-600); color: #fff }
+.btn.primary:hover { color: #fff; background: var(--brand-700) }
+.btn:disabled { opacity: .45; cursor: not-allowed }
+.progress { display: flex; gap: 4px; flex-wrap: wrap }
+.progress button { width: 26px; height: 6px; border-radius: 3px; border: 0; background: var(--line-200); padding: 0 }
+.progress button.done { background: var(--brand-400) }
+.progress button.cur { background: var(--brand-600) }
+pre.log { margin: 0; background: var(--brand-900); color: #dbe6f4; border-radius: var(--r-md); padding: 12px; font: .74rem/1.5 var(--font-mono); overflow-x: auto; max-height: 300px; white-space: pre }
+pre.log .k { color: #8fd3d5 } pre.log .s { color: #c9dcf5 } pre.log .n { color: #ffd59a } pre.log .h { color: #7b8ca6 }
+.verdict { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .74rem; font-weight: 600 }
+.v-match { background: var(--success-50); color: var(--success-700) }
+.v-park { background: var(--warn-50); color: var(--warn-700) }
+.v-exc { background: var(--danger-50); color: var(--danger-700) }
+.v-adj { background: var(--info-50); color: var(--info-700) }
+.v-fail { background: var(--danger-600); color: #fff }
+
+.pillars { display: grid; grid-template-columns: repeat(auto-fill,minmax(300px,1fr)); gap: 14px }
+.pillar { background: var(--surface-0); border: 1px solid var(--line-200); border-radius: var(--r-lg); padding: 16px; display: grid; gap: 10px; align-content: start }
+.pillar .top { display: flex; gap: 10px; align-items: center }
+.pillar .ico { width: 34px; height: 34px; border-radius: var(--r-md); display: grid; place-items: center; background: var(--brand-50); color: var(--brand-600); flex: none }
+.pillar .ico svg { width: 18px; height: 18px }
+.pillar ul { margin: 0; padding-left: 18px; display: grid; gap: 4px; font-size: .88rem; color: var(--ink-700) }
+.pillar .proof { font-size: .84rem; padding: 8px 10px; border-radius: var(--r-md); background: var(--accent-50); color: var(--accent-700) }
+.pillar .change { font-size: .8rem; color: var(--ink-600) }
+.pillar .change code { font-family: var(--font-mono); font-size: .9em; color: var(--brand-700) }
+
+.tablewrap { overflow-x: auto; border: 1px solid var(--line-200); border-radius: var(--r-lg); background: var(--surface-0) }
+table { border-collapse: collapse; width: 100%; font-size: .88rem }
+th, td { text-align: left; padding: 9px 12px; border-bottom: 1px solid var(--line-200); vertical-align: top }
+th { font-size: .7rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-400); background: var(--surface-2); font-weight: 600 }
+tr:last-child td { border-bottom: 0 }
+td b { color: var(--brand-700) }
+.grid2 { display: grid; grid-template-columns: minmax(0,1.15fr) minmax(0,1fr); gap: 16px; align-items: start }
+@media (max-width: 940px){ .grid2{grid-template-columns:1fr} }
+.chain { display: grid }
+.ent { display: grid; grid-template-columns: 56px minmax(0,1fr); border: 1px solid var(--line-200); background: var(--surface-0); border-radius: var(--r-md); margin-bottom: 18px; position: relative }
+.ent::after { content:""; position: absolute; left: 27px; bottom: -19px; height: 18px; border-left: 2px solid var(--line-300) }
+.ent:last-child::after { display: none }
+.ent .seq { font: 600 .78rem var(--font-mono); color: var(--ink-400); padding: 10px; border-right: 1px solid var(--line-200) }
+.ent .b { padding: 8px 10px; display: grid; gap: 3px; min-width: 0 }
+.ent .kind { font: 600 .78rem var(--font-mono); color: var(--accent-700) }
+.ent .what { font-size: .86rem; overflow-wrap: anywhere; color: var(--ink-700) }
+.ent .hh { font: .7rem var(--font-mono); color: var(--ink-400); overflow-wrap: anywhere }
+.ent.bad { border-color: var(--danger-600); background: var(--danger-50) }
+.ent.bad .hh.mine { color: var(--danger-700); font-weight: 600 }
+.ent.edited .what { color: var(--danger-700); font-weight: 600 }
+.status { padding: 10px 12px; border-radius: var(--r-md); font-weight: 600; font-size: .9rem }
+.status.ok { background: var(--success-50); color: var(--success-700) }
+.status.bad { background: var(--danger-50); color: var(--danger-700) }
+footer { padding-block: 26px 40px; color: var(--ink-500); font-size: .84rem }
+footer p { max-width: none }
+</style>
+
+<header class="mast"><div class="wrap">
+  <a class="brand" href="#top"><span class="mark" aria-hidden="true"></span>onsumm.ai</a>
+  <nav class="sections" aria-label="Sections">
+    <a href="#system">System design</a><a href="#flow">Follow an invoice</a><a href="#classes">Class diagram</a>
+    <a href="#env">Deployment</a><a href="#pillars">Pillars</a><a href="#logs">Audit trail</a>
+  </nav>
+</div></header>
+
+<main id="top">
+<div class="wrap hero">
+  <span class="eyebrow">Technical design &middot; HLD and LLD &middot; CAPEX invoice matching &middot; 13 Nov 2026</span>
+  <h1>Four-way reconciliation on a graph, where the rules decide and a person approves</h1>
+  <p class="lede">An email agent picks the PO, GRN, external audit report and supplier invoice off the AP mailbox, routes each to its own parser, and lands them as connected nodes rather than rows in five tables. Deterministic rules set by the organisation compile to GSQL and return their own evidence trail. Only what the rules decline is adjudicated, a person approves it, and the decision pair becomes precedent for the next one.</p>
+  <div class="stats" role="list">
+    <div class="stat" role="listitem"><b>4</b><span>documents reconciled per invoice line</span><span class="src">PO &middot; GRN &middot; audit &middot; invoice</span></div>
+    <div class="stat" role="listitem"><b>5</b><span>document-specific parsers, one standard line format</span><span class="src">design &sect;L2</span></div>
+    <div class="stat" role="listitem"><b>1</b><span>hop from an invoice line to the PO line it bills</span><span class="src">BILLS_AGAINST edge</span></div>
+    <div class="stat" role="listitem"><b>0</b><span>lines the model may decide without a person</span><span class="src">design rule, enforced in code</span></div>
+    <div class="stat" role="listitem"><b>4&ndash;5</b><span>invoices per audit-report hub in the Bata shape</span><span class="src">engagement data</span></div>
+    <div class="stat" role="listitem"><b>6</b><span>exception causes, each priced and owned</span><span class="src">design &sect;L5</span></div>
+    <div class="stat" role="listitem"><b>SHA&#8209;256</b><span>hash-chained task audit trail</span><span class="src">live demo below</span></div>
+  </div>
+  <p class="scopenote"><b>Read these as scope, not as results.</b> This is a design document for work not yet built, so every figure above describes what the system is specified to do. The only number on this page computed from real execution is the hash chain in the audit section, which your browser recomputes as you read it.</p>
+  <div class="flowline" aria-label="The pipeline in one line"><span>Mailbox</span><i>&rarr;</i><span>Classify</span><i>&rarr;</i><span>Parse</span><i>&rarr;</i><span>Normalise</span><i>&rarr;</i><span>Graph</span><i>&rarr;</i><span>Rules as GSQL</span><i>&rarr;</i><span>Adjudicate the residue</span><i>&rarr;</i><span>Review Hub</span><i>&rarr;</i><span>Post to Dynamics</span><i>&rarr;</i><span>Audit trail</span><i>&middot;</i><span style="border-color:var(--accent-600);color:var(--accent-700)">Memory graph over all of it</span></div>
+</div>
+
+<section id="system"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">High-level design</span><h2>The system on one page</h2>
+    <p class="muted">Four columns, one boundary. Everything inside the dashed line runs on the client's tenant; the graph store, the model providers and the ERP sit outside it, and every arrow that crosses the line is labelled with what it carries. Select any component to see what it does and where it lives.</p></div>
+  <div class="split">
+    <figure class="figure"><div class="scroll" id="hld"></div>
+      <figcaption>Facts come from the documents, structure from the graph, decisions from compiled rules. The model appears at exactly two points &mdash; reading a document and adjudicating what the rules declined &mdash; and a person approves every block, every write-off and every posting. The dashed teal path is the <b>memory graph</b>: the decision and the human action on it, kept as precedent.</figcaption></figure>
+    <aside class="detail" id="hldDetail" aria-live="polite"></aside>
+  </div>
+</div></section>
+
+<section id="flow"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Data flow</span><h2>Follow an invoice through the system</h2>
+    <p class="muted">Pick a case and step through it. Each step shows which components talk, what moves between them, and the audit entry the step writes. These entries are illustrative of the design, in the shape the trail will record.</p></div>
+  <div class="scen" id="scen" role="group" aria-label="Cases"></div>
+  <div class="player">
+    <figure class="figure"><div class="scroll" id="seq"></div>
+      <figcaption id="seqCap"></figcaption></figure>
+    <div class="stepcard" id="step" aria-live="polite"></div>
+  </div>
+</div></section>
+
+<section id="classes"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Low-level design</span><h2>Classes and how they connect</h2>
+    <p class="muted">The reconciliation layer is a set of small pieces with one job each. Graph sources share one protocol, so the same rules run against the live graph and against a local mirror used for back-testing a rule change before it is published. Select a class for its responsibilities and file.</p></div>
+  <div class="split">
+    <figure class="figure"><div class="scroll" id="uml"></div>
+      <figcaption>Dashed arrows with a hollow head mean "implements". Solid arrows mean "calls" or "produces", labelled with what passes. Sixteen boxes cover the path from an email attachment to a posted voucher with its evidence.</figcaption></figure>
+    <aside class="detail" id="umlDetail" aria-live="polite"></aside>
+  </div>
+</div></section>
+
+<section id="env"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Deployment</span><h2>Where each part runs</h2>
+    <p class="muted">The API, the pipeline workers, the parsers, the secrets and the audit trail stay on the client's tenant. Four external services are called over HTTPS with the minimum each needs. Rule sets are versioned, and a rule change is back-tested on the mirror before it is published.</p></div>
+  <figure class="figure"><div class="scroll" id="deploy"></div>
+    <figcaption>One API process serves the console and the Review Hub; invoices are independent of one another, so more workers can drain a queue in parallel against the same graph.</figcaption></figure>
+  <div style="height:16px"></div>
+  <div class="tablewrap"><table aria-label="Run modes">
+    <thead><tr><th>Mode</th><th>How it starts</th><th>Reads from</th><th>Writes</th><th>Used for</th></tr></thead>
+    <tbody>
+      <tr><td><b>Live</b></td><td class="mono">python -m onsumm.capex.run --tenant &hellip; --since &hellip;</td><td>TigerGraph tenant graph</td><td>verdicts, Review Hub items, audit trail, Dynamics voucher</td><td>day-to-day AP reconciliation</td></tr>
+      <tr><td><b>Mirror</b></td><td class="mono">--source mirror</td><td>a local copy of the same rows</td><td>verdicts and audit trail only; every evidence ref says "mirror"</td><td>back-testing a rule change, parity checks</td></tr>
+      <tr><td><b>Rules only</b></td><td class="mono">--no-model</td><td>graph or mirror</td><td>as above; declined lines become exceptions instead of adjudications</td><td>proving the deterministic floor, ablation</td></tr>
+      <tr><td><b>Dry run</b></td><td class="mono">--dry-run</td><td>graph</td><td>verdicts and audit trail; no posting, no Review Hub item</td><td>a new tenant's first pass, before anyone trusts it</td></tr>
+      <tr><td><b>Onboard a tenant</b></td><td class="mono">run.sh onboard propose &#124; review &#124; approve</td><td>the client's PO and GRN schema from Dynamics</td><td>proposed, reviewed and signed field mapping</td><td>bringing a new client to the same rules</td></tr>
+      <tr><td><b>Replay</b></td><td class="mono">--replay --rule-version v7</td><td>the graph as of that invoice's as-of time</td><td>nothing; prints the verdict and its evidence path</td><td>answering an auditor a year later</td></tr>
+    </tbody></table></div>
+</div></section>
+
+<section id="pillars"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Pillars of the design</span><h2>What the design is held to, and how it is enforced</h2>
+    <p class="muted">Each pillar names the mechanism, the test that will hold it, and the one place to change it.</p></div>
+  <div class="pillars" id="pillarGrid"></div>
+</div></section>
+
+<section id="logs"><div class="wrap">
+  <div class="sec-head"><span class="eyebrow">Task audit trail</span><h2>A record that cannot be edited quietly</h2>
+    <p class="muted">Every entry stores the SHA-256 of the entry before it. Try it: change who approved the write-off below, and the chain breaks at exactly that entry. These hashes are computed in your browser from the entries shown.</p></div>
+  <div class="grid2">
+    <div style="display:grid;gap:12px">
+      <div class="ctrl"><button class="btn primary" type="button" id="tamper">Change who approved the write-off</button><button class="btn" type="button" id="restore">Restore the record</button></div>
+      <div id="chainStatus" class="status ok" role="status">Computing the chain&hellip;</div>
+      <div class="chain" id="chain"></div>
+    </div>
+    <div style="display:grid;gap:14px">
+      <div><h3 style="margin-bottom:8px">Per-invoice run log, as specified</h3>
+        <pre class="log">invoice      latency_s gsql_queries model_tokens decided_by            verdict
+BW-24-00118  2.41      6            0            rule_R1_within_band   MATCH_4WAY
+BW-24-00119  1.08      4            0            rule_R4_no_audit      PARKED
+BW-24-00121  3.77      8            0            rule_R2_rate_variance EXCEPTION
+BW-24-00124  9.12      9            4310         decision_api          EXCEPTION
+BW-24-00126  2.95      7            0            rule_R6_ledger_cap    EXCEPTION</pre>
+        <p class="hint">run_log.csv &middot; tokens count every model token the invoice spent; a line the rules settle reports 0 because no model ran.</p></div>
+      <div><h3 style="margin-bottom:8px">Access log</h3>
+        <pre class="log">{"kind":"login.failed","actor":"ap.clerk.meera","data":{"why":"wrong password"}}
+{"kind":"access.refused","actor":"ap.clerk.meera","data":{"permission":"approve.L2"}}
+{"kind":"approval.denied","actor":"ap.clerk.meera","data":{"why":"role ap_clerk may not approve L2"}}
+{"kind":"login.succeeded","actor":"auditor.external","role":"auditor"}</pre>
+        <p class="hint">Same chain, case "_access" &middot; vendor bank details and PAN in free text are masked before writing.</p></div>
+      <div><h3 style="margin-bottom:8px">Failure, recorded instead of guessed</h3>
+        <pre class="log">{"invoice":"BW-24-00131","kind":"recon.failed","data":{
+  "error":"GraphUnavailable: ty_po_line(po='4500087321', line=20) could not be reached",
+  "verdict_written":false,"posted":false,
+  "note":"failed closed; no verdict, no posting, invoice stays in the queue"}}</pre>
+        <p class="hint">A reachable graph is a precondition, not a best effort. Nothing is posted on partial evidence.</p></div>
+    </div>
+  </div>
+</div></section>
+</main>
+
+<footer><div class="wrap"><p>Onsumm CAPEX four-way reconciliation &middot; design for the Bata engagement &middot; palette and type from <span class="mono">frontend/src/styles/tokens.css</span> &middot; graph store <span class="mono">TigerGraph (GSQL)</span> &middot; ERP of record <span class="mono">Microsoft Dynamics</span> &middot; OCR and parsing <span class="mono">Sarvam + OpenAI</span> &middot; document routing <span class="mono">Claude API</span> &middot; adjudication <span class="mono">OpenAI decision API</span>. Component paths below are the proposed locations in <span class="mono">backend_ocr/app</span>, not existing files.</p></div></footer>
+
+<script>
+(() => {
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+  const I = {
+    mail: '<rect x="1.8" y="3.4" width="12.4" height="9.2" rx="1.5"/><path d="M2.4 4.4L8 8.8l5.6-4.4"/>',
+    people: '<circle cx="6" cy="5" r="2.4"/><path d="M1.8 13c.6-2.6 2.2-3.9 4.2-3.9s3.6 1.3 4.2 3.9"/><circle cx="11.6" cy="5.8" r="1.9"/><path d="M11 9.4c1.7 0 3 1 3.4 3.2"/>',
+    lock: '<rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5.2 7V5a2.8 2.8 0 0 1 5.6 0v2"/>',
+    portal: '<rect x="1.8" y="2.5" width="12.4" height="11" rx="1.5"/><path d="M1.8 5.6h12.4M4 8.5h4M4 10.8h6"/>',
+    eye: '<path d="M1.5 8s2.4-4.3 6.5-4.3S14.5 8 14.5 8s-2.4 4.3-6.5 4.3S1.5 8 1.5 8z"/><circle cx="8" cy="8" r="2"/>',
+    split: '<path d="M2.4 3.2h4.2l1.6 2h5.4"/><path d="M2.4 8h11.2M2.4 12.8h4.2l1.6-2h5.4"/>',
+    term: '<rect x="1.8" y="2.5" width="12.4" height="11" rx="1.5"/><path d="M4.4 6.4l2 1.8-2 1.8M8 10.6h3.4"/>',
+    check: '<circle cx="8" cy="8" r="6.2"/><path d="M5.2 8.2l2 2 3.7-4"/>',
+    layers: '<path d="M8 2l6 3-6 3-6-3 6-3zM2 8l6 3 6-3M2 11l6 3 6-3"/>',
+    scan: '<path d="M2 5.4V3.4A1.4 1.4 0 0 1 3.4 2h2M10.6 2h2A1.4 1.4 0 0 1 14 3.4v2M14 10.6v2a1.4 1.4 0 0 1-1.4 1.4h-2M5.4 14h-2A1.4 1.4 0 0 1 2 12.6v-2"/><path d="M4.6 8h6.8"/>',
+    clock: '<circle cx="8" cy="8" r="6.2"/><path d="M8 4.4V8l2.6 1.6"/>',
+    rules: '<path d="M8 1.8l6 6.2-6 6.2-6-6.2z"/><path d="M5.6 8h4.8"/>',
+    chip: '<rect x="4" y="4" width="8" height="8" rx="1.2"/><path d="M6 1.8V4M10 1.8V4M6 12v2.2M10 12v2.2M1.8 6H4M1.8 10H4M12 6h2.2M12 10h2.2"/>',
+    policy: '<path d="M4 1.8h5.6L12.5 4.7V14.2H4z"/><path d="M6 7.2h4.4M6 9.6h4.4M6 12h2.6"/>',
+    shield: '<path d="M8 1.8l5.4 2v4c0 3.4-2.4 5.4-5.4 6.4C5 13.2 2.6 11.2 2.6 7.8v-4z"/>',
+    stamp: '<path d="M6.2 1.8h3.6v4.4l2.6 1.4v2.2H3.6V7.6l2.6-1.4z"/><path d="M3 13.6h10"/>',
+    db: '<ellipse cx="8" cy="3.8" rx="5.4" ry="2"/><path d="M2.6 3.8v8.4c0 1.1 2.4 2 5.4 2s5.4-.9 5.4-2V3.8M2.6 8c0 1.1 2.4 2 5.4 2s5.4-.9 5.4-2"/>',
+    cloud: '<path d="M4.6 12.6h7.2a2.8 2.8 0 0 0 .3-5.6 3.9 3.9 0 0 0-7.5-.9 2.9 2.9 0 0 0 0 6.5z"/>',
+    chain: '<rect x="1.8" y="5.6" width="7" height="4.8" rx="2.4"/><rect x="7.2" y="5.6" width="7" height="4.8" rx="2.4"/>',
+    file: '<path d="M4 1.8h5.4L12.4 4.8V14.2H4z"/><path d="M9.4 1.8v3h3"/>',
+    key: '<circle cx="5.4" cy="10.4" r="3"/><path d="M7.6 8.2l5.4-5.4M11 4.8l1.6 1.6M9.6 6.2l1.2 1.2"/>',
+    git: '<circle cx="4.6" cy="3.6" r="1.6"/><circle cx="4.6" cy="12.4" r="1.6"/><circle cx="11.4" cy="6.4" r="1.6"/><path d="M4.6 5.2v5.6M11.4 8c0 2.4-2.2 3-6.8 4"/>',
+    graph: '<circle cx="3.6" cy="4" r="1.8"/><circle cx="12.4" cy="4.6" r="1.8"/><circle cx="7.6" cy="12" r="1.8"/><path d="M5.3 4.2l5.3.3M4.6 5.6l2.2 4.8M11.6 6.2l-3.2 4.2"/>',
+    scale: '<path d="M8 2v12M3 14h10M3.4 5.4h9.2M3.4 5.4L1.6 9.6h3.6zM12.6 5.4l-1.8 4.2h3.6z"/>',
+    pencil: '<path d="M10.8 2.4l2.8 2.8-8 8H2.8v-2.8z"/>',
+    brain: '<path d="M6.4 2.6a2.2 2.2 0 0 0-2.2 2.2 2 2 0 0 0-1 3.5 2.2 2.2 0 0 0 1.4 3.6 2.1 2.1 0 0 0 3.8.9V3.9a1.4 1.4 0 0 0-2-1.3zM9.6 2.6a2.2 2.2 0 0 1 2.2 2.2 2 2 0 0 1 1 3.5 2.2 2.2 0 0 1-1.4 3.6"/>',
+    cut: '<circle cx="4.4" cy="11.6" r="2"/><circle cx="11.6" cy="11.6" r="2"/><path d="M5.6 10L11 2.6M10.4 10L5 2.6"/>',
+    bank: '<path d="M2 6.4L8 2.4l6 4M3.4 6.4v7.2M12.6 6.4v7.2M1.8 13.6h12.4M6 9v4.6M10 9v4.6"/>',
+  };
+  const icon = (n, x, y, s = 16, color = "currentColor") =>
+    `<g transform="translate(${x} ${y}) scale(${s/16})" fill="none" stroke="${color}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${I[n]||""}</g>`;
+  const iconSvg = (n) => `<svg viewBox="0 0 16 16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">${I[n]}</svg>`;
+  const ARROW = (id, color) => `<marker id="${id}" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="${color}"/></marker>`;
+
+  // ======================= HLD =======================
+  const N = {
+    sources: { x: 12, y: 56, w: 152, h: 104, label: "Sources", icon: "mail", lines: ["AP mailbox", "Dynamics export", "SFTP drop", "vendor portal"] },
+    settings: { x: 12, y: 180, w: 152, h: 104, label: "Org settings", icon: "policy", lines: ["tolerance bands", "retention / advance", "audit mandatory?", "approval routes"] },
+    people: { x: 12, y: 304, w: 152, h: 104, label: "People &amp; roles", icon: "people", lines: ["AP clerk", "Approver L1", "Controller L2", "External auditor"] },
+    connect: { x: 200, y: 56, w: 168, h: 48, label: "Connector pool", sub: "dedupe by content hash", icon: "portal" },
+    router: { x: 200, y: 120, w: 168, h: 48, label: "Doc-type router", sub: "Claude API &middot; classify", icon: "split", hl: true },
+    ocr: { x: 200, y: 184, w: 168, h: 48, label: "OCR layer", sub: "Sarvam + OpenAI", icon: "scan" },
+    parsers: { x: 200, y: 248, w: 168, h: 96, label: "5 parsers", icon: "layers", lines: ["contract &middot; po &middot; grn", "audit &middot; invoice", "one standard line format"] },
+    tables: { x: 200, y: 360, w: 168, h: 72, label: "Normalised tables", icon: "file", lines: ["po_lines &middot; grn_lines", "audit_lines &middot; invoice_lines"] },
+    loader: { x: 392, y: 56, w: 200, h: 48, label: "Graph loader", sub: "vertices + edges, upsert", icon: "graph" },
+    rulecomp: { x: 392, y: 120, w: 200, h: 48, label: "Rule compiler", sub: "settings &rarr; GSQL, versioned", icon: "rules" },
+    recon: { x: 392, y: 184, w: 200, h: 48, label: "Recon agent", sub: "row level &middot; evidence path", icon: "check" },
+    precedent: { x: 392, y: 248, w: 200, h: 48, label: "Precedent lookup", sub: "same vendor, item, cause", icon: "brain", hl: true },
+    decision: { x: 392, y: 312, w: 200, h: 48, label: "Decision service", sub: "OpenAI &middot; the residue only", icon: "chip" },
+    hub: { x: 616, y: 56, w: 200, h: 72, label: "Review Hub", icon: "stamp", lines: ["priced by rupee at risk", "routed by role &middot; aged"] },
+    audit: { x: 616, y: 144, w: 200, h: 48, label: "Task audit trail", sub: "agent decision + human action", icon: "chain" },
+    memory: { x: 616, y: 208, w: 200, h: 48, label: "Memory writer", sub: "precedent subgraph", icon: "brain", hl: true },
+    prune: { x: 616, y: 272, w: 200, h: 48, label: "Prune &amp; retain", sub: "hub keeps the settled position", icon: "cut" },
+    post: { x: 616, y: 336, w: 200, h: 48, label: "Posting adapter", sub: "voucher + evidence, once", icon: "bank" },
+    docstore: { x: 200, y: 452, w: 152, h: 52, label: "Document store", sub: "originals, hashed", icon: "file", s2: true },
+    rulestore: { x: 364, y: 452, w: 152, h: 52, label: "Rule sets", sub: "versioned, signed", icon: "policy", s2: true },
+    ledger: { x: 528, y: 452, w: 152, h: 52, label: "Audit ledger", sub: "append-only, chained", icon: "chain", s2: true },
+    evidence: { x: 692, y: 452, w: 152, h: 52, label: "Evidence bundles", sub: "one per verdict", icon: "eye", s2: true },
+    tg: { x: 864, y: 56, w: 220, h: 120, label: "TigerGraph", icon: "db", lines: ["tenant graph &middot; GSQL", "POLine, GRNLine, AuditLine,", "InvoiceLine, PaymentReceipt", "compiled rules installed", "memory subgraph"] },
+    openai: { x: 864, y: 196, w: 220, h: 84, label: "OpenAI API", icon: "cloud", lines: ["OCR assist on hard scans", "decision API: the residue", "embeddings for precedent"] },
+    sarvam: { x: 864, y: 300, w: 220, h: 64, label: "Sarvam API", icon: "cloud", lines: ["Indian formats, regional text", "poor-quality scans"] },
+    claude: { x: 864, y: 384, w: 220, h: 64, label: "Claude API", icon: "cloud", lines: ["document classification", "no write access, no posting"] },
+    dyn: { x: 864, y: 468, w: 220, h: 56, label: "Microsoft Dynamics", icon: "bank", lines: ["PO and GRN master, voucher post"] },
+  };
+  const E = [
+    { id: "e-src-conn", d: "M164 108 H182 V80 H200" },
+    { id: "e-conn-router", d: "M284 104 V120" },
+    { id: "e-router-ocr", d: "M284 168 V184", label: "routed to one parser", lx: 290, ly: 180, anchor: "start" },
+    { id: "e-ocr-parsers", d: "M284 232 V248" },
+    { id: "e-parsers-tables", d: "M284 344 V360" },
+    { id: "e-tables-loader", d: "M368 396 H380 V80 H392", label: "typed rows", lx: 376, ly: 420 },
+    { id: "e-set-rule", d: "M164 232 H176 V42 H492 V120", label: "configured tolerances and routes", lx: 340, ly: 37 },
+    { id: "e-rule-recon", d: "M492 168 V184" },
+    { id: "e-recon-prec", d: "M492 232 V248", label: "declined", lx: 498, ly: 244, anchor: "start" },
+    { id: "e-prec-dec", d: "M492 296 V312" },
+    { id: "e-load-tg", d: "M592 80 H852 V100 H864", label: "upsert vertices and edges", lx: 716, ly: 74 },
+    { id: "e-recon-tg", d: "M592 208 H840 V140 H864", label: "compiled GSQL traversal", lx: 700, ly: 202 },
+    { id: "e-dec-oai", d: "M592 336 H828 V238 H864", label: "subgraph + precedent", lx: 836, ly: 290, anchor: "start" },
+    { id: "e-ocr-sarvam", d: "M368 208 H380 V332 H864", label: "page images only", lx: 620, ly: 326 },
+    { id: "e-router-claude", d: "M368 144 H384 V416 H864", label: "attachment, as data", lx: 620, ly: 410 },
+    { id: "e-recon-hub", d: "M592 196 H600 V92 H616", label: "verdict", lx: 596, ly: 60, anchor: "end" },
+    { id: "e-hub-audit", d: "M716 128 V144" },
+    { id: "e-audit-mem", d: "M716 192 V208", mem: true },
+    { id: "e-mem-prune", d: "M716 256 V272", mem: true },
+    { id: "e-prune-post", d: "M716 320 V336" },
+    { id: "e-post-dyn", d: "M816 360 H848 V496 H864", label: "voucher + evidence", lx: 760, ly: 354 },
+    { id: "e-people-hub", d: "M164 356 H172 V426 H608 V92 H616", label: "approve &middot; reject &middot; escalate", lx: 300, ly: 440 },
+    { id: "e-audit-led", d: "M660 192 V452", label: "every step", lx: 666, ly: 430, anchor: "start" },
+    { id: "e-mem-tg", d: "M816 232 H1092 V176 H1084", label: "precedent subgraph", lx: 960, ly: 226, mem: true },
+    { id: "e-hub-ev", d: "M768 128 V452" },
+    { id: "e-conn-doc", d: "M240 104 V452" },
+    { id: "e-rule-store", d: "M440 168 V452" },
+  ];
+  const LIT = {
+    sources: ["e-src-conn"], settings: ["e-set-rule"], people: ["e-people-hub"],
+    connect: ["e-src-conn", "e-conn-router", "e-conn-doc"],
+    router: ["e-conn-router", "e-router-ocr", "e-router-claude"],
+    ocr: ["e-router-ocr", "e-ocr-parsers", "e-ocr-sarvam"],
+    parsers: ["e-ocr-parsers", "e-parsers-tables"],
+    tables: ["e-parsers-tables", "e-tables-loader"],
+    loader: ["e-tables-loader", "e-load-tg"],
+    rulecomp: ["e-set-rule", "e-rule-recon", "e-rule-store"],
+    recon: ["e-rule-recon", "e-recon-tg", "e-recon-prec", "e-recon-hub"],
+    precedent: ["e-recon-prec", "e-prec-dec"],
+    decision: ["e-prec-dec", "e-dec-oai"],
+    hub: ["e-recon-hub", "e-people-hub", "e-hub-audit", "e-hub-ev"],
+    audit: ["e-hub-audit", "e-audit-mem", "e-audit-led"],
+    memory: ["e-audit-mem", "e-mem-prune", "e-mem-tg"],
+    prune: ["e-mem-prune", "e-prune-post"],
+    post: ["e-prune-post", "e-post-dyn"],
+    docstore: ["e-conn-doc"], rulestore: ["e-rule-store"], ledger: ["e-audit-led"], evidence: ["e-hub-ev"],
+    tg: ["e-load-tg", "e-recon-tg", "e-mem-tg"], openai: ["e-dec-oai"], sarvam: ["e-ocr-sarvam"],
+    claude: ["e-router-claude"], dyn: ["e-post-dyn"],
+  };
+  const DETAIL = {
+    sources: ["Documents arrive as email attachments on the AP mailbox, as PO and GRN exports from Dynamics, as an SFTP drop from a large vendor, or through the vendor portal. The same invoice often arrives twice by two routes, which is why every file is hashed on the way in.", "app/capex/connectors/", "Free text in a covering email is data, never an instruction to the router."],
+    settings: ["The organisation's reconciliation policy, edited by finance rather than by engineering: price and quantity tolerance bands per asset class, over-delivery allowance, retention and advance-recovery treatment, whether an external audit report is mandatory, and which approval route each action takes.", "app/capex/settings.py", "A change here produces a new rule version; it never edits an existing one."],
+    people: ["Four roles, each seeing only what it may act on. AP clerks work the queue; Approver L1 clears variances inside the delegated band; the Controller approves write-offs, retention releases and anything above the band; external auditors read the record and change nothing.", "app/core/approval_chain.py", "Reuses the approval chain already in the platform rather than a second one."],
+    connect: ["Polls every source, stores each file once with its source, sender, received-at and SHA-256, and refuses a file it has already seen. The original is retained unmodified, because the evidence bundle has to point at what the vendor actually sent.", "app/capex/connectors/pool.py", "Idempotent on hash: a re-sent attachment is recognised, not re-parsed."],
+    router: ["Reads the document and decides what it is &mdash; contract, PO, GRN, external audit report or supplier invoice &mdash; then dispatches it to the parser that owns that type. It classifies from content, not from the filename or the email subject, because vendors name files anything. Below the confidence floor the document is held for a human to classify rather than sent to a guessed parser.", "app/capex/router.py", "Claude API. It can classify and route; it cannot parse, decide or write."],
+    ocr: ["Renders each page and recovers text and tables. Sarvam handles Indian vendor formats, regional-language text and the poor scans that make up most of a CAPEX file; OpenAI is used where a page defeats it. Per-field confidence travels with every value downstream, so a weak read is visible at the point it matters.", "app/capex/ocr/", "Two providers behind one interface; neither sees the tenant's name."],
+    parsers: ["One parser per document class, each lifting only the fields reconciliation consumes and normalising units, tax components, currency and dates on the way out. The standard line format is what lets a PO line and an invoice line be compared without per-vendor code. A required field the parser cannot fill is left null and flagged, never inferred.", "app/capex/parsers/", "Adding a document class is one parser and one registry line."],
+    tables: ["Typed relational rows: po_lines, grn_lines, audit_lines, invoice_lines, contract_lines. These stay the system of record for what was extracted, separate from the graph, so a parser fix can be replayed without touching reconciliation.", "app/capex/schema.sql", "stg_bill_line_items already carries sap_item_code, which seeds PO-line matching."],
+    loader: ["Loads each typed row into the graph as a vertex and writes the edges that bind it to what it references &mdash; the PO line an invoice bills, the GRN that received it, the audit report that certified it. An unresolved reference creates the vertex without the edge, so the gap is visible as data rather than hidden in a failed join.", "app/capex/graph/loader.py", "A missing edge is itself a finding, not an error to retry."],
+    rulecomp: ["Turns the organisation's settings into GSQL traversals and stamps each set with a version. A rule change is a new compiled query, not a code release, which is what makes a verdict replayable: the same invoice against the same rule version yields the same answer a year later.", "app/capex/rules/compiler.py", "Expressions reuse the existing hand-written parser in domain/playground/formula.py &mdash; never eval()."],
+    recon: ["Matches at row level and assigns one of MATCH_4WAY, PARKED or EXCEPTION. The traversal returns the verdict together with the path it walked, which is the evidence bundle. A rule that cannot evaluate &mdash; a field is null, a document is absent &mdash; abstains rather than passing or failing the line.", "app/capex/recon/agent.py", "Abstention is what makes 'the model only sees the residue' true rather than aspirational."],
+    precedent: ["Before anything is adjudicated, the memory graph is asked for a past decision on a line of the same shape: same vendor, same item class, same variance cause. Where one exists with a human action recorded on it, that becomes the primary context, so the system converges on how this organisation actually decides rather than on a generic answer.", "app/capex/memory/precedent.py", "Returns empty rather than a loose match; a weak precedent is worse than none."],
+    decision: ["Adjudicates only what the rules declined &mdash; description drift between PO and invoice, a split GRN, a part delivery, an audit qualification whose scope is unclear &mdash; given the relevant subgraph, the rule that abstained and any precedent. It returns a proposal and its reasoning. It cannot overturn a rule that reached a verdict, and it cannot post.", "app/capex/recon/adjudicate.py", "Proposes only. Every proposal goes to a person."],
+    hub: ["Each exception and each adjudication surfaces with its variance, its rupee value at risk, its evidence path and the agent's reasoning, routed to the owner for that role and aged. AP works the exposure in order instead of a flat queue.", "app/review/ &middot; adapters/capex_match.py", "Reuses the Review Hub adapter framework: scan() yields complete current truth, so a resolved finding clears itself."],
+    audit: ["An append-only record of what each agent read, what it decided and on whose authority, paired with the human action taken on it. This is what gives agent-level compliance oversight and post-implementation verification that an approved action was in fact carried out.", "app/capex/audit.py", "Each entry carries the SHA-256 of the one before it."],
+    memory: ["Writes the decision pair back as a precedent subgraph. This is the part that compounds: the trail is what an auditor reads, and the same pair is what the next ambiguous line is answered from.", "app/capex/memory/writer.py", "Growth is proportional to decisions made, not to documents processed."],
+    prune: ["Once every invoice under an audit report has been reconciled and posted, the transactional nodes for that invoice are deleted and the settled position is folded into the hub. Nothing is pruned before posting is confirmed, so the memory optimisation can never become data loss.", "app/capex/graph/prune.py", "Transactional volume stays bounded by work in progress."],
+    post: ["Creates the voucher in Dynamics with the evidence bundle attached, keyed on the invoice vertex so a retry cannot double-post. Posting is the last step: nothing reaches the ERP before the approval that authorised it is in the trail.", "app/capex/posting/dynamics.py", "Needs an idempotency key on Dynamics voucher creation &mdash; confirm before build."],
+    docstore: ["Original files exactly as received, addressed by content hash. The evidence bundle points here, so a reviewer can always open what the vendor actually sent rather than a rendering of it.", "app/object_store.py", "Existing object store; no new component."],
+    rulestore: ["Every rule set ever published, with who signed it and when. A replay names the version, and an unsigned set cannot be used in live mode.", "app/capex/rules/store.py", "Editing a published set is not possible; you publish a new version."],
+    ledger: ["Append-only JSON lines, each carrying the hash of the one before. Every graph query with its parameters and a result digest, every rule verdict, every abstention, every adjudication, every approval and refusal, every sign-in, every failure.", "app/capex/audit.py", "Editing an entry breaks the chain exactly there &mdash; demonstrated at the foot of this page."],
+    evidence: ["One bundle per verdict: the evidence path from the graph, the rule version in force, the figures compared and the tolerance applied. It is what the Review Hub shows and what the voucher carries into Dynamics.", "app/capex/recon/evidence.py", "Produced by the traversal, not reconstructed afterwards."],
+    tg: ["The reconciliation surface. Vertices for every document line plus Vendor, Project and PaymentReceipt; edges BILLS_AGAINST, RECEIVED_FOR, CERTIFIES, COVERED_BY, PAID_BY, ISSUED_BY. Compiled rules are installed queries. The memory subgraph lives here too, so precedent is one traversal away from the line that needs it.", "graph/schema.gsql &middot; graph/queries/", "Outside the tenant boundary: pseudonymous ids, no vendor bank details."],
+    openai: ["Three calls, each with only what it needs: OCR assistance on pages that defeat the primary reader, the decision API on the residue the rules declined, and embeddings for precedent search. No tenant name, no bank details, no PAN.", "app/ai/llm.py", "Reuses the existing client: retries, timeouts, schema validation and budget before spend."],
+    sarvam: ["The primary reader for Indian vendor documents: regional-language text, local invoice layouts, and the scanned-and-stamped pages that dominate a CAPEX file. It receives page images and returns text and tables.", "app/capex/ocr/sarvam.py", "Page images only; no covering text, no metadata."],
+    claude: ["Classifies each incoming attachment and names the parser that should receive it. It is given the document as data and returns a type and a confidence. It has no query access, no write access and no posting path.", "app/capex/router.py", "Least privilege: the only model with no path to a verdict."],
+    dyn: ["The ERP of record. PO and GRN master data are read from it, and the approved voucher is posted back to it with its evidence attached. Nothing else in the design writes to Dynamics.", "app/capex/posting/dynamics.py", "One writer, keyed on the invoice vertex."],
+  };
+  function nodeSvg(id, n) {
+    const body = n.lines
+      ? n.lines.map((l, i) => `<text class="t-sub" x="${n.x+12}" y="${n.y+42+i*16}">${l}</text>`).join("")
+      : `<text class="t-sub" x="${n.x+(n.s2?12:32)}" y="${n.y+(n.s2?40:35)}">${n.sub||""}</text>`;
+    const fill = n.hl ? "var(--accent-50)" : id === "tg" ? "var(--info-50)" : (id === "openai"||id==="sarvam"||id==="claude") ? "var(--brand-50)" : id === "dyn" ? "var(--surface-2)" : "var(--surface-0)";
+    const stroke = n.hl ? "var(--accent-600)" : "var(--line-300)";
+    return `<g class="node" data-id="${id}" tabindex="0" role="button" aria-label="${esc(n.label.replace(/&[a-z]+;/g,' '))}">
+      <rect class="box" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="8" fill="${fill}" stroke="${stroke}" stroke-width="${n.hl?1.8:1}"/>
+      ${icon(n.icon, n.x+10, n.y+9, 16, n.hl ? "var(--accent-600)" : "var(--brand-600)")}
+      <text class="t-label" x="${n.x+32}" y="${n.y+21}">${n.label}</text>${body}</g>`;
+  }
+  function edgeSvg(e) {
+    const lab = e.label ? `<text class="t-edge" x="${e.lx}" y="${e.ly}" text-anchor="${e.anchor||"middle"}">${e.label}</text>` : "";
+    const col = e.mem ? "var(--accent-600)" : "var(--ink-300)";
+    return `<g class="edge${e.mem?" mem":""}" data-id="${e.id}"><path d="${e.d}" fill="none" stroke="${col}" stroke-width="1.4" ${e.mem?'stroke-dasharray="5 3"':""} marker-end="url(#${e.mem?"hB":"hA"})"/>${lab}</g>`;
+  }
+  function renderHLD() {
+    document.getElementById("hld").innerHTML = `<svg viewBox="0 0 1100 540" role="img" aria-label="CAPEX four-way system design: documents arrive from the AP mailbox, Dynamics, SFTP and the vendor portal into a connector pool; a Claude-powered router classifies each and dispatches it to one of five parsers over an OCR layer built on Sarvam and OpenAI; parsed lines land in normalised tables and are loaded into TigerGraph as vertices and edges; organisation settings compile to GSQL rules which the recon agent runs at row level, returning a verdict and an evidence path; lines the rules decline go through precedent lookup to the OpenAI decision service; verdicts reach the Review Hub where a person approves, and the decision pair is written to the task audit trail and the memory graph before settled nodes are pruned and the voucher is posted to Microsoft Dynamics.">
+      <defs>${ARROW("hA","var(--ink-300)")}${ARROW("hB","var(--accent-600)")}</defs>
+      <rect x="188" y="30" width="668" height="494" rx="12" fill="none" stroke="var(--brand-600)" stroke-width="1.4" stroke-dasharray="6 5"/>
+      <text class="t-head" x="200" y="22">TENANT BOUNDARY &middot; THE CLIENT'S OWN ENVIRONMENT</text>
+      <text class="t-head" x="12" y="46">INPUTS &amp; POLICY</text>
+      <text class="t-head" x="392" y="46">GRAPH &amp; DECISION</text>
+      <text class="t-head" x="616" y="46">ACT, RECORD &amp; REMEMBER</text>
+      <text class="t-head" x="864" y="46">OUTSIDE THE TENANT</text>
+      <text class="t-head" x="200" y="446">TENANT-SIDE STORES</text>
+      ${E.map(edgeSvg).join("")}${Object.entries(N).map(([k,n]) => nodeSvg(k,n)).join("")}
+    </svg>`;
+    document.querySelectorAll("#hld .node").forEach((g) => {
+      const go = () => selectHLD(g.dataset.id);
+      g.addEventListener("click", go);
+      g.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } });
+    });
+    selectHLD("recon");
+  }
+  function selectHLD(id) {
+    document.querySelectorAll("#hld .node").forEach((g) => g.classList.toggle("sel", g.dataset.id === id));
+    document.querySelectorAll("#hld .edge").forEach((g) => g.classList.toggle("lit", (LIT[id]||[]).includes(g.dataset.id)));
+    const [what, file, note] = DETAIL[id];
+    document.getElementById("hldDetail").innerHTML = `<h3><span style="color:var(--brand-600);width:18px;height:18px;display:inline-block">${iconSvg(N[id].icon)}</span>${N[id].label}</h3>
+      <dl><div><dt>What it does</dt><dd>${what}</dd></div><div><dt>Where it lives</dt><dd><span class="file">${file}</span></dd></div><div><dt>Worth knowing</dt><dd>${note}</dd></div></dl>
+      <p class="hint">Select another component in the diagram.</p>`;
+  }
+
+  // ======================= FLOW =======================
+  const LANES = [["ingest","Mailbox &amp; router","mail"],["parse","Parsers","layers"],["graph","TigerGraph","db"],["rules","Rules engine","rules"],["ai","OpenAI decision","cloud"],["people","Review Hub","people"],["ledger","Audit trail","chain"]];
+  const SCEN = {
+    clean: { name: "Clean four-way match", tone: "var(--success-600)", badge: '<span class="verdict v-match">MATCH_4WAY &middot; posted</span>',
+      cap: "BW-24-00118. A milestone bill against a part-billed PO line, with the GRN and the certified audit figures already in the graph. Every inequality holds inside the configured band, so the rules settle it and no model runs.",
+      steps: [
+        ["ingest","ingest","Attachment arrives","AP mailbox &middot; subject: \"Inv 118 civil works ph-2\" &middot; 1 PDF, 4 pages",{seq:4101,kind:"doc.received",data:{source:"ap_mailbox",sender:"accounts@bharatworks.in",sha256:"9f2c41d8ab07e5b1",pages:4}}],
+        ["ingest","parse","Classified and routed","supplier_invoice at 0.97 &rarr; invoice parser",{seq:4102,kind:"doc.classified",data:{doc_type:"supplier_invoice",confidence:0.97,model:"claude",routed_to:"invoice_parser"}}],
+        ["parse","graph","Parsed to the standard format","3 lines &middot; PO 4500087321 &middot; retention 5% &middot; advance adjusted 120000",{seq:4104,kind:"doc.parsed",data:{parser:"invoice",lines:3,po_ref:"4500087321",retention_pct:5,advance_adjusted:120000,null_fields:[]}}],
+        ["graph","graph","Loaded as vertices and edges","3 InvoiceLine &middot; BILLS_AGAINST &rarr; POLine, COVERED_BY &rarr; AuditLine",{seq:4106,kind:"graph.loaded",data:{vertices:3,edges:{BILLS_AGAINST:3,COVERED_BY:3,ISSUED_BY:1},unresolved:0}}],
+        ["rules","graph","Cumulative ledger read","billed_to_date 4820000 of 7400000 ordered &middot; accepted_to_date 4950000",{seq:4108,kind:"rule.query",data:{query:"ty_po_line_position",params:{po:"4500087321",line:20},n_rows:1,result_digest:"c71b04ef9a2d"}}],
+        ["rules","rules","Four inequalities, all inside band","qty 0.4% &middot; value 0.3% &middot; accepted &ge; billed &middot; verified &ge; billed",{seq:4111,kind:"rule.verdict",data:{rule:"R1_within_band",rule_version:"v7",qty_var_pct:0.4,val_var_pct:0.3,qty_tol_pct:2,val_tol_pct:2,abstained:[]}}],
+        ["rules","people","Verdict","MATCH_4WAY &middot; no exception raised &middot; auto route",{seq:4112,kind:"recon.verdict",data:{verdict:"MATCH_4WAY",decided_by:"rule_R1_within_band",money_at_risk_inr:0,route:"auto"}}],
+        ["people","people","Approved inside the delegated band","L1 by approver.ravi &middot; evidence path reviewed",{seq:4118,kind:"approval.granted",actor:"approver.ravi",role:"approver_l1",data:{action:"RELEASE_FOR_POSTING",route:"L1",note:"Milestone 3 of 5; certified qty matches, retention held."}}],
+        ["people","graph","Posted, then pruned","voucher DYN-V-55210 &middot; invoice cluster pruned, hub retains the position",{seq:4121,kind:"posting.done",data:{erp:"dynamics",voucher:"DYN-V-55210",idempotency_key:"inv:BW-24-00118",pruned_vertices:7,hub_retained:"AUD-2026-0094"}}],
+      ]},
+    parked: { name: "Audit report pending", tone: "var(--warn-600)", badge: '<span class="verdict v-park">PARKED &middot; clears itself</span>',
+      cap: "BW-24-00119. The invoice, PO and GRN all agree, but the external audit report for this milestone has not arrived. In CAPEX that is normal, not a failure, so the line parks and the next pass recomputes it when the report lands.",
+      steps: [
+        ["ingest","parse","Invoice arrives and is parsed","2 lines &middot; PO 4500087344 &middot; GRN 5000312218 referenced",{seq:4203,kind:"doc.parsed",data:{parser:"invoice",lines:2,po_ref:"4500087344",grn_ref:"5000312218"}}],
+        ["graph","graph","Edges written, one missing","BILLS_AGAINST and RECEIVED_FOR resolved &middot; COVERED_BY: no AuditLine",{seq:4205,kind:"graph.loaded",data:{edges:{BILLS_AGAINST:2,RECEIVED_FOR:2,COVERED_BY:0},unresolved:["COVERED_BY: no audit report for milestone 2"]}}],
+        ["rules","rules","The audit rule abstains","asset_class PLANT requires an audit report; none present",{seq:4208,kind:"rule.abstained",data:{rule:"R4_audit_mandatory",rule_version:"v7",why:"no AuditLine reachable via COVERED_BY",asset_class:"PLANT"}}],
+        ["rules","people","Verdict","PARKED &middot; not an exception &middot; no owner assigned, nothing to work",{seq:4209,kind:"recon.verdict",data:{verdict:"PARKED",decided_by:"rule_R4_no_audit",awaiting:["external_audit_report"],money_at_risk_inr:0}}],
+        ["ingest","graph","Nine days later, the report arrives","audit parser &rarr; AUD-2026-0097 &middot; certified qty for milestone 2",{seq:4661,kind:"doc.parsed",data:{parser:"audit",report_no:"AUD-2026-0097",certified_lines:2,qualifications:[],signed_by:"M/s Deshpande & Co"}}],
+        ["rules","people","Recomputed on the next pass","COVERED_BY now resolves &middot; MATCH_4WAY &middot; parked item clears itself",{seq:4664,kind:"recon.verdict",data:{verdict:"MATCH_4WAY",decided_by:"rule_R1_within_band",previous:"PARKED",cleared_without_human_action:true}}],
+      ]},
+    variance: { name: "Rate above contract", tone: "var(--danger-600)", badge: '<span class="verdict v-exc">EXCEPTION &middot; priced and owned</span>',
+      cap: "BW-24-00121. The quantities agree with the GRN and the audit report, but the rate billed is above the contracted rate by more than the band allows. The rules settle this without a model: it is an exception with a number on it.",
+      steps: [
+        ["ingest","parse","Invoice parsed","4 lines &middot; rate 0.94 per unit on line 2",{seq:4301,kind:"doc.parsed",data:{parser:"invoice",lines:4,po_ref:"4500087361"}}],
+        ["rules","graph","Contract rate read","contract_lines: agreed rate 0.79 &middot; same item code, same vendor",{seq:4305,kind:"rule.query",data:{query:"ty_contract_rate",params:{vendor:"V-10442",item:"ITM-CIV-220"},n_rows:1,agreed_rate:0.79}}],
+        ["rules","rules","Rate compared, not quantity","19.0% above contract &middot; band is 2% &middot; quantity agrees with the GRN",{seq:4307,kind:"rule.verdict",data:{rule:"R2_rate_variance",rule_version:"v7",billed_rate:0.94,agreed_rate:0.79,variance_pct:19.0,tol_pct:2}}],
+        ["rules","rules","Quantity deliberately not flagged","a contract quantity is a commitment; usage legitimately differs",{seq:4308,kind:"rule.note",data:{why:"rate is what the contract fixes; flagging quantity produced false exceptions on metered items"}}],
+        ["rules","people","Exception priced","EXCEPTION &middot; cause rate_above_contract &middot; INR 2,84,600 at risk &middot; L2",{seq:4309,kind:"recon.verdict",data:{verdict:"EXCEPTION",cause:"rate_above_contract",decided_by:"rule_R2_rate_variance",money_at_risk_inr:284600,route:"L2"}}],
+        ["people","people","A clerk tries to clear it","refused: ap_clerk may not approve L2",{seq:4330,kind:"approval.denied",actor:"ap.clerk.meera",role:"ap_clerk",data:{action:"ACCEPT_VARIANCE",route:"L2",why:"role ap_clerk may not approve L2"}}],
+        ["people","people","The Controller rejects the line","vendor asked to revise &middot; line not posted",{seq:4332,kind:"approval.granted",actor:"controller.anil",role:"controller",data:{action:"REJECT_LINE",route:"L2",note:"Rate 0.94 not supported by contract; revised invoice requested for line 2 only."}}],
+        ["people","ledger","Recorded as precedent","vendor V-10442 &middot; rate_above_contract &middot; action REJECT_LINE",{seq:4333,kind:"memory.written",data:{precedent_id:"P-0881",vendor:"V-10442",cause:"rate_above_contract",human_action:"REJECT_LINE",authority:"controller"}}],
+      ]},
+    adjudicate: { name: "Rules decline, adjudicated", tone: "var(--info-600)", badge: '<span class="verdict v-adj">adjudicated &middot; approved by a person</span>',
+      cap: "BW-24-00124. The invoice describes \"RCC M-30 incl. shuttering\" where the PO line reads \"concrete works grade 30\". No rule can say whether these are the same line, so the rule abstains, precedent is checked, and the decision API proposes. A person decides.",
+      steps: [
+        ["ingest","parse","Invoice parsed","6 lines &middot; two descriptions with no exact or substring match on the PO",{seq:4401,kind:"doc.parsed",data:{parser:"invoice",lines:6,unmatched_descriptions:2}}],
+        ["graph","graph","Two lines land without an edge","4 of 6 BILLS_AGAINST resolved &middot; 2 vertices with no PO line",{seq:4404,kind:"graph.loaded",data:{edges:{BILLS_AGAINST:4},unresolved:["line 3: RCC M-30 incl. shuttering","line 5: misc. centering"]}}],
+        ["rules","rules","The matcher abstains","no exact match, no substring match; deliberately not a fuzzy engine",{seq:4407,kind:"rule.abstained",data:{rule:"R3_line_match",rule_version:"v7",why:"description match is exact-or-substring by design; neither applies"}}],
+        ["rules","ai","Precedent checked first","P-0613: same vendor, same pair, Controller mapped them last quarter",{seq:4408,kind:"memory.read",data:{precedent_id:"P-0613",vendor:"V-10442",pair:["RCC M-30 incl. shuttering","concrete works grade 30"],human_action:"MAP_TO_LINE",age_days:96}}],
+        ["ai","ai","Decision API asked","subgraph + abstained rule + precedent &middot; proposal only",{seq:4409,kind:"adjudication",data:{model:"openai_decision",proposal:"MAP_TO_LINE",po_line:30,confidence:0.88,rationale:"Precedent P-0613 maps this exact description pair for this vendor; quantities and unit agree.",can_post:false}}],
+        ["ai","people","Surfaced, not applied","Review Hub &middot; INR 11,40,000 at risk &middot; proposal shown with its precedent",{seq:4410,kind:"recon.verdict",data:{verdict:"EXCEPTION",cause:"line_match_uncertain",decided_by:"decision_api",money_at_risk_inr:1140000,route:"L2",auto_applied:false}}],
+        ["people","people","The Controller accepts the mapping","line 3 &rarr; PO line 30 &middot; line 5 rejected, no PO cover",{seq:4421,kind:"approval.granted",actor:"controller.anil",role:"controller",data:{action:"MAP_TO_LINE",route:"L2",accepted:["line 3 → po line 30"],rejected:["line 5: no PO cover for centering"]}}],
+        ["people","ledger","Precedent strengthened","P-0613 confirmed a second time &middot; next identical pair will be proposed with it",{seq:4423,kind:"memory.written",data:{precedent_id:"P-0613",confirmations:2,human_action:"MAP_TO_LINE",authority:"controller"}}],
+      ]},
+      ledgercap: { name: "Running bill, cumulative ledger", tone: "var(--brand-600)", badge: '<span class="verdict v-exc">EXCEPTION &middot; over-billed in aggregate</span>',
+      cap: "BW-24-00126. Each individual bill looked reasonable. This one is the fourth against the same PO line, and the running total now exceeds what was ordered. No single-invoice comparison would catch it; the cumulative position does.",
+      steps: [
+        ["ingest","parse","The fourth bill on one PO line","advance, milestone 1, milestone 2 already posted &middot; this is a running bill",{seq:4501,kind:"doc.parsed",data:{parser:"invoice",lines:1,po_ref:"4500087299",bill_kind:"running"}}],
+        ["rules","graph","Position read, not just this bill","billed_to_date 7210000 &middot; ordered 7400000 &middot; this bill 410000",{seq:4504,kind:"rule.query",data:{query:"ty_po_line_position",params:{po:"4500087299",line:10},billed_to_date:7210000,ordered_value:7400000,prior_bills:3}}],
+        ["rules","rules","Cumulative cap breached","7210000 + 410000 = 7620000 &gt; 7400000 &times; 1.02",{seq:4506,kind:"rule.verdict",data:{rule:"R6_ledger_cap",rule_version:"v7",cumulative_after:7620000,cap:7548000,excess_inr:72000}}],
+        ["rules","rules","Advance recovery checked too","advance 1200000 &middot; recovered 880000 &middot; under-recovered by 320000",{seq:4507,kind:"rule.verdict",data:{rule:"R7_advance_recovery",advance_paid:1200000,recovered_to_date:880000,shortfall_inr:320000}}],
+        ["rules","people","Two causes on one line","EXCEPTION &middot; qty_over_ordered + advance_under_recovered &middot; INR 3,92,000",{seq:4508,kind:"recon.verdict",data:{verdict:"EXCEPTION",causes:["cumulative_over_ordered","advance_under_recovered"],money_at_risk_inr:392000,route:"L2",key_qualifier:"po:4500087299:line:10"}}],
+        ["people","people","Part-approved","excess held back, advance recovery corrected on this bill",{seq:4530,kind:"approval.granted",actor:"controller.anil",role:"controller",data:{action:"PART_APPROVE",route:"L2",approved_inr:338000,held_inr:72000,advance_recovery_applied_inr:320000}}],
+        ["people","graph","Posted at the approved figure","voucher carries both the variance and the authority for it",{seq:4533,kind:"posting.done",data:{erp:"dynamics",voucher:"DYN-V-55288",posted_inr:338000,evidence_bundle:"EV-4508",approval_seq:4530}}],
+      ]},
+    down: { name: "Graph unavailable", tone: "var(--ink-700)", badge: '<span class="verdict v-fail">failed closed &middot; nothing posted</span>',
+      cap: "A drill. The graph cannot answer mid-reconciliation. The run stops, says why, records the failure and writes no verdict. It does not fall back to the relational tables and present a partial answer as complete.",
+      steps: [
+        ["ingest","parse","Invoice parsed normally","3 lines &middot; PO 4500087321",{seq:4601,kind:"doc.parsed",data:{parser:"invoice",lines:3}}],
+        ["rules","graph","Traversal fails","ty_po_line position query cannot be reached",{seq:4603,kind:"rule.query",data:{query:"ty_po_line_position",error:"GraphUnavailable: connection reset after 3 attempts"}}],
+        ["rules","ledger","Failure recorded","recon.failed &middot; verdict_written: false &middot; posted: false",{seq:4604,kind:"recon.failed",data:{error:"GraphUnavailable: ty_po_line_position",verdict_written:false,posted:false,note:"failed closed; invoice stays in the queue"}}],
+        ["rules","ingest","Worker stops on this invoice","exit 2 &middot; no Review Hub item, no Dynamics write, next invoice continues",{seq:4604,kind:"recon.failed",data:{exit_code:2,review_hub_item:null,erp_write:false,queue_position:"retained"}}],
+      ]},
+  };
+  let scen = "clean", stepIx = 0, timer = null;
+  function renderScen() {
+    document.getElementById("scen").innerHTML = Object.entries(SCEN).map(([k,s]) =>
+      `<button type="button" data-scen="${k}" aria-pressed="${k===scen}"><span class="dot" style="background:${s.tone}"></span>${esc(s.name)}</button>`).join("");
+  }
+  function renderSeq() {
+    const s = SCEN[scen], steps = s.steps;
+    const W = 940, laneW = (W-40)/LANES.length, top = 62, row = 34, H = top + steps.length*row + 26;
+    const lx = (id) => 20 + laneW*LANES.findIndex((l) => l[0]===id) + laneW/2;
+    let out = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Sequence of steps for ${esc(s.name)}: ${steps.map((x)=>x[2]).join(", ")}">
+      <defs>${ARROW("sA","var(--ink-300)")}${ARROW("sB","var(--brand-600)")}</defs>`;
+    LANES.forEach(([id,name,ic]) => {
+      const x = lx(id);
+      out += `${icon(ic, x-8, 12, 16, "var(--brand-600)")}<text class="t-label" x="${x}" y="46" text-anchor="middle">${name}</text>
+        <line x1="${x}" y1="${top-6}" x2="${x}" y2="${H-8}" stroke="var(--line-200)" stroke-width="2"/>`;
+    });
+    steps.forEach(([a,b,title], i) => {
+      const y = top + i*row + 16, x1 = lx(a), x2 = lx(b), cur = i===stepIx, done = i<stepIx;
+      const stroke = cur ? "var(--brand-600)" : done ? "var(--brand-400)" : "var(--ink-300)";
+      out += `<g class="edge ${cur?"lit":""}" data-step="${i}" style="cursor:pointer">`;
+      if (a === b) {
+        out += `<path d="M${x1} ${y-6} h26 v12 h-24" fill="none" stroke="${stroke}" stroke-width="${cur?2.4:1.4}" marker-end="url(#${cur?"sB":"sA"})"/>
+          <text class="t-edge" x="${x1+32}" y="${y+4}" ${cur?'style="fill:var(--brand-600);font-weight:600"':""}>${i+1}. ${esc(title)}</text>`;
+      } else {
+        const dir = x2 > x1 ? 1 : -1;
+        out += `<line x1="${x1}" y1="${y}" x2="${x2-dir*4}" y2="${y}" stroke="${stroke}" stroke-width="${cur?2.4:1.4}" marker-end="url(#${cur?"sB":"sA"})"/>
+          <text class="t-edge" x="${(x1+x2)/2}" y="${y-5}" text-anchor="middle" ${cur?'style="fill:var(--brand-600);font-weight:600"':""}>${i+1}. ${esc(title)}</text>`;
+      }
+      out += `<circle cx="${lx("ledger")}" cy="${y}" r="${cur?5:3.2}" fill="${cur?"var(--brand-600)":done?"var(--brand-400)":"var(--ink-300)"}"/></g>`;
+    });
+    out += `</svg>`;
+    document.getElementById("seq").innerHTML = out;
+    document.getElementById("seqCap").innerHTML = `${s.badge} ${esc(s.cap)} Every step also appends an entry to the task audit trail, shown as the dots in the last lane.`;
+    document.querySelectorAll("#seq [data-step]").forEach((g) => g.addEventListener("click", () => { stepIx = +g.dataset.step; renderSeq(); }));
+    renderStep();
+  }
+  function jsonHTML(o) {
+    return esc(JSON.stringify(o, null, 2))
+      .replace(/&quot;([^&]+?)&quot;(?=:)/g, '<span class="k">"$1"</span>')
+      .replace(/: &quot;(.*?)&quot;/g, ': <span class="s">"$1"</span>')
+      .replace(/: (-?\d+(\.\d+)?|true|false|null)/g, ': <span class="n">$1</span>');
+  }
+  function renderStep() {
+    const s = SCEN[scen], [a,b,title,sub,log] = s.steps[stepIx];
+    const lane = (id) => LANES.find((l) => l[0]===id)[1];
+    const entry = { seq: log.seq, kind: log.kind, actor: log.actor || "capex-agent", role: log.role || "system", data: log.data };
+    document.getElementById("step").innerHTML = `
+      <span class="num">STEP ${stepIx+1} OF ${s.steps.length} &middot; ${lane(a)}${a!==b ? " &rarr; " + lane(b) : ""}</span>
+      <h3>${esc(title)}</h3><p class="muted">${sub}</p>
+      <div class="progress" role="group" aria-label="Steps">${s.steps.map((_,i) => `<button type="button" aria-label="Step ${i+1}" data-jump="${i}" class="${i<stepIx?"done":i===stepIx?"cur":""}"></button>`).join("")}</div>
+      <div><div class="hint" style="margin-bottom:6px">Audit entry #${log.seq} &middot; ${esc(log.kind)}</div><pre class="log">${jsonHTML(entry)}</pre></div>
+      <div class="ctrl"><button class="btn" type="button" id="prev" ${stepIx===0?"disabled":""}>Previous</button>
+        <button class="btn primary" type="button" id="next" ${stepIx===s.steps.length-1?"disabled":""}>Next step</button>
+        <button class="btn" type="button" id="play">Play all</button></div>`;
+    document.getElementById("prev").onclick = () => { stepIx--; renderSeq(); };
+    document.getElementById("next").onclick = () => { stepIx++; renderSeq(); };
+    document.getElementById("play").onclick = play;
+    document.querySelectorAll("[data-jump]").forEach((x) => x.onclick = () => { stepIx = +x.dataset.jump; renderSeq(); });
+  }
+  function play() {
+    clearInterval(timer); stepIx = 0; renderSeq();
+    const n = SCEN[scen].steps.length;
+    timer = setInterval(() => { if (stepIx >= n-1) { clearInterval(timer); return; } stepIx++; renderSeq(); }, 1600);
+  }
+  document.getElementById("scen").addEventListener("click", (ev) => {
+    const b = ev.target.closest("[data-scen]"); if (!b) return;
+    clearInterval(timer); scen = b.dataset.scen; stepIx = 0; renderScen(); renderSeq();
+  });
+
+  // ======================= CLASS DIAGRAM =======================
+  const CW = 248, CH = 152, GX = 22, GY = 46, X0 = 14, Y0 = 16;
+  const cell = (c,r) => ({ x: X0 + c*(CW+GX), y: Y0 + r*(CH+GY) });
+  const C = [
+    ["line",0,0,"StdLine","dataclass",["doc_type · doc_no · line_no","item_code · description","qty · unit · rate · value","tax_split · retention · advance","po_ref · grn_ref · audit_ref","confidence per field"],"The one shape every parser emits and every rule reads. Normalising here is what lets a PO line and an invoice line be compared without per-vendor code.","capex/model.py"],
+    ["src",1,0,"GraphSource","protocol",["po_line(po, line, as_of)","grn_for(po, line, as_of)","audit_for(po, line, as_of)","line_position(po, line, as_of)","precedent(vendor, cause, before)"],"Every question a rule may ask. as_of is always the invoice's own date, so no rule can see a document that arrived after the invoice it judges.","capex/model.py"],
+    ["mem",2,0,"MemoryGraph","class",["write(decision, human_action)","find(vendor, item_class, cause)","confirmations(precedent_id)","prune(audit_report_id)","hub_position(audit_report_id)"],"Precedent and lifecycle in one place: it writes the decision pair, finds past decisions of the same shape, and prunes a settled invoice cluster while the hub keeps the position.","capex/memory/"],
+    ["ledger",3,0,"AuditLedger","class",["append(invoice, kind, data, actor)","entries(invoice)","verify(path) → first_broken","QueryRecorder(ledger, invoice)","redact(text)"],"Append-only, hash-chained. Every source records every query through a QueryRecorder; vendor bank details and PAN are masked before writing.","capex/audit.py"],
+    ["verdict",0,1,"MatchVerdict","dataclass",["state: MATCH_4WAY | PARKED","        | EXCEPTION","causes: list[str]","evidence: EvidencePath","rule_version · decided_by","money_at_risk_inr"],"One line's outcome and why: which rule or which adjudication decided, what it compared, and what it is worth.","capex/recon/model.py"],
+    ["tgsrc",1,1,"TigerGraphSource","implements GraphSource",["each method is an installed query","compiled rules by version","GraphUnavailable → fail closed","UnknownRef → no edge, a finding","recorder: QueryRecorder"],"The live source. Graph errors raise GraphUnavailable and the invoice fails closed; an unresolvable reference is recorded as a missing edge rather than retried forever.","capex/graph/tg.py"],
+    ["mirror",2,1,"MirrorSource","implements GraphSource",["same protocol, local copy","label: mirror on every ref","used to back-test a rule change"],"The back-test mirror: identical rows behind the identical interface, so a rule change can be measured before it is published. Never a silent fallback in live mode.","capex/graph/mirror.py"],
+    ["access",3,1,"Access &amp; approvals","modules",["require_service('capex')","GRANTS[role] · APPROVERS[route]","approval_chain.request(action)","Finding.audience_roles"],"Who may see and do what: the licensing gate, one permission table, and the approval chain the platform already has. The Review Hub routes a finding by the same table.","core/approval_chain.py · licensing"],
+    ["rules",0,2,"RULES","registry · 10",["R1 within_band · R2 rate","R3 line_match · R4 audit","R5 duplicate · R6 ledger_cap","R7 advance · R8 retention","R9 tax · R10 asset_class","(line, src, as_of) → Verdict | ABSTAIN"],"Ten pure functions with one signature. Adding a rule is one function, one registry line and a back-test on the mirror.","capex/rules/registry.py"],
+    ["recon",1,2,"reconcile()","orchestrator",["load → edges, unresolved","run RULES in order","ABSTAIN → precedent → adjudicate","never overrule a decided rule","returns MatchVerdict"],"The decision order. Each step can only make the outcome more careful about paying wrongly or blocking a vendor wrongly. Rules are switchable for ablation.","capex/recon/agent.py"],
+    ["adj",2,2,"Adjudication","dataclass + adjudicate()",["proposal · confidence · rationale","precedent_id used","scan_injection(doc_text)","can_post = False, always","failure → EXCEPTION, not a guess"],"The model boundary. A proposal in, a person's decision out. Document text is quoted as untrusted data, never read as instruction.","capex/recon/adjudicate.py"],
+    ["comp",3,2,"RuleCompiler","class",["compile(settings) → GSQL","version · signed_by · at","install(graph)","expression → formula.py parser"],"Turns finance's settings into installed traversals and stamps a version. Expressions go through the existing hand-written parser, never eval().","capex/rules/compiler.py"],
+    ["pos",0,3,"LinePosition","dataclass",["ordered_qty · ordered_value","billed_to_date · billed_value","accepted_to_date","verified_value","advance_paid · recovered","retention_held"],"The cumulative position on one PO line. This is the object that makes advance, milestone, running and final bills net correctly against one order.","capex/recon/position.py"],
+    ["evid",1,3,"EvidencePath","dataclass",["vertices and edges walked","figures compared · tolerance","rule_version in force","source: graph | mirror","digest"],"Produced by the traversal rather than reconstructed afterwards, which is why a replay a year later can show the same path.","capex/recon/evidence.py"],
+    ["build",2,3,"build_voucher() · write_back()","functions",["verdict + approval → payload","evidence bundle attached","upsert in graph, read back","idempotency_key = invoice vertex"],"Turns an approved verdict into the Dynamics payload and the graph record, and marks it posted only after it reads back.","capex/posting/"],
+    ["payload",3,3,"PostingPayload","pydantic model",["invoice · vendor · lines","gst_split · tds · retention","approved_by · approval_seq","evidence_bundle_id","validators: approved before posted"],"The ERP contract with its invariants, validated before anything is written to Dynamics.","capex/posting/model.py"],
+  ];
+  const R = [
+    ["tgsrc","src","implements","impl",(p)=>`M${p.tgsrc.x+CW/2} ${p.tgsrc.y} V${p.src.y+CH}`],
+    ["mirror","src","implements","impl",(p)=>`M${p.mirror.x+CW/2} ${p.mirror.y} V${p.src.y+CH+GY/2} H${p.src.x+CW*0.8} V${p.src.y+CH}`],
+    ["src","line","returns StdLine","use",(p)=>`M${p.src.x} ${p.src.y+58} H${p.line.x+CW}`],
+    ["tgsrc","mem","reads precedent","use",(p)=>`M${p.tgsrc.x+CW} ${p.tgsrc.y+40} H${p.tgsrc.x+CW+GX/2} V${p.mem.y+CH-30} H${p.mem.x}`],
+    ["rules","verdict","produce","use",(p)=>`M${p.rules.x+CW/2} ${p.rules.y} V${p.verdict.y+CH}`],
+    ["recon","rules","runs in order","use",(p)=>`M${p.recon.x} ${p.recon.y+50} H${p.rules.x+CW}`],
+    ["recon","pos","reads position","use",(p)=>`M${p.recon.x} ${p.recon.y+112} H${p.recon.x-GX/2} V${p.pos.y+40} H${p.pos.x+CW}`],
+    ["recon","tgsrc","reads via GraphSource","use",(p)=>`M${p.recon.x+CW/2} ${p.recon.y} V${p.tgsrc.y+CH}`],
+    ["recon","adj","abstained lines","use",(p)=>`M${p.recon.x+CW} ${p.recon.y+60} H${p.adj.x}`],
+    ["recon","evid","emits","use",(p)=>`M${p.recon.x+CW/2} ${p.recon.y+CH} V${p.evid.y}`],
+    ["evid","build","attached by","use",(p)=>`M${p.evid.x+CW} ${p.evid.y+60} H${p.build.x}`],
+    ["build","comp","rule_version","use",(p)=>`M${p.build.x+CW*0.75} ${p.build.y} V${p.build.y-GY/2} H${p.comp.x+CW/2} V${p.comp.y+CH}`],
+    ["build","payload","validates","use",(p)=>`M${p.build.x+CW} ${p.build.y+60} H${p.payload.x}`],
+    ["access","ledger","records approvals","use",(p)=>`M${p.access.x+CW/2} ${p.access.y} V${p.ledger.y+CH}`],
+    ["access","comp","signs a rule set","use",(p)=>`M${p.access.x+CW/2} ${p.access.y+CH} V${p.comp.y}`],
+  ];
+  function renderUML() {
+    const pos = {}; C.forEach(([id,c,r]) => (pos[id] = cell(c,r)));
+    const W = X0*2 + 4*CW + 3*GX, H = Y0*2 + 4*CH + 3*GY;
+    let s = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Class diagram: TigerGraphSource and MirrorSource implement GraphSource, which returns StdLine rows; reconcile() runs the rule registry that produces a MatchVerdict, reads the cumulative LinePosition, and sends abstained lines to Adjudication; build_voucher attaches the EvidencePath and validates a PostingPayload; access and approvals record into the AuditLedger and sign rule sets in the RuleCompiler.">
+      <defs>${ARROW("uA","var(--ink-500)")}<marker id="uI" viewBox="0 0 12 12" refX="11" refY="6" markerWidth="10" markerHeight="10" orient="auto-start-reverse"><path d="M0 0L12 6L0 12z" fill="var(--surface-0)" stroke="var(--ink-500)" stroke-width="1.2"/></marker></defs>`;
+    R.forEach(([a,b,label,kind,path]) => {
+      const d = path(pos);
+      const m = d.match(/-?\d+(\.\d+)?/g).map(Number);
+      const lx = (m[0]+m[m.length-2])/2, ly = (m[1]+m[m.length-1])/2;
+      s += `<g class="edge" data-rel="${a}-${b}"><path d="${d}" fill="none" stroke="var(--ink-500)" stroke-width="1.2" ${kind==="impl"?'stroke-dasharray="5 4" marker-end="url(#uI)"':'marker-end="url(#uA)"'}/>
+        <text class="t-edge" x="${lx+4}" y="${ly-4}">${esc(label)}</text></g>`;
+    });
+    C.forEach(([id,c,r,name,stereo,members]) => {
+      const p = pos[id];
+      const head = (id==="src"||id==="rules") ? "var(--brand-50)" : id==="tgsrc" ? "var(--info-50)" : (id==="ledger"||id==="mem") ? "var(--accent-50)" : "var(--surface-1)";
+      s += `<g class="node" data-id="${id}" tabindex="0" role="button" aria-label="${esc(name)}">
+        <rect class="box" x="${p.x}" y="${p.y}" width="${CW}" height="${CH}" rx="8" fill="var(--surface-0)" stroke="var(--line-300)"/>
+        <path d="M${p.x} ${p.y+8} a8 8 0 0 1 8 -8 h${CW-16} a8 8 0 0 1 8 8 v32 h-${CW} z" fill="${head}"/>
+        <line x1="${p.x}" y1="${p.y+40}" x2="${p.x+CW}" y2="${p.y+40}" stroke="var(--line-300)"/>
+        <text class="t-mono" x="${p.x+CW/2}" y="${p.y+14}" text-anchor="middle" style="font-size:9px">&#171;${esc(stereo)}&#187;</text>
+        <text class="t-label" x="${p.x+CW/2}" y="${p.y+31}" text-anchor="middle">${name}</text>
+        ${members.map((m,i) => `<text class="t-mono" x="${p.x+10}" y="${p.y+58+i*16}">${esc(m)}</text>`).join("")}</g>`;
+    });
+    s += `</svg>`;
+    document.getElementById("uml").innerHTML = s;
+    document.querySelectorAll("#uml .node").forEach((g) => {
+      const go = () => selectUML(g.dataset.id);
+      g.addEventListener("click", go);
+      g.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } });
+    });
+    selectUML("recon");
+  }
+  function selectUML(id) {
+    const c = C.find((x) => x[0]===id);
+    document.querySelectorAll("#uml .node").forEach((g) => g.classList.toggle("sel", g.dataset.id===id));
+    document.querySelectorAll("#uml .edge").forEach((g) => g.classList.toggle("lit", g.dataset.rel.split("-").includes(id)));
+    const rels = R.filter((r) => r[0]===id || r[1]===id).map((r) => `${r[0]===id?"→":"←"} ${C.find((x)=>x[0]===(r[0]===id?r[1]:r[0]))[3]}: ${r[2]}`);
+    document.getElementById("umlDetail").innerHTML = `<h3>${c[3]}</h3><span class="hint">&#171;${esc(c[4])}&#187;</span>
+      <dl><div><dt>Responsibility</dt><dd>${esc(c[6])}</dd></div><div><dt>Proposed file</dt><dd><span class="file">backend_ocr/app/${esc(c[7])}</span></dd></div>
+      <div><dt>Connections</dt><dd>${rels.map(esc).join("<br>") || "&mdash;"}</dd></div></dl><p class="hint">Select another class in the diagram.</p>`;
+  }
+
+  // ======================= DEPLOYMENT =======================
+  function renderDeploy() {
+    const box = (x,y,w,h,label,sub,ic,fill="var(--surface-0)") => `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="8" fill="${fill}" stroke="var(--line-300)"/>
+      ${icon(ic, x+10, y+9, 16, "var(--brand-600)")}<text class="t-label" x="${x+32}" y="${y+21}">${label}</text>
+      ${(Array.isArray(sub)?sub:[sub]).map((t,i) => `<text class="t-sub" x="${x+12}" y="${y+40+i*15}">${t}</text>`).join("")}`;
+    document.getElementById("deploy").innerHTML = `<svg viewBox="0 0 1060 450" role="img" aria-label="Deployment: the FastAPI service, the CAPEX pipeline workers, the parser pool, secrets, the rule store, the audit ledger and the back-test mirror run inside the client's tenant; they call TigerGraph, OpenAI, Sarvam, the Claude API and Microsoft Dynamics over HTTPS; code is deployed from a tagged release.">
+      <defs>${ARROW("dA","var(--ink-300)")}</defs>
+      <rect x="14" y="30" width="646" height="404" rx="12" fill="var(--surface-1)" stroke="var(--brand-600)" stroke-dasharray="6 5"/>
+      <text class="t-head" x="28" y="22">CLIENT TENANT &middot; VPC OR ON-PREMISES</text>
+      ${box(34,50,294,98,"FastAPI service","Console, Review Hub and approvals;|require_service('capex') gates every route;|one session, the platform's own RBAC".split("|"),"portal")}
+      ${box(348,50,294,98,"CAPEX pipeline workers","python -m onsumm.capex.run;|one invoice per task, independent;|CDC-triggered, bounded passes".split("|"),"term")}
+      ${box(34,166,190,82,"Parser pool","5 parsers, one per|document class; stateless".split("|"),"layers")}
+      ${box(240,166,196,82,"Secrets","TG_KEY, OPENAI_API_KEY,|SARVAM_KEY, ANTHROPIC_KEY, DYN_*|.env, never committed".split("|"),"key")}
+      ${box(452,166,190,82,"Rule store","every published version,|with who signed it".split("|"),"policy")}
+      ${box(34,266,300,98,"Run directory","verdicts/*.json &middot; evidence/*.json|audit/ledger.jsonl (hash-chained)|run_log.csv: latency, queries, tokens".split("|"),"chain","var(--accent-50)")}
+      ${box(352,266,290,98,"Back-test mirror","a local copy of the same rows|a rule change is measured here first|parity must hold before publishing".split("|"),"db")}
+      <text class="t-sub" x="34" y="390">Publishing a rule change: compile &rarr; back-test on the mirror &rarr; parity check &rarr; Controller signs &rarr; install in the graph</text>
+      <text class="t-sub" x="34" y="408">Nothing posts to Dynamics without an approval entry in the ledger that authorises that exact figure</text>
+      ${box(720,40,324,106,"TigerGraph","tenant graph &middot; GSQL|document-line vertices and their edges|compiled rules installed per version|memory subgraph: precedent and hubs".split("|"),"db","var(--info-50)")}
+      ${box(720,164,324,74,"OpenAI API","decision API on the declined residue|embeddings for precedent &middot; OCR assist".split("|"),"cloud","var(--brand-50)")}
+      ${box(720,256,324,58,"Sarvam API","Indian formats, regional text, poor scans","cloud","var(--brand-50)")}
+      ${box(720,332,324,58,"Claude API","document classification only; no writes","cloud","var(--brand-50)")}
+      ${box(720,408,324,32,"Microsoft Dynamics","","bank","var(--surface-2)")}
+      <path d="M660 92 H700 V93 H720" fill="none" stroke="var(--ink-300)" stroke-width="1.4" marker-end="url(#dA)"/><text class="t-edge" x="690" y="84" text-anchor="middle">HTTPS &middot; GSQL</text>
+      <path d="M660 120 H702 V201 H720" fill="none" stroke="var(--ink-300)" stroke-width="1.4" marker-end="url(#dA)"/><text class="t-edge" x="706" y="162" text-anchor="end">subgraph only</text>
+      <path d="M224 207 H236 V285 H706 V285 H720" fill="none" stroke="var(--ink-300)" stroke-width="1.4" marker-end="url(#dA)"/><text class="t-edge" x="470" y="279" text-anchor="middle">page images only</text>
+      <path d="M436 207 H444 V361 H720" fill="none" stroke="var(--ink-300)" stroke-width="1.4" marker-end="url(#dA)"/><text class="t-edge" x="560" y="355" text-anchor="middle">attachment, as data</text>
+      <path d="M334 340 H664 V424 H720" fill="none" stroke="var(--ink-300)" stroke-width="1.4" marker-end="url(#dA)"/><text class="t-edge" x="520" y="334" text-anchor="middle">approved voucher + evidence</text>
+    </svg>`;
+  }
+
+  // ======================= PILLARS =======================
+  const P = [
+    ["chain","Auditable",["Every graph query with its parameters and a result digest, every rule verdict, every abstention, every adjudication, every approval and refusal is a ledger entry.","Each entry carries the hash of the one before, so an edited approval is visible at exactly that entry.","Every evidence claim names the query, the figures and the rule version."],"Demonstrated at the foot of this page: the chain is recomputed in your browser","app/capex/audit.py"],
+    ["shield","Safe by default",["Graph unreachable: stop, record, post nothing.","A rule that cannot evaluate abstains rather than passing or failing the line.","Pruning happens only after posting is confirmed, so the memory optimisation cannot lose history."],"Target: zero postings on partial evidence, enforced by the posting adapter's preconditions","capex/recon/agent.py"],
+    ["lock","Secure, least privilege",["The platform's own RBAC and licensing gate: require_service('capex') on every route.","The classifier model has no query, write or posting path; the decision model cannot post.","Vendor bank details and PAN are masked before anything is written to the trail."],"No tenant name, bank detail or PAN in any outbound model call","core/approval_chain.py · licensing"],
+    ["eye","Explainable",["Every verdict names the rule or the adjudication that decided it.","The evidence path comes out of the traversal, not from a later reconstruction.","A replay against the rule version in force reproduces the verdict exactly."],"Replay mode is a first-class run mode, not a debugging afterthought","capex/recon/evidence.py"],
+    ["scale","Measured, not assumed",["A rule change is back-tested on the mirror before it is published.","Each rule can be switched off to measure what it is worth.","Graph and mirror must agree, invoice for invoice, before a change goes live."],"Parity is a precondition for publishing a rule set, not a report afterwards","capex/graph/mirror.py"],
+    ["layers","Scalable",["Invoices are independent, so workers scale horizontally against one graph.","Adapter passes stay bounded, because CDC triggers wake the worker constantly.","Settled clusters are pruned, so transactional volume tracks work in progress rather than history."],"Graph growth is proportional to decisions made, not documents processed","capex/graph/prune.py"],
+    ["brain","Precedent, not a fresh guess",["The memory graph is asked before the decision API is called.","A past decision with a human action on it is the primary context.","An empty result is returned rather than a loose match: a weak precedent is worse than none."],"The system converges on how this organisation decides, not on a generic answer","capex/memory/precedent.py"],
+    ["policy","Finance owns the rules",["Tolerance bands, retention, advance recovery and approval routes are settings, not code.","A change compiles to a new installed query and a new version; it never edits an existing one.","Expressions go through the existing hand-written parser, never eval()."],"A rule change is a signed configuration version, not a release","capex/rules/compiler.py"],
+    ["pencil","Easy to change",["A new rule is one function, one registry line and a back-test.","A new document class is one parser and one registry line.","Colours and type come from one token file already in the product."],"One command runs it all: run.sh capex &middot; parity &middot; test","rules/registry.py · parsers/ · tokens.css"],
+  ];
+  document.getElementById("pillarGrid").innerHTML = P.map(([ic,name,how,proof,file]) => `<article class="pillar">
+    <div class="top"><span class="ico">${iconSvg(ic)}</span><h3>${esc(name)}</h3></div>
+    <ul>${how.map((h) => `<li>${esc(h)}</li>`).join("")}</ul><div class="proof">${esc(proof)}</div>
+    <div class="change">Change it in <code>${esc(file)}</code></div></article>`).join("");
+
+  // ======================= TAMPER DEMO =======================
+  const ENTRIES0 = [
+    { seq: 4506, at: "2026-11-13T09:14:02.118", invoice: "BW-24-00126", kind: "rule.verdict", actor: "capex-agent", role: "system", data: { rule: "R6_ledger_cap", rule_version: "v7", cumulative_after: 7620000, cap: 7548000, excess_inr: 72000 } },
+    { seq: 4508, at: "2026-11-13T09:14:02.244", invoice: "BW-24-00126", kind: "recon.verdict", actor: "capex-agent", role: "system", data: { verdict: "EXCEPTION", causes: ["cumulative_over_ordered", "advance_under_recovered"], money_at_risk_inr: 392000, route: "L2" } },
+    { seq: 4521, at: "2026-11-13T11:02:47.903", invoice: "BW-24-00126", kind: "approval.requested", actor: "capex-agent", role: "system", data: { action: "PART_APPROVE", route: "L2", approvers: ["controller"] } },
+    { seq: 4527, at: "2026-11-13T11:48:12.551", invoice: "BW-24-00126", kind: "approval.denied", actor: "ap.clerk.meera", role: "ap_clerk", data: { action: "PART_APPROVE", why: "role ap_clerk may not approve L2" } },
+    { seq: 4530, at: "2026-11-13T12:06:33.072", invoice: "BW-24-00126", kind: "approval.granted", actor: "controller.anil", role: "controller", data: { action: "PART_APPROVE", route: "L2", approved_inr: 338000, held_inr: 72000 } },
+    { seq: 4533, at: "2026-11-13T12:06:41.610", invoice: "BW-24-00126", kind: "posting.done", actor: "capex-agent", role: "system", data: { voucher: "DYN-V-55288", posted_inr: 338000, approval_seq: 4530 } },
+  ];
+  const canon = (o) => Array.isArray(o) ? "[" + o.map(canon).join(",") + "]"
+    : o && typeof o === "object" ? "{" + Object.keys(o).sort().map((k) => JSON.stringify(k) + ":" + canon(o[k])).join(",") + "}" : JSON.stringify(o);
+  async function sha(s) {
+    const b = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(s));
+    return [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
+  }
+  let sealed = null, edited = false;
+  async function seal(list) {
+    let prev = "0".repeat(64); const out = [];
+    for (const e of list) { const x = { ...e, prev_hash: prev }; x.hash = await sha(prev + canon(x)); out.push(x); prev = x.hash; }
+    return out;
+  }
+  async function verifyChain(list) {
+    let prev = "0".repeat(64);
+    for (const e of list) {
+      const { hash, ...rest } = e;
+      const want = await sha(prev + canon(rest));
+      if (e.prev_hash !== prev || e.hash !== want) return { broken: e.seq };
+      prev = e.hash;
+    }
+    return { broken: null };
+  }
+  function what(e) {
+    const d = e.data;
+    return {
+      "rule.verdict": `${d.rule} (${d.rule_version}): cumulative ₹${(d.cumulative_after/100000).toFixed(1)}L against a cap of ₹${(d.cap/100000).toFixed(1)}L`,
+      "recon.verdict": `${d.verdict} · ${d.causes.join(", ")} · ₹${(d.money_at_risk_inr/100000).toFixed(2)}L at risk · route ${d.route}`,
+      "approval.requested": `${d.action} (${d.route}) requested · approver ${d.approvers.join(" or ")}`,
+      "approval.denied": `${d.action} refused for ${e.actor}: ${d.why}`,
+      "approval.granted": `${d.action} approved by ${e.actor} (${e.role}) · ₹${(d.approved_inr/100000).toFixed(2)}L approved, ₹${(d.held_inr/1000).toFixed(0)}k held`,
+      "posting.done": `voucher ${d.voucher} posted at ₹${(d.posted_inr/100000).toFixed(2)}L under approval #${d.approval_seq}`,
+    }[e.kind];
+  }
+  async function renderChain() {
+    const v = await verifyChain(sealed);
+    const st = document.getElementById("chainStatus");
+    st.className = "status " + (v.broken ? "bad" : "ok");
+    st.textContent = v.broken
+      ? `Chain broken at entry #${v.broken}: its stored hash no longer matches its contents. Every entry after it is now unverifiable, including the posting.`
+      : `Chain intact: ${sealed.length} entries recomputed in this browser.`;
+    document.getElementById("chain").innerHTML = sealed.map((e) => {
+      const bad = v.broken && e.seq >= v.broken;
+      return `<div class="ent ${bad?"bad":""} ${edited && e.seq===4530 ? "edited":""}"><div class="seq">#${e.seq}</div><div class="b">
+        <span class="kind">${esc(e.kind)}</span><span class="what">${esc(what(e))}</span>
+        <span class="hh mine">hash ${e.hash.slice(0,24)}&hellip;</span><span class="hh">prev ${e.prev_hash.slice(0,24)}&hellip;</span></div></div>`;
+    }).join("");
+  }
+  document.getElementById("tamper").onclick = async () => {
+    sealed = sealed.map((e) => e.seq===4530 ? { ...e, actor: "ap.clerk.meera", role: "ap_clerk" } : e); edited = true; await renderChain();
+  };
+  document.getElementById("restore").onclick = async () => { sealed = await seal(ENTRIES0); edited = false; await renderChain(); };
+
+  // ======================= boot =======================
+  renderHLD(); renderScen(); renderSeq(); renderUML(); renderDeploy();
+  (async () => { try { sealed = await seal(ENTRIES0); await renderChain(); }
+    catch (e) { document.getElementById("chainStatus").textContent = "This browser cannot compute SHA-256 here, so the live chain demo is unavailable."; } })();
+})();
+</script>
+
+</body></html>

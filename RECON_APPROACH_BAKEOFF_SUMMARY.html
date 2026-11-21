@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Recon Architecture Bake-off</title>
+<style>
+  :root {
+    --bg: #f7f7f5; --card: #ffffff; --ink: #1c2230; --muted: #5d6677; --line: #e3e5ea;
+    --navy: #1f3a68; --good: #1e7b4c; --good-bg: #e6f4ec; --bad: #b03a2e; --bad-bg: #fbeae8;
+    --mid: #8a6100; --mid-bg: #fcf3dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12151c; --card: #1a1f29; --ink: #e8eaef; --muted: #a2a9b7; --line: #2c3341;
+      --navy: #8fb0e8; --good: #6fd19c; --good-bg: #173326; --bad: #f08a7e; --bad-bg: #3a1d1a;
+      --mid: #e6c36a; --mid-bg: #352b12;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12151c; --card: #1a1f29; --ink: #e8eaef; --muted: #a2a9b7; --line: #2c3341;
+    --navy: #8fb0e8; --good: #6fd19c; --good-bg: #173326; --bad: #f08a7e; --bad-bg: #3a1d1a;
+    --mid: #e6c36a; --mid-bg: #352b12;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+         font: 15px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 32px 16px 48px; }
+  h1 { font-size: 24px; margin: 0 0 4px; }
+  h2 { font-size: 17px; margin: 28px 0 10px; color: var(--navy); }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 18px 20px; }
+  .verdict { border-left: 4px solid var(--good); }
+  .verdict p { margin: 6px 0; }
+  .scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 14px; }
+  .score { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px; }
+  .score .n { font-size: 30px; font-weight: 700; }
+  .score .l { color: var(--muted); font-size: 13px; }
+  .score.win { border-color: var(--good); }
+  .tablewrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 10px; background: var(--card); }
+  table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+  th, td { padding: 9px 12px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); background: var(--bg); }
+  tr:last-child td { border-bottom: 0; }
+  td.c { text-align: center; white-space: nowrap; }
+  .g { background: var(--good-bg); color: var(--good); font-weight: 600; }
+  .b { background: var(--bad-bg); color: var(--bad); font-weight: 600; }
+  .m { background: var(--mid-bg); color: var(--mid); font-weight: 600; }
+  .note { color: var(--muted); font-size: 13px; }
+  ul { margin: 6px 0; padding-left: 20px; }
+  li { margin: 5px 0; }
+  .total td { font-weight: 700; }
+  @media (max-width: 560px) { .scores { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+  <h1>Recon architecture bake-off</h1>
+  <p class="sub">PO ↔ audit report ↔ invoice reconciliation · tested on real Bata documents (Thane 8255, Mangalore 9621) · Nov 2026</p>
+
+  <div class="card verdict">
+    <p><strong>Recommendation: build C (hybrid).</strong></p>
+    <p>All three designs calculate the payable correctly. They differ in what happens <em>after</em> the first run: whether a reviewer's decisions survive, whether a past verdict can be replayed, and how many systems must stay up. C was the only one to pass every test.</p>
+  </div>
+
+  <div class="scores">
+    <div class="score"><div class="n">78.6</div><div class="l">A · relational tables + vocabulary learning<br>13 / 16 tests passed</div></div>
+    <div class="score"><div class="n">48.4</div><div class="l">B · one JSON row per doc + graph database<br>8 / 16 tests passed</div></div>
+    <div class="score win"><div class="n">89.2</div><div class="l">C · hybrid (JSON row + decision log + vocabulary learning)<br>16 / 16 tests passed</div></div>
+  </div>
+  <p class="note">Weighted score out of 100. Each metric is scored 1–5 (5 = best).</p>
+
+  <h2>Metric comparison</h2>
+  <div class="tablewrap">
+  <table>
+    <thead><tr><th>Metric</th><th>Weight</th><th>A</th><th>B</th><th>C</th><th>What we saw</th></tr></thead>
+    <tbody>
+      <tr><td>Correctness</td><td class="c">15</td><td class="c g">5</td><td class="c g">5</td><td class="c g">5</td><td>All three got Thane exactly right (₹6,06,740.50 payable, ₹30,000 held, ₹1,850 unbilled) and caught 12/12 flags.</td></tr>
+      <tr><td>Safety (silent wrong payment)</td><td class="c">15</td><td class="c m">3</td><td class="c b">2</td><td class="c g">5</td><td>A and B silently lose reviewer corrections on re-extraction. B silently misreads an ambiguous "QTY" column and loses one of two simultaneous edits.</td></tr>
+      <tr><td>Decisions survive / replayable</td><td class="c">15</td><td class="c b">2</td><td class="c b">1</td><td class="c g">5</td><td>After a document is re-read, A and B lose 22 of 26 confirmed matches. B's graph rebuild loses all confirmations, and pruning makes old verdicts unreplayable. C keeps everything.</td></tr>
+      <tr><td>Operational complexity</td><td class="c">12</td><td class="c g">5</td><td class="c b">1</td><td class="c g">4</td><td>B needs a second database (TigerGraph); if it's down, payments and reviews stop. A and C run on Postgres alone.</td></tr>
+      <tr><td>Fit for a 3-person team</td><td class="c">10</td><td class="c g">4</td><td class="c b">1</td><td class="c g">4</td><td>B adds a new query language and a second system to run and monitor.</td></tr>
+      <tr><td>Onboarding a new client</td><td class="c">8</td><td class="c g">4</td><td class="c m">3</td><td class="c g">4</td><td>Human steps 5 / 6 / 5. No schema changes for any. B also needs one model regeneration.</td></tr>
+      <tr><td>Analytics across stores</td><td class="c">6</td><td class="c g">5</td><td class="c b">2</td><td class="c m">3</td><td>Same answers everywhere. JSON storage is 1.3–12× slower; B's pruned graph can't see settled invoices.</td></tr>
+      <tr><td>Concurrent reviewers</td><td class="c">6</td><td class="c g">5</td><td class="c b">2</td><td class="c g">5</td><td>B lost one of two simultaneous edits on the same document.</td></tr>
+      <tr><td>Schema changes needed</td><td class="c">5</td><td class="c m">3</td><td class="c g">4</td><td class="c g">5</td><td>A has one rate column, so it can't hold a list rate and a net rate together. B needs a code update for each new field.</td></tr>
+      <tr><td>Speed &amp; storage</td><td class="c">4</td><td class="c g">4</td><td class="c g">4</td><td class="c g">4</td><td>At 10,000 documents: 484–577 MB, 5–7 ms to save a document. Not a deciding factor at Bata's size.</td></tr>
+      <tr><td>Code size</td><td class="c">4</td><td class="c g">5</td><td class="c g">4</td><td class="c m">3</td><td>Prototype: about 380 / 390 / 490 lines. B would need more in production (graph schema and loader).</td></tr>
+      <tr class="total"><td>Weighted total</td><td class="c">100</td><td class="c">78.6</td><td class="c">48.4</td><td class="c">89.2</td><td></td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h2>Key takeaways</h2>
+  <ul>
+    <li><strong>Storage format isn't the issue.</strong> Relational and JSON are close on speed and size. What matters is keeping human decisions in a permanent, append-only log.</li>
+    <li><strong>The vocabulary-learning loop works as a safety guard.</strong> It auto-handled only 1 of 6 new client labels; the rest correctly went to a person. With the guard off, one misleading column header silently over-paid ₹18,660.</li>
+    <li><strong>Fix the dictionary first.</strong> Five terms the schemas rely on are missing from it, so the Thane audit report is rejected as written.</li>
+    <li><strong>One business decision is needed.</strong> Should the typed audit table or the signed site sheet set the payable? They give ₹6,06,740.50 vs ₹6,08,143.50.</li>
+  </ul>
+
+  <h2>Not tested yet</h2>
+  <ul>
+    <li><strong>Real Postgres:</strong> ran on SQLite. A quick re-run is worth it to confirm storage sizes.</li>
+    <li><strong>A real graph database:</strong> not needed, because B's problems are in the design, not the engine.</li>
+    <li><strong>AI extraction:</strong> it doesn't affect this choice; it should be tested separately, with approval to use client documents.</li>
+  </ul>
+
+  <p class="note">Full report with test-by-test evidence: docs/research/RECON_APPROACH_BAKEOFF.md</p>
+</main>
+</body>
+</html>
