@@ -1,0 +1,71 @@
+name: Build Tally Agent
+
+# Builds OnsummTallyAgent.exe on a GitHub-hosted Windows runner (PyInstaller
+# can't cross-compile, and nothing heavy runs on our own boxes). Download the
+# exe from the run's artifacts, then copy it to the backend at AGENT_EXE_PATH
+# so GET /agent/download serves it.
+
+on:
+  workflow_dispatch:
+    inputs:
+      server:
+        description: 'Server the exe connects to (auto = uat2 → dev, else prod)'
+        type: choice
+        options: [auto, dev, prod]
+        default: auto
+  push:
+    branches: [master, uat2, seo/audit-fixes]
+    paths:
+      - 'tally_agent/**'
+      - '.github/workflows/build-agent.yml'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: tally_agent
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Point the agent at its server
+        shell: bash
+        run: |
+          choice="${{ inputs.server || 'auto' }}"
+          if [ "$choice" = auto ]; then
+            [ "$GITHUB_REF_NAME" = uat2 ] && choice=dev || choice=prod
+          fi
+          [ "$choice" = dev ] && url=https://api.onsumm.ai/dev || url=https://api.onsumm.ai
+          sed -i "s#^BUILD_SERVER_URL = .*#BUILD_SERVER_URL = \"$url\"#" agent.py
+          grep -n '^BUILD_SERVER_URL' agent.py
+          echo "AGENT_ENV=$choice" >> "$GITHUB_ENV"
+
+      - name: Build exe
+        run: >
+          pyinstaller --onefile --windowed --name OnsummTallyAgent
+          --hidden-import tkinter --hidden-import PIL._tkinter_finder --hidden-import dashboard
+          --collect-all pystray --collect-all PIL
+          agent.py
+
+      - name: Checksum
+        shell: pwsh
+        run: |
+          $h = (Get-FileHash dist\OnsummTallyAgent.exe -Algorithm SHA256).Hash.ToLower()
+          "$h  OnsummTallyAgent.exe" | Out-File -Encoding ascii dist\OnsummTallyAgent.exe.sha256
+          Write-Output "SHA256: $h"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: OnsummTallyAgent-${{ env.AGENT_ENV }}
+          path: |
+            tally_agent/dist/OnsummTallyAgent.exe
+            tally_agent/dist/OnsummTallyAgent.exe.sha256
+          retention-days: 90

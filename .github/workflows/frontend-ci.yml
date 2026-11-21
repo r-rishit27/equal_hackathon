@@ -1,0 +1,72 @@
+name: Frontend CI
+
+# Quality gate for the UI revamp. Every PR touching the frontend must be green
+# before merge: types, lint (with a pinned warning ceiling), CSS, tests, build.
+# See docs/UI_UX_AUDIT_AND_REVAMP_PLAN.md → Phase 0.2.
+
+on:
+  push:
+    branches: [ui-revamp, uat2, uat, master]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/frontend-ci.yml'
+
+concurrency:
+  group: frontend-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  verify:
+    name: typecheck · lint · test · build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
+
+      # Fails if the accessibility / dead-code debt grows beyond the pinned
+      # ceiling in package.json. The ceiling only ever moves down.
+      - name: Lint (TS/JSX, a11y)
+        run: npm run lint
+
+      - name: Lint (CSS)
+        run: npm run lint:css
+
+      - name: Formatting
+        run: npm run format:check
+
+      - name: Unit tests
+        run: npm run test
+
+      - name: Build
+        run: npm run build
+
+      # Guards the Phase 0.4 fix: a bearer token must never reappear in a URL.
+      - name: Security — no tokens in URLs
+        run: |
+          if grep -rn "access_token=" src/ --include="*.ts" --include="*.tsx" \
+             | grep -v "authedFiles"; then
+            echo "::error::A bearer token is being placed in a URL. See src/api/authedFiles.ts."
+            exit 1
+          fi
+          echo "OK — no tokens in URLs."
