@@ -22,10 +22,10 @@ def health():
     return {"status": "ok"}
 
 @router.get("/api/notifications/count")
-def notification_count(role: str, company_id: str = Query(default=None)):
+def notification_count(role: str, company_id: str = Query(default=None), brand_id: str | None = None):
     import time as _t
     tenant = require_tenant()  # tenant from JWT; client company_id ignored
-    _key = f"{tenant}:{role}"
+    _key = (tenant, role, brand_id)
     _cached = _notif_cache.get(_key)
     if _cached and _t.monotonic() < _cached[1]:
         return {"count": _cached[0]}
@@ -44,8 +44,9 @@ def notification_count(role: str, company_id: str = Query(default=None)):
         with conn.cursor() as cur:
             ph = ",".join(["%s"] * len(statuses))
             cur.execute(
-                f"SELECT COUNT(*) FROM fact_invoices WHERE tenant_id=%s AND status IN ({ph})",
-                [tenant] + statuses,
+                f"SELECT COUNT(*) FROM fact_invoices WHERE tenant_id=%s AND status IN ({ph}) "
+                "AND COALESCE(soft_status, 'active') = 'active' AND (%s::uuid IS NULL OR brand_id=%s::uuid)",
+                [tenant, *statuses, brand_id, brand_id],
             )
             count = int(cur.fetchone()[0])
         put_conn(conn)

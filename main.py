@@ -150,6 +150,8 @@ async def _acquire_singleton_lock() -> bool:
 # ── Main ───────────────────────────────────────────────────────────────────────
 
 async def main() -> None:
+    from backend_ocr.app.agents.ownership import is_external
+
     logger.info("Initialising database pool…")
     await init_pool()
     logger.info("Database pool ready.")
@@ -174,11 +176,11 @@ async def main() -> None:
         WebhookWorker(),
         UploadOcrWorker(),
         StagingPromotionWorker(),
-        ApprovalWorker(),
+        *([] if is_external("payable") else [ApprovalWorker()]),
         # TallyReadWorker(),   # disabled — Tally Prime not running
         # TallySyncWorker(),   # disabled — Tally Prime not running
         DeduplicationWorker(),
-        GstVerificationWorker(),
+        *([] if is_external("gst") else [GstVerificationWorker()]),
         # BankVerificationWorker(),  # disabled — it declares three_state=True
         # ("NULL = permanently not found") but dim_suppliers.bank_verified and
         # dim_end_customers.bank_verified are still `boolean NOT NULL`, so the
@@ -189,7 +191,7 @@ async def main() -> None:
         #   ALTER TABLE dim_suppliers     ALTER COLUMN bank_verified DROP NOT NULL;
         #   ALTER TABLE dim_end_customers ALTER COLUMN bank_verified DROP NOT NULL;
         CategoryEnrichmentWorker(),
-        TdsProcessingWorker(),
+        *([] if is_external("tds") else [TdsProcessingWorker()]),
         FxRateWorker(),
         FxCurrencyAgent(),
     ]

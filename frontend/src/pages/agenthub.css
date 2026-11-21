@@ -1,14 +1,4 @@
-/**
- * Agent Hub — fleet console.
- *
- * The first cut gave one agent the whole page: a paragraph of prose, a five-up
- * stat row and two half-width panels, with nowhere for the eight agents in the
- * PRD roadmap to land. This lays the page out as a roster of compact agent
- * tiles (live + queued) with one selected agent's telemetry below, so adding an
- * agent is adding a tile, not redesigning the page.
- *
- * All colour/space/type values come from tokens.css.
- */
+/* Agent Hub console and mailbox evidence. */
 
 .ah {
   height: 100%;
@@ -24,7 +14,7 @@
 .ah-deck {
   position: relative;
   overflow: hidden;
-  padding: var(--sp-5) var(--sp-6);
+  padding: var(--sp-3) var(--sp-4);
   border-radius: var(--r-lg);
   background:
     radial-gradient(120% 140% at 88% -30%, rgb(92 216 218 / 26%) 0%, transparent 55%),
@@ -52,6 +42,26 @@
   justify-content: space-between;
   gap: var(--sp-4);
   flex-wrap: wrap;
+}
+
+.ah-deck[data-scanning="true"]::after {
+  content: "";
+  position: absolute;
+  inset: auto auto 0 0;
+  width: 35%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--accent-400), transparent);
+  animation: ah-scan-sweep 1.5s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes ah-scan-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(290%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ah-deck[data-scanning="true"]::after { animation: none; width: 100%; }
 }
 
 .ah-deck__id {
@@ -96,9 +106,7 @@
   color: rgb(255 255 255 / 72%);
 }
 
-.ah-deck__sep {
-  color: rgb(255 255 255 / 32%);
-}
+
 
 .ah-deck__actions {
   position: relative;
@@ -152,142 +160,162 @@
   box-shadow: 0 0 0 2px var(--brand-900), 0 0 0 4px var(--accent-400);
 }
 
-/* ── Section label ────────────────────────────────────────────────────────── */
-.ah-label {
+.ah-console {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--sp-3);
+  align-items: start;
+  margin-top: var(--sp-3);
+}
+
+.ah-roster, .ah-mailbox {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-lg);
+  background: var(--surface-0);
+}
+
+.ah-roster__head {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  justify-content: space-between;
   gap: var(--sp-2);
-  margin: var(--sp-6) 0 var(--sp-3);
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--ink-500);
+  padding: var(--sp-2) var(--sp-3);
+  background: linear-gradient(110deg, var(--brand-50), var(--surface-0) 75%);
+  border-bottom: 1px solid var(--line-200);
 }
 
-.ah-label__rule {
-  flex: 1;
-  height: 1px;
-  background: var(--line-200);
+.ah-roster__head h2 {
+  margin: 0;
+  font-size: var(--fs-md);
 }
 
-/* ── Fleet grid ───────────────────────────────────────────────────────────── */
+.ah-roster__head span {
+  color: var(--ink-600);
+  font-size: var(--fs-xs);
+}
+
 .ah-fleet {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
-  gap: var(--sp-3);
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 14rem), 1fr));
+  gap: var(--sp-2);
+  margin: 0;
+  padding: var(--sp-2);
+  list-style: none;
 }
 
 .ah-agent {
-  position: relative;
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-content: start;
+  align-items: start;
   gap: var(--sp-2);
-  padding: var(--sp-4);
-  text-align: left;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line-200);
-  background: var(--surface-0);
-  box-shadow: var(--e-1);
-  font-family: inherit;
-  transition: border-color var(--dur-fast) var(--ease), box-shadow var(--dur-fast) var(--ease),
-    transform var(--dur-fast) var(--ease);
-}
-
-/* Selected agent — the tile whose telemetry is showing below. */
-.ah-agent--sel {
-  border-color: var(--brand-600);
-  box-shadow: 0 0 0 1px var(--brand-600), var(--e-2);
-}
-
-.ah-agent--sel::after {
-  content: "";
-  position: absolute;
-  left: var(--sp-4);
-  right: var(--sp-4);
-  bottom: -1px;
-  height: 2px;
-  border-radius: var(--r-full);
-  background: linear-gradient(90deg, var(--brand-600), var(--accent-400));
-}
-
-.ah-agent--soon {
-  background: var(--surface-1);
-  border-style: dashed;
-  border-color: var(--line-300);
-  box-shadow: none;
-}
-
-.ah-agent__top {
-  display: flex;
-  align-items: center;
-  gap: var(--sp-2);
-}
-
-.ah-agent__icon {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  flex-shrink: 0;
-  border-radius: var(--r-md);
-  background: var(--brand-50);
-  color: var(--brand-600);
-}
-
-.ah-agent--soon .ah-agent__icon {
-  background: var(--surface-2);
-  color: var(--ink-400);
-}
-
-.ah-agent__name {
-  flex: 1;
   min-width: 0;
-  font-size: var(--fs-md);
-  font-weight: var(--fw-semibold);
-  color: var(--ink-900);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  padding: var(--sp-2);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+  background: linear-gradient(135deg, var(--brand-50), var(--surface-0) 62%);
+  transition: border-color 160ms ease, box-shadow 160ms ease;
 }
 
-.ah-agent--soon .ah-agent__name {
-  color: var(--ink-600);
+.ah-agent:is(:hover, :focus-within) {
+  border-color: var(--brand-500);
+  box-shadow: inset 0 2px 0 var(--brand-500);
 }
 
-.ah-agent__desc {
-  font-size: var(--fs-xs);
-  line-height: var(--lh-normal);
-  color: var(--ink-500);
+.ah-agent--planned {
+  border-style: dashed;
+  background: var(--surface-1);
 }
 
-.ah-agent__foot {
+.ah-agent > .ah-agent__actions,
+.ah-agent > .ah-shortcut { grid-column: 1 / -1; }
+.ah-agent > .ah-shortcut { justify-self: start; }
+
+.ah-agent__switch {
+  grid-column: 1 / -1;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--sp-2);
-  margin-top: auto;
-  padding-top: var(--sp-1);
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
-  color: var(--ink-500);
+  font-size: var(--fs-xs);
+  color: var(--ink-700);
 }
 
-.ah-agent__phase {
-  font-family: var(--font-mono);
-  font-size: var(--fs-2xs);
-  font-weight: var(--fw-semibold);
-  letter-spacing: 0.08em;
-  color: var(--ink-400);
+@media (prefers-reduced-motion: reduce) {
+  .ah-agent { transition: none; }
+}
+
+.ah-roster__identity, .ah-roster__status {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.ah-roster__identity strong { display: block; font-size: var(--fs-sm); }
+.ah-roster__identity small { display: block; font-size: var(--fs-xs); font-weight: var(--fw-medium); color: var(--ink-600); }
+.ah-roster__status { font-size: var(--fs-xs); white-space: nowrap; color: var(--ink-700); }
+
+.ah-agent__icon {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  flex: 0 0 28px;
+  place-items: center;
+  border-radius: var(--r-md);
+  background: var(--brand-50);
+  color: var(--brand-700);
+}
+
+.ah-console__tools {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+  gap: var(--sp-3);
+  min-width: 0;
+}
+
+.ah-console__tools .ah-processing { margin-top: 0; padding: var(--sp-3); }
+.ah-console__tools .ah-processing__controls { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--sp-2); }
+.ah-console__tools .ah-processing__controls > button { justify-self: start; }
+
+.ah-agent__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+}
+
+.ah-shortcut {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  gap: var(--sp-1);
   padding: 2px var(--sp-2);
-  border-radius: var(--r-full);
-  background: var(--surface-2);
-  white-space: nowrap;
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+  background: var(--brand-50);
+  color: var(--brand-800);
+  font: var(--fw-semibold) var(--fs-xs) var(--font-sans);
+  text-decoration: none;
+  cursor: pointer;
 }
 
-/* ── Live dot ─────────────────────────────────────────────────────────────── */
+.ah-shortcut:hover {
+  border-color: var(--brand-500);
+  background: var(--brand-100);
+}
+
+.ah-shortcut:focus-visible,
+:is(#ah-mailbox-activity, #ah-drafts):focus-visible {
+  outline: 2px solid var(--brand-600);
+  outline-offset: 2px;
+}
+
+:is(#ah-mailbox-activity, #ah-drafts) {
+  scroll-margin-top: var(--sp-3);
+}
+
 .ah-dot {
   position: relative;
   width: 8px;
@@ -340,39 +368,11 @@
 }
 
 /* ── Telemetry strip ──────────────────────────────────────────────────────── */
-.ah-tele {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
-  gap: 1px;
-  overflow: hidden;
-  border-radius: var(--r-lg);
-  border: 1px solid var(--line-200);
-  background: var(--line-200);
-}
+.ah-tele { margin: 0; padding: var(--sp-1) var(--sp-3); }
+.ah-tele > div { display: flex; justify-content: space-between; gap: var(--sp-2); padding: var(--sp-1) 0; }
+.ah-tele dt { color: var(--ink-600); font-size: var(--fs-xs); }
+.ah-tele dd { margin: 0; font-size: var(--fs-sm); font-variant-numeric: tabular-nums; }
 
-.ah-tele__cell {
-  padding: var(--sp-3) var(--sp-4);
-  background: var(--surface-0);
-}
-
-.ah-tele__val {
-  font-family: var(--font-mono);
-  font-size: var(--fs-xl);
-  font-weight: var(--fw-bold);
-  color: var(--ink-900);
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-}
-
-.ah-tele__key {
-  margin-top: 2px;
-  font-size: var(--fs-2xs);
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ink-500);
-}
-
-/* ── Panels ───────────────────────────────────────────────────────────────── */
 .ah-panels {
   display: grid;
   grid-template-columns: minmax(0, 1.45fr) minmax(0, 1fr);
@@ -381,21 +381,68 @@
   margin-top: var(--sp-4);
 }
 
-.ah-workflow {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--sp-1) var(--sp-2);
-  margin: var(--sp-2) 0;
-  padding: 0;
-  list-style: none;
-  color: var(--brand-700);
-  font-size: var(--fs-xs);
+.ah-processing {
+  margin-top: var(--sp-4);
+  padding: var(--sp-4);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-lg);
+  background: linear-gradient(110deg, var(--brand-50), var(--surface-0) 60%);
 }
 
-.ah-workflow li {
+.ah-processing__head,
+.ah-processing__controls {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: var(--sp-1);
+  gap: var(--sp-3);
+}
+
+.ah-processing__head :is(h2, p) { margin: 0; }
+.ah-processing__head h2 { font-size: var(--fs-lg); }
+.ah-processing__head p { color: var(--ink-600); font-size: var(--fs-sm); }
+.ah-processing__controls { margin-top: var(--sp-4); }
+
+.ah-processing select {
+  min-width: 0;
+  max-width: 100%;
+  padding: var(--sp-2);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: var(--ink-900);
+  font: inherit;
+}
+
+.ah-processing__results {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: var(--sp-2);
+  padding: 0;
+  margin: var(--sp-3) 0 0;
+  list-style: none;
+}
+
+.ah-processing__results li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-content: start;
+  gap: var(--sp-1) var(--sp-2);
+  padding: var(--sp-3);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  animation: ah-check-in 180ms ease-out both;
+}
+
+.ah-processing__results :is(span, small) { grid-column: 2; }
+.ah-processing__results svg { color: var(--brand-700); }
+
+@keyframes ah-check-in {
+  from { opacity: 0; transform: translateY(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ah-processing__results li { animation: none; }
 }
 
 .ah-contact-table {

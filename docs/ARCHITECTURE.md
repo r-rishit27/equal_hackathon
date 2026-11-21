@@ -4,16 +4,16 @@
 
 ## 1. System overview
 
-Three independently deployed processes share one database and coordinate only through it:
+The web application, API and pipeline form the core deployment. Nova and the optional standalone agent processes are described below.
 
 | Process | What it is | Where it runs |
 |---|---|---|
 | **Frontend** | React 18 + Vite + TypeScript SPA | AWS Amplify |
-| **Backend API** | FastAPI + Uvicorn, 218 HTTP routes | AWS EC2 |
+| **Backend API** | FastAPI + Uvicorn | AWS EC2 |
 | **Pipeline engine** | Python asyncio, 12 CDC workers | AWS EC2 |
 | **Database** | PostgreSQL 15 | AWS RDS |
 
-The pipeline is what makes this an automation platform rather than a form over a database: it is the only component that reacts to data changes on its own, via Postgres `LISTEN`/`NOTIFY`. The API only writes in response to a request.
+Pipeline workers consume database events and perform scheduled scans. API lifespan workers handle mailbox and review jobs unless ownership is assigned to a standalone process.
 
 ```
 React SPA (Amplify)
@@ -133,6 +133,34 @@ Production feature (`docs/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md`, `docs/REVIEW_HU
 - The mailbox OAuth connector (`routers/email_connection.py`, `integrations/email_oauth.py`) that lets a user link their inbox.
 - The Vendor Bill Agent's own mailbox watcher (§3.9).
 - Fact extraction from email content (`domain/fact_graph.py`), plus a planned `notify` action kind so a compliance finding can trigger an outbound email through the same connector.
+
+### CFO invoice controls
+
+The CFO Orchestrator is a request-driven, read-only workflow. The router checks the Agent Hub entitlement and the admin or finance-controller role. The authenticated tenant and selected brand scope the invoice lookup.
+
+```mermaid
+flowchart LR
+    K[Vendor identification and KYC] --> M[Vendor master setup]
+    M --> R[Invoice reconciliation]
+    R --> A[Invoice approval]
+    A --> P[Payment readiness]
+    classDef control fill:#eaf4ff,stroke:#3675ad,color:#102f50
+    class K,M,R,A,P control
+```
+
+| Stage | Evidence evaluated |
+|---|---|
+| Vendor identification and KYC | GST registration verification, PAN format and beneficiary bank verification |
+| Vendor master setup | Contact channel, extracted identity claims and stored supplier details |
+| Invoice reconciliation | Status of the reconciliation case linked to the invoice |
+| Invoice approval | Recorded approval decision, including rejection |
+| Payment readiness | Outstanding upstream controls, disbursement status and invoice amount |
+
+`GET /api/agents/invoice-processing` lists recent invoices. `POST /api/agents/invoice-processing/{invoice_id}/cfo` returns ordered stages and individual control results. A blocked control takes precedence over a review item. The UI pairs passed, review and blocked states with a check, eye and flag and respects reduced motion. Agent Hub also offers the shorter advisory preflight at the same invoice path ending in `/check`.
+
+**Brand scope.** Approval notification counts are cached by tenant, role and brand. Payment queues and vendor payment profiles select active outstanding invoices for the chosen brand. Payment history and transaction totals use the brand of the linked invoice. The remitter balance belongs to the bank account. Switching brands clears open payment selections.
+
+**Ingestion and worker ownership.** After invoice ingestion commits, the shared hook schedules Fact Graph enrichment and signals reconciliation. The API serves the CFO evidence on demand. Ten Python entry points expose existing agent implementations to process supervisors. [Agent runtime and ownership](agent-hub/agent-runtime.md)
 
 ### 3.9 Agent Hub &amp; the Vendor Bill Agent
 

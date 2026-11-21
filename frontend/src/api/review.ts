@@ -1,3 +1,4 @@
+import { activeBrandId } from '../auth/activeBrand'
 /**
  * Review Hub API client.
  *
@@ -317,15 +318,6 @@ export function buildQuery(q: FindingQuery): string {
  * the queue, its counts and a card's lines are scoped the way Bills and Vendors
  * are. Nothing picked means every brand.
  */
-function activeBrandId(): string | null {
-  try {
-    const raw = sessionStorage.getItem('onsum_active_brand')
-    return raw ? (JSON.parse(raw)?.id ?? null) : null
-  } catch {
-    return null
-  }
-}
-
 function withBrand(url: string): string {
   const brand = activeBrandId()
   if (!brand) return url

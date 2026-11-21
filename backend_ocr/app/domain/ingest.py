@@ -245,20 +245,12 @@ def ingest_invoice(payload: dict, tenant_id: str | None = None) -> dict:
         raise exc
     else:
         put_conn(conn)
-        # Fire-and-forget: enrich the tenant fact graph off the request path.
-        # Lazy import avoids an import cycle; enqueue never raises.
         try:
-            if result.get("invoice_id"):
-                from ..domain import fact_graph
-                fact_graph.enqueue(fact_graph.enrich_bill, tid, result["invoice_id"])
+            from .invoice_orchestrator import on_invoice_saved
+
+            on_invoice_saved(tid, result["supplier_id"], result["invoice_id"])
         except Exception:
-            pass
-        # Recon: a vendor with documents waiting for an invoice gets them re-linked (docs/bata-recon F8).
-        try:
-            from ..recon.hooks import bill_arrived
-            bill_arrived(tid, result.get("supplier_id"), result.get("invoice_id"))
-        except Exception:
-            pass
+            logging.getLogger(__name__).exception("Post-ingest orchestration could not start")
     return result
 
 

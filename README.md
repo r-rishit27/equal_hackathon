@@ -123,6 +123,16 @@ The React workspace calls FastAPI over REST and multipart uploads. FastAPI and a
 
 [Open the interactive application diagram](docs/aws-deploy/system-architecture.html) to highlight a workflow, inspect its steps, or pause the animation.
 
+### Finance automation workspace
+
+| Screen | What the finance team can do |
+|---|---|
+| Agent Hub · `/agent-hub` | Open agent findings and evidence, inspect the Fact Graph, check a recent invoice, and enable or pause mailbox scanning. The Communication card stays live while its scanner is paused. |
+| CFO Orchestrator · `/cfo-orchestrator` | Select an invoice, run the five-stage control review, and inspect the evidence behind each passed, review or blocked result. Available to admins and finance controllers with Agent Hub access. |
+| Bills and Payment Hub · `/bills`, `/payments` | Switch brands to refresh approval badges, notifications, outstanding bills, payment history and bank-specific transaction totals. The Acme workspace switcher offers Acme group, Bata India Limited and Diensten Tech Limited. |
+
+The CFO review reads the vendor master, reconciliation case, approval decision and payment records. Payment authorization stays in the payment workflow. See the [control sequence and API contract](docs/ARCHITECTURE.md#cfo-invoice-controls) and the [standalone agent commands](docs/agent-hub/agent-runtime.md).
+
 ### Components and integrations
 
 ```mermaid

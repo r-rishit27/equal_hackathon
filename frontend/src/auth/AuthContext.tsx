@@ -21,6 +21,14 @@ export interface Brand {
   created_at: string | null
 }
 
+// The shared Acme workspace exposes its three operating brands in the switcher.
+const ACME_WORKSPACE = 'd0e00000-0000-0000-0000-000000000003'
+const ACME_BRANDS = new Set([
+  'e6e89126-dfa4-4bfe-8533-d022b2ad046f', // Acme group
+  'ec87e637-5fd0-4955-82db-ba031fb6efea', // Bata India Limited
+  'b80624fb-37c8-43a3-ab64-d31d95bb9b9d', // Diensten Tech Limited
+])
+
 interface AuthState {
   user: AuthUser | null
   brands: Brand[]
@@ -81,7 +89,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [activeBrand, setActiveBrandState] = useState<Brand | null>(() => {
     try {
       const raw = sessionStorage.getItem('onsum_active_brand')
-      return raw ? JSON.parse(raw) : null
+      const saved = raw ? JSON.parse(raw) : null
+      return user?.company_id === ACME_WORKSPACE && !ACME_BRANDS.has(saved?.id) ? null : saved
     } catch { return null }
   })
 
@@ -91,7 +100,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetch(`${API_BASE}/api/brands?company_id=${user.company_id}`)
       .then(r => r.json())
       .then((data: { brands: Brand[] }) => {
-        const list = data.brands ?? []
+        const list = (data.brands ?? []).filter(brand => user.company_id !== ACME_WORKSPACE || ACME_BRANDS.has(brand.id))
         setBrands(list)
         // Restore saved active brand or fall back to default
         const saved = sessionStorage.getItem('onsum_active_brand')

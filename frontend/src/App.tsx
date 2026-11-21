@@ -46,6 +46,7 @@ const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const DataExtractionPage = lazy(() => import('./pages/DataExtractionPage'))
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'))
 const NovaPage = lazy(() => import('./pages/NovaPage'))
+const CfoOrchestratorPage = lazy(() => import('./pages/CfoOrchestratorPage'))
 const AgentHubPage = lazy(() => import('./pages/AgentHubPage'))
 const PaymentHubPage = lazy(() => import('./pages/PaymentHubPage'))
 // Distinct from ReviewPage above, which is the OCR review step of the upload flow.
@@ -137,11 +138,14 @@ function AppShell() {
   // visible without opening Bills.
   const [pendingCount, setPendingCount] = useState(0)
   useEffect(() => {
-    if (!user) return
+    setPendingCount(0)
+    if (!user || !activeBrand) return
+    let live = true
     fetchNotificationCount(user.role, user.company_id)
-      .then(setPendingCount)
+      .then(value => { if (live) setPendingCount(value) })
       .catch(() => {})
-  }, [user])
+    return () => { live = false }
+  }, [user, activeBrand?.id])
 
   // Review counts are loaded here rather than in the hub so the nav badge is
   // honest on every page, not only once someone has visited /review.
@@ -222,7 +226,7 @@ function AppShell() {
       <div className="shell__main">
         {/* Renders nothing unless ops is viewing this account. */}
         <ImpersonationBanner />
-        <TopBar onGoToBills={() => navigate(PATHS.bills)} onGoToBill={openBill} />
+        <TopBar key={activeBrand?.id} onGoToBills={() => navigate(PATHS.bills)} onGoToBill={openBill} />
         <div className={`shell__content${scrolls ? ' shell__content--scroll' : ''}`}>
           {/* One boundary for every route below, since they are all code-split.
               The shell — sidebar, top bar, banner — stays mounted across the
@@ -254,7 +258,7 @@ function AppShell() {
                 vendor's contacts can be linked to, bookmarked and reached with
                 Back. */}
               {[PATHS.bills, `${PATHS.bills}/:invoiceId`].map(path => (
-                <Route key={path} path={path} element={<RequireService service="bills"><BillsPage onReviewDraft={handleReviewDraft} /></RequireService>} />
+                <Route key={path} path={path} element={<RequireService service="bills"><BillsPage key={activeBrand?.id} onReviewDraft={handleReviewDraft} /></RequireService>} />
               ))}
               {[PATHS.vendors, `${PATHS.vendors}/:supplierId`, `${PATHS.vendors}/:supplierId/:tab`].map(
                 path => (
@@ -268,7 +272,7 @@ function AppShell() {
                 path={PAY_ROUTE}
                 element={
                   <RequireService service="disbursement">
-                    <PaymentRoute />
+                    <PaymentRoute key={activeBrand?.id} />
                   </RequireService>
                 }
               />
@@ -280,7 +284,7 @@ function AppShell() {
                 path={PATHS.payments}
                 element={
                   <RequireService service="disbursement">
-                    <PaymentHubPage />
+                    <PaymentHubPage key={activeBrand?.id} />
                   </RequireService>
                 }
               />
@@ -342,6 +346,13 @@ function AppShell() {
                   </RequireService>
                 }
               />
+              <Route path={PATHS['cfo-orchestrator']} element={
+                <RequireService service="agent_hub">
+                  <RequireRole roles={['admin', 'finance_controller']}>
+                    <CfoOrchestratorPage key={JSON.stringify([user?.company_id, activeBrand?.id])} brandId={activeBrand?.id} />
+                  </RequireRole>
+                </RequireService>
+              } />
               <Route
                 path={PATHS['agent-hub']}
                 element={

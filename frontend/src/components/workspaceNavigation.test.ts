@@ -19,7 +19,7 @@ describe('tenant workspace navigation', () => {
   it('includes purchased modules once across both ledgers', () => {
     const result = pages('admin', ['review_hub', 'disbursement', 'receivables', 'fact_graph', 'agent_hub', 'nova_billing'])
     expect(result).toEqual([
-      'review', 'payments', 'copilot', 'agent-hub', 'nova',
+      'review', 'payments', 'copilot', 'agent-hub', 'cfo-orchestrator', 'nova',
       'ar-cash', 'ar-invoices', 'ar-upload', 'ar-customers', 'integrations',
     ])
     const receivables = workspaceNavigation('admin', () => true, 'receivable')

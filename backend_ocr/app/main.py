@@ -33,6 +33,7 @@ from fastapi.security import HTTPBearer
 from starlette.formparsers import MultiPartParser
 
 from .core import observability
+from .agents.ownership import is_external
 from .security.auth import auth_context
 from .security.licensing import impersonation_gate, license_gate, require_service
 
@@ -202,7 +203,8 @@ app.include_router(admin_router)
 async def _start_background_agents() -> None:
     try:
         from .routers.agent import start_agent_poller
-        start_agent_poller()  # Communication Agent: the Vendor Bill mailbox watcher
+        if not is_external("communication"):
+            start_agent_poller()
     except Exception:
         logging.getLogger(__name__).exception(
             "[startup] Vendor Bill mailbox watcher failed to start — "
@@ -221,7 +223,8 @@ async def _start_background_agents() -> None:
 
     try:
         from .domain.payments.scheduler import start_disbursement_sweeper
-        await start_disbursement_sweeper()  # asks the bank about PENDING payments
+        if not is_external("payable"):
+            await start_disbursement_sweeper()
     except Exception:
         logging.getLogger(__name__).exception(
             "[startup] Disbursement sweeper failed to start — the API is still up, "

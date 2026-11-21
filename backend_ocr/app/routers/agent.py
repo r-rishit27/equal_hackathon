@@ -126,7 +126,6 @@ def _agent_enabled(cur, tenant_id: str) -> bool:
     row = cur.fetchone()
     return True if row is None else bool(row["enabled"])   # default ON until toggled
 
-
 def _live_access_token(conn, cur, row) -> str | None:
     """Live access token for a connection row, refreshing + persisting if expired.
     Returns None (rather than raising) so the poller can skip a broken mailbox."""
@@ -645,7 +644,7 @@ async def scan_tenant_now(tenant_id: str) -> None:
     await _scan_conns(conns)
 
 
-async def _poller_loop() -> None:
+async def run_mailbox_agent() -> None:
     await asyncio.sleep(20)   # let startup migrations settle first
     print(f"[agent] poller started (every {AGENT_POLL_INTERVAL}s, lookback {AGENT_LOOKBACK})")
     while True:
@@ -662,7 +661,7 @@ def start_agent_poller() -> None:
 
     def _runner():
         try:
-            asyncio.run(_poller_loop())
+            asyncio.run(run_mailbox_agent())
         except Exception:
             traceback.print_exc()
 

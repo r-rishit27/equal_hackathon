@@ -1,14 +1,17 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import {
   Cpu, RefreshCw, FileText, Mail, XCircle, AlertTriangle, Clock, Network,
   GitCompare, ShieldCheck, Radar, Brain, Banknote, ScrollText, Percent, Landmark, HandCoins,
-  ClipboardCheck, ChevronRight, ScanLine,
+  ClipboardCheck, ArrowUpRight,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
+import { useEntitlements } from '../auth/EntitlementsContext'
+import type { ServiceKey } from '../auth/services'
 import FactGraphModal from '../components/factgraph/FactGraphModal'
+import InvoiceProcessing from '../components/InvoiceProcessing'
 import { Switch, Button, useToast } from '../ui'
-import { reviewPath } from '../routes/paths'
+import { PATHS, reviewPath, settingsPath } from '../routes/paths'
 import {
   fetchAgentStatus, toggleAgent, triggerAgentScan, fetchAgentEvents, fetchAgentPocs, setContactAgent,
   fetchAgentDrafts, fetchAgentDraft, fetchAgentDraftFile,
@@ -33,21 +36,39 @@ const ACTION_META: Record<string, { label: string; color: string; icon: React.El
   ocr_failed:      { label: 'OCR failed',          color: 'var(--danger-600)', icon: AlertTriangle },
 }
 
-/**
- * The rest of the fleet, from docs/PRD_AGENT_HUB.md §13. They are shown before
- * they ship on purpose: the hub is a roster, and an empty roster with one live
- * agent reads as a single-feature page rather than a fleet console.
- */
-const ROADMAP: { name: string; desc: string; phase: string; icon: React.ElementType }[] = [
-  { name: 'Verification', desc: 'GSTIN, PAN, bank and MSME checks → trust score.', phase: 'P0', icon: ShieldCheck },
-  { name: 'Recon',        desc: 'Invoice lines vs ERP usage → discrepancy set.',   phase: 'P0', icon: GitCompare },
-  { name: 'Analytics',    desc: 'Weekly spend, exceptions and run rollup.',        phase: 'P0', icon: Radar },
-  { name: 'CFO Orchestrator', desc: 'Plans a goal, delegates it across the fleet.', phase: 'PHASE 2', icon: Brain },
-  { name: 'Payable',      desc: 'Gated disbursement, OTP, chain follow-ups.',      phase: 'NEXT', icon: Banknote },
-  { name: 'Contract',     desc: 'Parses contracts, extracts and links terms.',     phase: 'P1', icon: ScrollText },
-  { name: 'TDS',          desc: 'Computes liability, drafts the return.',          phase: 'P2', icon: Percent },
-  { name: 'GST',          desc: 'Assembles returns, checks vendor filings.',       phase: 'P2', icon: Landmark },
-  { name: 'Receivable',   desc: 'Tracks AR, chases overdue invoices.',             phase: 'P2', icon: HandCoins },
+// Agent fleet and licensed destinations.
+type Shortcut = { label: string; to: string; requires: ServiceKey[]; adminOnly?: boolean }
+const SERVICES: { name: string; desc: string; planned?: boolean; icon: React.ElementType; shortcuts?: Shortcut[] }[] = [
+  { name: 'Verification', desc: 'Vendor identity and bank checks.', icon: ShieldCheck, shortcuts: [
+    { label: 'Identity findings', to: `${reviewPath()}?types=vendor_identity`, requires: ['review_hub'] },
+  ] },
+  { name: 'Recon', desc: 'Invoice lines matched to purchase and receipt evidence.', icon: GitCompare, shortcuts: [
+    { label: 'Recon findings', to: `${reviewPath()}?types=reconciliation`, requires: ['review_hub'] },
+    { label: 'Browse vendors', to: PATHS.vendors, requires: ['recon', 'vendors'] },
+  ] },
+  { name: 'Analytics', desc: 'Approval turnaround and invoice rework.', icon: Radar, shortcuts: [
+    { label: 'Approval analytics', to: `${PATHS.reports}?tab=approval`, requires: ['reports'] },
+  ] },
+  { name: 'CFO Orchestrator', desc: 'Runs invoice controls and surfaces exceptions.', icon: Brain, shortcuts: [
+    { label: 'Open orchestrator', to: PATHS['cfo-orchestrator'], requires: ['agent_hub'] },
+  ] },
+  { name: 'Payable', desc: 'Approval routing and payment status.', icon: Banknote, shortcuts: [
+    { label: 'Payment findings', to: `${reviewPath()}?types=approval,payment`, requires: ['review_hub'] },
+    { label: 'Open payments', to: PATHS.payments, requires: ['disbursement'] },
+  ] },
+  { name: 'Contract', desc: 'Extracted terms and invoice variances.', icon: ScrollText, shortcuts: [
+    { label: 'Contract findings', to: `${reviewPath()}?type=contract_bill_variance`, requires: ['review_hub'] },
+  ] },
+  { name: 'TDS', desc: 'Withholding on eligible bills.', icon: Percent, shortcuts: [
+    { label: 'Tax findings', to: `${reviewPath()}?types=tax`, requires: ['review_hub', 'tds'] },
+    { label: 'TDS settings', to: settingsPath('tds'), requires: ['settings', 'tds'], adminOnly: true },
+  ] },
+  { name: 'GST', desc: 'Vendor GST registration checks.', icon: Landmark, shortcuts: [
+    { label: 'GSTIN findings', to: `${reviewPath()}?type=vendor_gstin_verification_failed`, requires: ['review_hub'] },
+  ] },
+  { name: 'Receivable', desc: 'Receipts matched to open invoices.', icon: HandCoins, shortcuts: [
+    { label: 'Cash application', to: PATHS['ar-cash'], requires: ['receivables'] },
+  ] },
 ]
 
 function timeAgo(iso: string): string {
@@ -60,10 +81,16 @@ function timeAgo(iso: string): string {
   return new Date(iso).toLocaleDateString()
 }
 
+function focusPanel(id: string) {
+  const panel = document.getElementById(id)
+  panel?.focus({ preventScroll: true })
+  panel?.scrollIntoView({ block: 'start' })
+}
+
 export default function AgentHubPage({ onReviewDraft }: Props) {
-  const { user } = useAuth()
+  const { user, activeBrand } = useAuth()
   const toast = useToast()
-  const navigate = useNavigate()
+  const { has } = useEntitlements()
   const companyId = user?.company_id
 
   const [status, setStatus]   = useState<AgentStatus | null>(null)
@@ -116,14 +143,14 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
     setStatus({ ...status, enabled: next })
     try {
       await toggleAgent(companyId, next)
-      toast.success(next ? 'Vendor Bill Agent started' : 'Vendor Bill Agent paused')
+      toast.success(next ? 'Mailbox scanning enabled' : 'Mailbox scanning paused')
     } catch {
       // The toggle used to flip back with no explanation, leaving the user
       // believing a mailbox-reading agent was off when it was still running.
       setStatus({ ...status, enabled: !next })
       toast.error(
-        next ? 'Could not start the agent' : 'Could not pause the agent',
-        'Nothing changed — the agent is still in its previous state. Try again.',
+        next ? 'Could not enable mailbox scanning' : 'Could not pause mailbox scanning',
+        'The mailbox setting stayed the same. Try again.',
       )
     } finally { setSavingToggle(false) }
   }
@@ -152,14 +179,9 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
   }
 
   const watched = pocs.filter(p => p.agent_enabled)
-  const live = !!status?.enabled
-  // Compliance has no on/off switch of its own — it's the existing Review Hub
-  // adapter mesh (pipelines/review/adapters/{vendor_compliance,
-  // master_data_conflict,contract_bill_variance}.py), which always sweeps
-  // every tenant on every pass. "Deployed" here means "shipped and running,"
-  // not "toggleable from this page" — there's nothing to toggle.
-  const complianceOnline = true
-  const fleetTotal = ROADMAP.length + 1 /* Communication */ + 1 /* Compliance */
+  const mailboxEnabled = status?.enabled === true
+  const plannedCount = SERVICES.filter(agent => agent.planned).length
+  const liveCount = SERVICES.length - plannedCount + 2
 
   const telemetry = [
     { key: 'Watched contacts', val: status?.watched_pocs ?? 0 },
@@ -172,7 +194,7 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
   return (
     <div className="ah">
       {/* ── Command deck ─────────────────────────────────────────────────── */}
-      <div className="ah-deck">
+      <div className="ah-deck" data-scanning={scanning}>
         <div className="ah-deck__row">
           <div className="ah-deck__id">
             <div className="ah-deck__mark"><Cpu size={22} /></div>
@@ -180,126 +202,109 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
               <h1 className="ah-deck__title">Agent Hub</h1>
               <div className="ah-deck__meta">
                 <span className="ah-dot ah-dot--deck ah-dot--on" aria-hidden="true" />
-                <span>{(live ? 1 : 0) + (complianceOnline ? 1 : 0)} of {fleetTotal} online</span>
-                <span className="ah-deck__sep">·</span>
-                <span>{status?.events_total ?? 0} events</span>
-                <span className="ah-deck__sep">·</span>
-                <span>last scan {status?.last_scan_at ? timeAgo(status.last_scan_at) : 'never'}</span>
+                <span>{liveCount} live modules</span>
               </div>
             </div>
           </div>
           <div className="ah-deck__actions">
-            <button
+            {has('fact_graph') && <button
               className="ah-deck__btn"
               onClick={() => setShowGraph(true)}
               title="Shared memory: every vendor, bill and contact, plus the facts agents extract"
             >
               <Network size={14} aria-hidden="true" /> Fact Graph
-            </button>
+            </button>}
             <button
               className="ah-deck__btn ah-deck__btn--accent"
               onClick={manualRefresh}
-              disabled={scanning}
+              disabled={scanning || savingToggle || !mailboxEnabled}
               title="Scan the watched mailboxes now and reload"
             >
               <RefreshCw size={14} className={scanning || loading ? 'ah-spin' : ''} aria-hidden="true" />
-              {scanning ? 'Scanning…' : 'Scan now'}
+              {scanning ? 'Scanning…' : 'Scan mailbox'}
             </button>
           </div>
         </div>
       </div>
 
-      {/* ── Fleet roster ─────────────────────────────────────────────────── */}
-      <div className="ah-label">
-        <span>Fleet</span>
-        <span className="ah-label__rule" />
-        <span>{(live ? 1 : 0) + (complianceOnline ? 1 : 0)} online · {fleetTotal - (live ? 1 : 0) - (complianceOnline ? 1 : 0)} queued</span>
-      </div>
+      <div className="ah-console">
+        <section className="ah-roster" aria-labelledby="ah-fleet-title">
+          <div className="ah-roster__head">
+            <h2 id="ah-fleet-title">Agent fleet</h2>
+            <span>{liveCount} live · {plannedCount} planned</span>
+          </div>
+          <ul className="ah-fleet">
+                <li className="ah-agent">
+                    <div className="ah-roster__identity">
+                      <span className="ah-agent__icon"><Mail size={16} aria-hidden="true" /></span>
+                      <div><strong>Communication</strong><small>Mailbox → extraction → draft or claim</small></div>
+                    </div>
+                    <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Live</span>
+                    <div className="ah-agent__actions">
+                      <button type="button" className="ah-shortcut" onClick={() => focusPanel('ah-mailbox-activity')}>Mailbox evidence</button>
+                      {drafts.length > 0 && <button type="button" className="ah-shortcut" onClick={() => focusPanel('ah-drafts')}>View drafts</button>}
+                    </div>
+                    <div className="ah-agent__switch">
+                      <span>Mailbox scanning</span>
+                      <Switch checked={mailboxEnabled} onChange={handleToggleAgent}
+                        disabled={savingToggle || scanning || !status} label="Mailbox scanning" />
+                    </div>
+                </li>
+                <li className="ah-agent">
+                    <div className="ah-roster__identity">
+                      <span className="ah-agent__icon"><ClipboardCheck size={16} aria-hidden="true" /></span>
+                      <div><strong>Compliance</strong><small>Vendor compliance, master data, and contracts</small></div>
+                    </div>
+                  <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Live</span>
+                  {has('review_hub') && <Link className="ah-shortcut" to={reviewPath()}>View findings <ArrowUpRight size={12} aria-hidden="true" /></Link>}
+                </li>
+                {SERVICES.map(agent => {
+                  const Icon = agent.icon
+                  const shortcuts = agent.shortcuts?.filter(shortcut =>
+                    (shortcut.to !== PATHS['cfo-orchestrator'] || user?.role === 'admin' || user?.role === 'finance_controller') &&
+                    shortcut.requires.every(has) && (!shortcut.adminOnly || user?.role === 'admin'),
+                  )
+                  return (
+                    <li key={agent.name} className={agent.planned ? 'ah-agent ah-agent--planned' : 'ah-agent'}>
+                        <div className="ah-roster__identity">
+                          <span className="ah-agent__icon"><Icon size={16} aria-hidden="true" /></span>
+                          <div><strong>{agent.name}</strong><small>{agent.desc}</small></div>
+                        </div>
+                      <span className="ah-roster__status"><span className={agent.planned ? 'ah-dot' : 'ah-dot ah-dot--on'} aria-hidden="true" />{agent.planned ? 'Planned' : 'Live'}</span>
+                        <div className="ah-agent__actions">
+                          {shortcuts?.map(shortcut => (
+                            <Link className="ah-shortcut" key={shortcut.to} to={shortcut.to}>{shortcut.label} <ArrowUpRight size={12} aria-hidden="true" /></Link>
+                          ))}
+                        </div>
+                    </li>
+                  )
+                })}
+          </ul>
+        </section>
 
-      <div className="ah-fleet">
-        <div className="ah-agent ah-agent--sel">
-          <div className="ah-agent__top">
-            <div className="ah-agent__icon"><Mail size={16} /></div>
-            <span className="ah-agent__name">Communication Agent</span>
-            <Switch
-              checked={live}
-              onChange={handleToggleAgent}
-              disabled={savingToggle}
-              label="Vendor Bill Agent"
-            />
-          </div>
-          <ol className="ah-workflow" aria-label="Communication Agent workflow">
-            <li><Mail size={15} aria-hidden="true" /> Mailbox</li>
-            <li><ChevronRight size={13} aria-hidden="true" /><ScanLine size={15} aria-hidden="true" /> Extract</li>
-            <li><ChevronRight size={13} aria-hidden="true" /><FileText size={15} aria-hidden="true" /> Draft or claim</li>
-          </ol>
-          <div className="ah-agent__foot">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className={`ah-dot ${live ? 'ah-dot--on' : ''}`} aria-hidden="true" />
-              {live ? 'Active' : 'Paused'} · Vendor Bill watcher
-            </span>
-            <span>{status?.watched_pocs ?? 0} watched · {status?.pending_drafts ?? 0} drafts</span>
-          </div>
-        </div>
-
-        <div className="ah-agent">
-          <div className="ah-agent__top">
-            <div className="ah-agent__icon"><ClipboardCheck size={16} /></div>
-            <span className="ah-agent__name">Compliance Agent</span>
-            <span className="ah-agent__phase">ACTIVE</span>
-          </div>
-          <div className="ah-agent__desc">
-            Vendor completeness (GSTIN/PAN/bank), comm-extracted master-data conflicts, and
-            contract-vs-bill rate/quantity variance — surfaced as Review Hub findings.
-          </div>
-          <div className="ah-agent__foot">
-            <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-              <span className="ah-dot ah-dot--on" aria-hidden="true" /> Active
-            </span>
-            <Button size="sm" variant="secondary" onClick={() => navigate(reviewPath())}>
-              View findings
-            </Button>
-          </div>
-        </div>
-
-        {ROADMAP.map(a => {
-          const Icon = a.icon
-          return (
-            <div key={a.name} className="ah-agent ah-agent--soon">
-              <div className="ah-agent__top">
-                <div className="ah-agent__icon"><Icon size={16} /></div>
-                <span className="ah-agent__name">{a.name}</span>
-                <span className="ah-agent__phase">{a.phase}</span>
-              </div>
-              <div className="ah-agent__desc">{a.desc}</div>
-              <div className="ah-agent__foot">
-                <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-                  <span className="ah-dot" aria-hidden="true" /> Not deployed
-                </span>
-              </div>
+        <aside className="ah-console__tools" aria-label="Agent tools">
+          {user && ['admin', 'finance_controller'].includes(user.role) && (
+            <InvoiceProcessing key={`${companyId}:${activeBrand?.id ?? ''}`} brandId={activeBrand?.id} />
+          )}
+          <section className="ah-mailbox" aria-labelledby="ah-mailbox-title">
+            <div className="ah-roster__head">
+              <h2 id="ah-mailbox-title">Mailbox watcher</h2>
+              <span>{status ? mailboxEnabled ? 'Enabled' : 'Paused' : 'Status unavailable'}</span>
             </div>
-          )
-        })}
-      </div>
-
-      {/* ── Selected agent telemetry ─────────────────────────────────────── */}
-      <div className="ah-label">
-        <span>Communication Agent · Vendor Bill telemetry</span>
-        <span className="ah-label__rule" />
-      </div>
-
-      <div className="ah-tele">
-        {telemetry.map(t => (
-          <div key={t.key} className="ah-tele__cell">
-            <div className="ah-tele__val">{t.val}</div>
-            <div className="ah-tele__key">{t.key}</div>
-          </div>
-        ))}
+            <dl className="ah-tele">
+              {telemetry.map(metric => (
+                <div key={metric.key}>
+                  <dt>{metric.key}</dt><dd>{metric.val}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        </aside>
       </div>
 
       <div className="ah-panels">
         {/* Activity stream */}
-        <div className="ah-panel">
+        <div className="ah-panel" id="ah-mailbox-activity" tabIndex={-1} role="region" aria-label="Mailbox activity">
           <div className="ah-panel__head">
             <div className="ah-panel__title">Activity</div>
             <span className="ah-panel__count">{events.length} events</span>
@@ -369,7 +374,7 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
 
           {/* Drafts waiting */}
           {drafts.length > 0 && (
-            <div className="ah-panel">
+            <div className="ah-panel" id="ah-drafts" tabIndex={-1} role="region" aria-label="Drafts waiting">
               <div className="ah-panel__head">
                 <div className="ah-panel__title"><FileText size={13} aria-hidden="true" /> Drafts waiting</div>
                 <span className="ah-panel__count">{drafts.length}</span>

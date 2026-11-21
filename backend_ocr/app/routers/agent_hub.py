@@ -11,15 +11,43 @@ convention (`disbursement_api._tid`). Every read in `fact_graph` is tenant-scope
 
 import asyncio
 import json
+from uuid import UUID
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, HTTPException, Query
 from fastapi.responses import StreamingResponse
 
 from ..config import TENANT_ID, get_conn, put_conn
-from ..security.auth import require_tenant
-from ..domain import fact_graph
+from ..security.auth import require_role, require_tenant
+from ..domain import cfo_workflow, fact_graph, invoice_orchestrator
 
 router = APIRouter(prefix="/api/agents", tags=["Agent Hub"])
+
+
+@router.get("/invoice-processing")
+def invoice_processing_bills(brand_id: UUID | None = None):
+    tenant = require_tenant()
+    require_role("admin", "finance_controller")
+    return invoice_orchestrator.recent_bills(tenant, str(brand_id) if brand_id else None)
+
+
+@router.post("/invoice-processing/{invoice_id}/cfo")
+def run_cfo_workflow(invoice_id: UUID, brand_id: UUID | None = None):
+    tenant = require_tenant()
+    require_role("admin", "finance_controller")
+    checks = cfo_workflow.run(tenant, str(brand_id) if brand_id else None, str(invoice_id))
+    if checks is None:
+        raise HTTPException(status_code=404, detail="Invoice not found in this workspace")
+    return {"checks": checks}
+
+
+@router.post("/invoice-processing/{invoice_id}/check")
+def check_invoice(invoice_id: UUID, brand_id: UUID | None = None):
+    tenant = require_tenant()
+    require_role("admin", "finance_controller")
+    checks = invoice_orchestrator.preflight(tenant, str(brand_id) if brand_id else None, str(invoice_id))
+    if checks is None:
+        raise HTTPException(status_code=404, detail="Invoice not found in this workspace")
+    return {"checks": checks}
 
 
 def _tid(company_id: str | None) -> str:

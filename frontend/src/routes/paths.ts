@@ -21,6 +21,7 @@ export type NavPage =
   | 'data-extraction'
   | 'nova'
   | 'agent-hub'
+  | 'cfo-orchestrator'
   | 'payments'
   | 'review'
   | 'ar-cash'
@@ -52,6 +53,7 @@ export const PATHS: Record<NavPage, string> = {
   'data-extraction': '/data-extraction',
   nova:              '/nova',
   review:            '/review',
+  'cfo-orchestrator': '/cfo-orchestrator',
   'agent-hub':       '/agent-hub',
   integrations:      '/integrations',
   settings:          '/settings',
@@ -239,6 +241,7 @@ const TITLES: Record<string, string> = {
   [PATHS.nova]:              'Nova',
   [PATHS.review]:            'Review Hub',
   [REVIEW_BROWSE_PATH]:      'Browse — Review Hub',
+  [PATHS['cfo-orchestrator']]: 'CFO Orchestrator',
   [PATHS['agent-hub']]:      'Agent Hub',
   [PATHS.payments]:          'Payment Hub',
   [PATHS.integrations]:      'Integrations',

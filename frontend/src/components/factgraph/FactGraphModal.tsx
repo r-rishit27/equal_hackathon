@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, useCallback, lazy, Suspense } from 'react'
-import { Network, X, RefreshCw, AlertTriangle, Search } from 'lucide-react'
+import { Network, X, RefreshCw, AlertTriangle, Search, Maximize, Minimize, Scan } from 'lucide-react'
 import { fetchFactGraph, openFactGraphStream } from '../../api/factGraph'
 import type { FactGraphStream } from '../../api/factGraph'
 import type { FactGraph, GraphNode, NodeType } from '../../api/factGraph'
@@ -26,6 +26,7 @@ export default function FactGraphModal({ companyId, onClose }: Props) {
   const [error, setError] = useState<string>('')
   const [graphData, setGraphData] = useState<{ nodes: SimNode[]; links: SimLink[] }>({ nodes: [], links: [] })
   const [streaming, setStreaming] = useState(false)
+  const [expanded, setExpanded] = useState(false)
 
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [hoverId, setHoverId] = useState<string | null>(null)
@@ -209,7 +210,7 @@ export default function FactGraphModal({ companyId, onClose }: Props) {
   return (
     <div onClick={e => { if (e.target === e.currentTarget) onClose() }}
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.45)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Inter, sans-serif' }}>
-      <div style={{ width: 'min(1200px, 94vw)', height: '86vh', background: '#fff', borderRadius: 14, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
+      <div style={{ width: expanded ? '100vw' : 'min(1500px, 96vw)', height: expanded ? '100dvh' : '90dvh', background: '#fff', borderRadius: expanded ? 0 : 14, display: 'flex', flexDirection: 'column', overflow: 'hidden', boxShadow: '0 20px 60px rgba(0,0,0,0.3)' }}>
         {/* Header */}
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '14px 20px', borderBottom: '1px solid #f3f4f6', background: '#f9fafb' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
@@ -225,18 +226,22 @@ export default function FactGraphModal({ companyId, onClose }: Props) {
               </span>
             )}
           </div>
-          <button onClick={onClose} style={{ border: 'none', background: 'transparent', cursor: 'pointer', color: '#6b7280', display: 'flex' }}>
-            <X size={18} />
-          </button>
+          <div className="fg-tools">
+            <button type="button" onClick={() => canvasRef.current?.zoomToFit(0)} disabled={status !== 'ready'} aria-label="Fit graph"><Scan size={17} /></button>
+            <button type="button" onClick={() => setExpanded(value => !value)} aria-label={expanded ? 'Restore graph' : 'Expand graph'}>
+              {expanded ? <Minimize size={17} /> : <Maximize size={17} />}
+            </button>
+            <button type="button" onClick={onClose} aria-label="Close Fact Graph"><X size={18} /></button>
+          </div>
         </div>
 
         {/* Body */}
         <div style={{ display: 'flex', flex: 1, overflow: 'hidden' }}>
-          <div ref={containerRef} style={{ flex: 1, position: 'relative', background: '#f9fafb' }}>
+          <div ref={containerRef} style={{ flex: 1, position: 'relative', background: 'radial-gradient(#a9beda 1px, transparent 1px) 0 0 / 20px 20px, #f6f9ff' }}>
             {/* Search box */}
             <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 5, display: 'flex', alignItems: 'center', gap: 6, background: '#fff', border: '1px solid #e5e7eb', borderRadius: 8, padding: '6px 10px', boxShadow: '0 1px 3px rgba(0,0,0,0.06)' }}>
               <Search size={14} color="#9ca3af" />
-              <input value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') onSearchEnter() }}
+              <input aria-label="Search graph nodes" value={query} onChange={e => setQuery(e.target.value)} onKeyDown={e => { if (e.key === 'Enter') onSearchEnter() }}
                 placeholder="Search nodes…"
                 style={{ border: 'none', outline: 'none', fontSize: 13, fontFamily: 'inherit', width: 160, background: 'transparent' }} />
             </div>
@@ -247,12 +252,11 @@ export default function FactGraphModal({ companyId, onClose }: Props) {
                 const meta = NODE_META[t]
                 const off = dimmed.has(t)
                 return (
-                  <div key={t} onClick={() => toggleType(t)}
-                    style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer', opacity: off ? 0.35 : 1, fontSize: 12 }}>
+                  <button type="button" className="fg-legend-button" key={t} aria-pressed={!off} onClick={() => toggleType(t)}>
                     <span style={{ width: 10, height: 10, borderRadius: '50%', background: meta.bg, border: `2px solid ${meta.color}`, flexShrink: 0 }} />
                     <span style={{ color: '#374151', flex: 1 }}>{meta.label}</span>
                     <span style={{ color: '#9ca3af' }}>{counts[t] ?? 0}</span>
-                  </div>
+                  </button>
                 )
               })}
             </div>
@@ -307,6 +311,13 @@ export default function FactGraphModal({ companyId, onClose }: Props) {
       </div>
 
       <style>{`
+        .fg-tools { display: flex; gap: 6px; }
+        .fg-tools button, .fg-legend-button { display: inline-flex; align-items: center; gap: 8px; background: #fff; color: #173d69; border: 1px solid #d9e5f5; border-radius: 6px; padding: 5px; cursor: pointer; font: inherit; }
+        .fg-tools button:hover, .fg-legend-button:hover { background: #edf5ff; }
+        .fg-tools button:disabled { opacity: .4; cursor: default; }
+        .fg-legend-button { font-size: 12px; }
+        .fg-legend-button[aria-pressed="false"] { background: #edf1f6; }
+        @media (prefers-reduced-motion: reduce) { .fg-spin, .fg-pulse { animation: none !important; } }
         .fg-spin { animation: fg-spin 0.8s linear infinite; }
         @keyframes fg-spin { to { transform: rotate(360deg); } }
         .fg-pulse { animation: fg-pulse 1.2s ease-in-out infinite; }

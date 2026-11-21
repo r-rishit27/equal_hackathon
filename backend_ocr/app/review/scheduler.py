@@ -38,6 +38,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+from ..agents.ownership import is_external
 
 logger = logging.getLogger(__name__)
 
@@ -74,13 +75,21 @@ async def start_review_workers() -> None:
     from .agent_worker import ReviewAgentWorker
     from .comm_extraction_worker import CommExtractionWorker
 
-    workers = [ReviewAdapterWorker(), ReviewAgentWorker(), CommExtractionWorker()]
+    workers = []
+    if not is_external("compliance"):
+        workers.extend((ReviewAdapterWorker(), ReviewAgentWorker()))
+    if not is_external("contract"):
+        workers.append(CommExtractionWorker())
     from ..recon.worker import ReconWorker, start_enabled as _recon_enabled
-    if _recon_enabled():                 # RECON_WORKER_ENABLED — off locally (shared dev DB)
+    if _recon_enabled() and not is_external("recon"):
         workers.append(ReconWorker())
     from ..receivables.worker import CashAppWorker, start_enabled as _cashapp_enabled
-    if _cashapp_enabled():               # CASHAPP_WORKER_ENABLED — off locally (shared dev DB)
+    if _cashapp_enabled() and not is_external("receivable"):
         workers.append(CashAppWorker())
+    if not workers:
+        await conn.execute("SELECT pg_advisory_unlock($1)", _SINGLETON_LOCK_KEY)
+        await pool.release(conn)
+        _lock_conn = None
     for w in workers:
         task = asyncio.create_task(w.run(), name=f"review.{w.name}")
         task.add_done_callback(_on_worker_done)

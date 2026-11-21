@@ -1,3 +1,4 @@
+import { activeBrandId } from '../auth/activeBrand'
 import axios from 'axios'
 
 import { reviewHeaders } from './reviewContext'
@@ -949,7 +950,7 @@ export async function updatePriorityLabels(labels: PriorityLabels): Promise<Prio
 export async function fetchNotificationCount(role: string, companyId?: string): Promise<number> {
   const params: Record<string, string> = { role }
   if (companyId) params.company_id = companyId
-  const { data } = await axios.get<{ count: number }>('/api/notifications/count', { params })
+  const { data } = await axios.get<{ count: number }>('/api/notifications/count', { params: { ...params, brand_id: activeBrandId() ?? undefined } })
   return data.count
 }
 
@@ -969,12 +970,13 @@ export async function fetchBills(forceRefresh = false, companyId?: string, onBac
   if (brandId) params.brand_id = brandId
   if (softStatus) params.soft_status = softStatus
   if (costCenterId) params.cost_center_id = costCenterId
+  const cacheable = (!softStatus || softStatus === 'active') && !costCenterId
   const doFetch = async () => {
     const { data } = await axios.get<{ bills: Bill[]; total: number }>('/api/bills', { params })
-    billsCacheSet(data.bills, companyId, role, brandId)
+    if (cacheable) billsCacheSet(data.bills, companyId, role, brandId)
     return data.bills
   }
-  if (!forceRefresh) {
+  if (cacheable && !forceRefresh) {
     const cached = billsCacheGet(companyId, role, brandId)
     if (cached) {
       // Stale-while-revalidate: serve cache instantly, refresh silently
@@ -1144,7 +1146,7 @@ export interface DisbursementStats {
 /** `bank` picks whose remitter account to describe (each bank pays from its own). */
 export async function fetchDisbursementStats(companyId?: string, bank?: string): Promise<DisbursementStats> {
   const params = { ...(companyId ? { company_id: companyId } : {}), ...(bank ? { bank } : {}) }
-  const { data } = await axios.get<DisbursementStats>('/api/disbursements/stats', { params })
+  const { data } = await axios.get<DisbursementStats>('/api/disbursements/stats', { params: { ...params, brand_id: activeBrandId() ?? undefined } })
   return data
 }
 
@@ -1168,7 +1170,7 @@ export interface VendorPaymentProfile {
 
 export async function fetchVendorPaymentProfile(supplierId: string, companyId?: string): Promise<VendorPaymentProfile> {
   const params = companyId ? { company_id: companyId } : {}
-  const { data } = await axios.get<VendorPaymentProfile>(`/api/vendors/${supplierId}/payment-profile`, { params })
+  const { data } = await axios.get<VendorPaymentProfile>(`/api/vendors/${supplierId}/payment-profile`, { params: { ...params, brand_id: activeBrandId() ?? undefined } })
   return data
 }
 
@@ -1294,7 +1296,7 @@ export interface FailedAttempt {
 /** Every vendor with money owed, across the whole tenant — the Payment Hub's landing table. */
 export async function fetchDisbursementQueue(companyId?: string): Promise<PaymentQueueVendor[]> {
   const params = companyId ? { company_id: companyId } : {}
-  const { data } = await axios.get<{ vendors: PaymentQueueVendor[] }>('/api/disbursements/queue', { params })
+  const { data } = await axios.get<{ vendors: PaymentQueueVendor[] }>('/api/disbursements/queue', { params: { ...params, brand_id: activeBrandId() ?? undefined } })
   return data.vendors
 }
 
@@ -1328,7 +1330,7 @@ export interface RecentDisbursement {
 export async function fetchRecentDisbursements(limit = 25, companyId?: string): Promise<RecentDisbursement[]> {
   const params: Record<string, unknown> = { limit }
   if (companyId) params.company_id = companyId
-  const { data } = await axios.get<{ disbursements: RecentDisbursement[] }>('/api/disbursements/recent', { params })
+  const { data } = await axios.get<{ disbursements: RecentDisbursement[] }>('/api/disbursements/recent', { params: { ...params, brand_id: activeBrandId() ?? undefined } })
   return data.disbursements
 }
 

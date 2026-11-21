@@ -26,6 +26,7 @@ from db import get_pool
 from .base_worker import BaseWorker
 
 from .adapters import ALL_ADAPTERS
+from ..agents.ownership import is_external
 from .store import apply_suppression, sweep_autoresolve, upsert_finding
 
 logger = logging.getLogger(__name__)
@@ -40,8 +41,14 @@ class ReviewAdapterWorker(BaseWorker):
     notify_channel = "ch_review_adapters"
     skip_backfill = False
 
-    def __init__(self) -> None:
-        self._adapters = ALL_ADAPTERS()
+    def __init__(self, adapters=None) -> None:
+        if adapters is not None:
+            self._adapters = adapters
+            return
+        self._adapters = [
+            adapter for adapter in ALL_ADAPTERS()
+            if not (adapter.detector == "adapter:vendor_identity" and is_external("verification"))
+        ]
 
     async def _tenant_ids(self, conn) -> list[str]:
         ids = config.PIPELINE_TENANT_IDS

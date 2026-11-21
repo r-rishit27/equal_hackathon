@@ -42,6 +42,7 @@ GET     /api/agents/fact-graph                                                 f
 GET     /api/agents/fact-graph/neighbors                                       fact_graph
 GET     /api/agents/fact-graph/search                                          fact_graph
 GET     /api/agents/fact-graph/stream                                          fact_graph
+GET     /api/agents/invoice-processing                                         agent_hub
 GET     /api/agents/payment-context                                            fact_graph
 GET     /api/ar/customers                                                      receivables
 GET     /api/ar/customers/{customer_id}                                        receivables
@@ -53,6 +54,7 @@ GET     /api/ar/payments/{payment_id}                                          r
 GET     /api/ar/remittances                                                    receivables
 GET     /api/ar/remittances/{remittance_id}                                    receivables
 GET     /api/ar/remittances/{remittance_id}/document                           receivables
+GET     /api/ar/review-board                                                   receivables
 GET     /api/ar/settings                                                       receivables
 GET     /api/ar/statements                                                     receivables
 GET     /api/ar/statements/{statement_id}                                      receivables
@@ -105,7 +107,11 @@ GET     /api/oauth/email/callback                                              _
 GET     /api/recon/cases/{case_id}                                             recon
 GET     /api/recon/cases/{case_id}/documents                                   recon
 GET     /api/recon/cases/{case_id}/export                                      recon
+GET     /api/recon/cases/{case_id}/fourway                                     recon
+GET     /api/recon/cases/{case_id}/graph                                       recon
+GET     /api/recon/cases/{case_id}/path                                        recon
 GET     /api/recon/documents/{doc_id}/view                                     recon
+GET     /api/recon/grn/mapping                                                 recon
 GET     /api/recon/segments/{segment_id}/crop                                  recon
 GET     /api/recon/segments/{segment_id}/page                                  recon
 GET     /api/reports/activity                                                  reports
@@ -193,6 +199,8 @@ POST    /api/admin/tenants/{tenant_id}/impersonate                             _
 POST    /api/agent/drafts/{draft_id}/submitted                                 agent_hub
 POST    /api/agent/scan                                                        agent_hub
 POST    /api/agent/toggle                                                      agent_hub
+POST    /api/agents/invoice-processing/{invoice_id}/cfo                        agent_hub
+POST    /api/agents/invoice-processing/{invoice_id}/check                      agent_hub
 POST    /api/ar/customers                                                      receivables
 POST    /api/ar/customers/{customer_id}/aliases                                receivables
 POST    /api/ar/invoices/ingest                                                receivables
@@ -246,11 +254,13 @@ POST    /api/mapping/search                                                    s
 POST    /api/mapping/vendor-code                                               sap_matching
 POST    /api/nova/credentials                                                  nova_billing
 POST    /api/recon/cases/{case_id}/ack                                         recon
+POST    /api/recon/cases/{case_id}/confirm                                     recon
 POST    /api/recon/cases/{case_id}/detach                                      recon
 POST    /api/recon/cases/{case_id}/lines/match                                 recon
 POST    /api/recon/cases/{case_id}/rerun                                       recon
 POST    /api/recon/documents/{doc_id}/reread                                   recon
 POST    /api/recon/evidence/{row_id}/correct                                   recon
+POST    /api/recon/grn/upload                                                  recon
 POST    /api/recon/lines/{result_id}/review                                    recon
 POST    /api/recon/segments/{segment_id}/ignore                                recon
 POST    /api/recon/segments/{segment_id}/link                                  recon

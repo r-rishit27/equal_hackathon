@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Upload, FileText, Users, Package, BarChart2, Database,
-  Zap, Settings, ShieldAlert, ListChecks, Bot, Banknote, HandCoins, Receipt,
+  Zap, Settings, ShieldAlert, ListChecks, Workflow, Bot, Banknote, HandCoins, Receipt,
 } from 'lucide-react'
 import { can, type Permission, type Role } from '../auth/permissions'
 import type { ServiceKey } from '../auth/services'
@@ -81,6 +81,8 @@ const NAV: NavGroup[] = [
         icon: Bot, label: 'Agent Hub', page: 'agent-hub',
         requiredPermission: 'payables.view', requiredService: 'agent_hub',
       },
+      { icon: Workflow, label: 'CFO Orchestrator', page: 'cfo-orchestrator',
+        requiredService: 'agent_hub', requiredRoles: ['admin', 'finance_controller'] },
       NOVA,
     ],
   },

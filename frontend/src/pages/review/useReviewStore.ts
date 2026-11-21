@@ -21,7 +21,9 @@ import {
   setFindingStatus, undoFinding,
 } from '../../api/review'
 
-const COUNTS_CACHE_KEY = 'onsum_review_counts'
+function countsCacheKey() {
+  return 'onsum_review_counts:' + (sessionStorage.getItem('onsum_active_brand') ?? '')
+}
 
 /** Mirrors BulkRequest.finding_ids' max_length in routers/review_hub.py. */
 const BULK_MAX = 500
@@ -96,7 +98,7 @@ function readCachedCounts(): ReviewCounts | null {
   // Counts only, so the nav badge paints instantly instead of flashing zero on
   // every navigation. Never finding bodies — a stale finding is a lie.
   try {
-    const raw = sessionStorage.getItem(COUNTS_CACHE_KEY)
+    const raw = sessionStorage.getItem(countsCacheKey())
     return raw ? (JSON.parse(raw) as ReviewCounts) : null
   } catch {
     return null
@@ -105,7 +107,7 @@ function readCachedCounts(): ReviewCounts | null {
 
 function writeCachedCounts(c: ReviewCounts) {
   try {
-    sessionStorage.setItem(COUNTS_CACHE_KEY, JSON.stringify(c))
+    sessionStorage.setItem(countsCacheKey(), JSON.stringify(c))
   } catch {
     /* private mode, quota, blocked site data — the badge just starts empty */
   }
@@ -200,20 +202,26 @@ function unretire(id: string, at: number | undefined) {
 
 // ── Writes ────────────────────────────────────────────────────────────────────
 
+let countsToken = 0
+let countsScope = ''
 let queryToken = 0
 
 export const reviewActions = {
   async loadCounts() {
+    const token = ++countsToken
+    const scope = sessionStorage.getItem('onsum_active_brand') ?? ''
+    if (scope !== countsScope) { state.counts = null; countsScope = scope }
     state.countsLoading = true
     emit()
     try {
       const c = await fetchCounts()
+      if (token !== countsToken) return
       state.counts = c
       writeCachedCounts(c)
     } catch {
       /* the badge keeps its last value rather than flashing to zero */
     } finally {
-      state.countsLoading = false
+      if (token === countsToken) state.countsLoading = false
       emit()
     }
   },
@@ -589,7 +597,7 @@ export const reviewActions = {
     state.error = null
     state.rowErrors = new Map()
     try {
-      sessionStorage.removeItem(COUNTS_CACHE_KEY)
+      sessionStorage.removeItem(countsCacheKey())
     } catch {
       /* nothing to clear */
     }

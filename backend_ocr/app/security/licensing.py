@@ -132,6 +132,7 @@ _RULES: tuple[tuple[str, str, str], ...] = (
     ("*", "/api/vendors/{supplier_id}/contacts/{contact_id}/agent", "agent_hub"),
     ("*", "/api/agents/fact-graph", "fact_graph"),
     ("*", "/api/agents/payment-context", "fact_graph"),
+    ("*", "/api/agents/invoice-processing", "agent_hub"),
     ("*", "/api/mapping/", "sap_matching"),
 
     # ── Integrations ──────────────────────────────────────────────────────────

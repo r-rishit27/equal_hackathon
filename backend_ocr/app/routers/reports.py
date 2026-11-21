@@ -8,6 +8,7 @@ import psycopg2
 from psycopg2.extras import RealDictCursor
 from fastapi import FastAPI, File, Form, UploadFile, HTTPException, Query, Request, Depends
 from ..config import DB_URL, TENANT_ID, OPENAI_API_KEY, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_ADMIN_EMAIL, APPROVAL_SECRET, JWT_SECRET, APP_URL, ACCESS_TOKEN_TTL_MIN, REFRESH_TOKEN_TTL_DAYS, get_conn, put_conn
+from ..agents.analytics import activity_report as build_activity_report
 from ..security.auth import auth_context, require_tenant, current_tenant, current_role, current_username, require_role
 
 from fastapi import APIRouter
@@ -16,110 +17,8 @@ router = APIRouter()
 
 @router.get("/api/reports/activity")
 def activity_report(company_id: str | None = Query(None), brand_id: str | None = Query(None)):
-    """
-    Per-bill lifecycle, extracted from the activity trail.
+    return build_activity_report(require_tenant(), brand_id)
 
-    Everything Reports needs about timing already exists in `bill_approval_chain`
-    — the same rows the per-bill "View activity" timeline renders. Until now it
-    was only reachable one bill at a time, so a book-wide turnaround chart would
-    have meant an N+1 across the whole ledger. This collapses it to one query and
-    returns one compact row per bill:
-
-      first_at    when the bill entered the chain (first recorded action)
-      approved_at when it cleared its LAST approval — the timestamp that ends
-                  turnaround and starts the payment buffer
-      send_backs  how many times it was pushed back for revision, i.e. rework
-      role_days   days the bill sat with each desk before that desk acted, so
-                  "where does the time go" is answerable per stage rather than
-                  as one opaque total
-
-    A stage's wait is measured from the previous action on that bill, falling back
-    to the bill's own created_at for the first action — otherwise the first
-    approver's queue time would be invisible. Clamped at zero: a clock-skewed or
-    backdated chain row is missing data, not a negative wait.
-
-    Step 99 is excluded throughout; it is the reserved payment/audit step, not a
-    stage anybody waits in.
-    """
-
-    tenant = require_tenant()  # tenant from JWT; client company_id ignored
-
-    conn = get_conn()
-    try:
-        with conn.cursor(cursor_factory=RealDictCursor) as cur:
-            cur.execute(
-                """
-                WITH ev AS (
-                    SELECT
-                        c.invoice_id,
-                        c.action,
-                        c.actor_role,
-                        c.created_at,
-                        COALESCE(
-                            LAG(c.created_at) OVER (
-                                PARTITION BY c.invoice_id ORDER BY c.created_at, c.id
-                            ),
-                            fi.created_at
-                        ) AS prev_at
-                    FROM bill_approval_chain c
-                    JOIN fact_invoices fi
-                          ON fi.invoice_id = c.invoice_id
-                         AND fi.tenant_id  = c.tenant_id
-                    WHERE c.tenant_id = %s
-                      AND c.step <> 99
-                      AND (%s::uuid IS NULL OR fi.brand_id = %s::uuid)
-                ),
-                per_role AS (
-                    SELECT
-                        invoice_id,
-                        COALESCE(NULLIF(TRIM(actor_role), ''), 'Unattributed') AS role,
-                        SUM(
-                            GREATEST(EXTRACT(EPOCH FROM (created_at - prev_at)), 0)
-                        ) / 86400.0 AS days
-                    FROM ev
-                    GROUP BY 1, 2
-                ),
-                role_json AS (
-                    SELECT invoice_id,
-                           jsonb_object_agg(role, ROUND(days::numeric, 4)) AS role_days
-                    FROM per_role
-                    GROUP BY 1
-                )
-                SELECT
-                    ev.invoice_id::text                        AS invoice_id,
-                    MIN(ev.created_at)                         AS first_at,
-                    MAX(ev.created_at) FILTER (
-                        WHERE ev.action IN ('approve', 'approved')
-                    )                                          AS approved_at,
-                    COUNT(*) FILTER (
-                        WHERE ev.action IN ('send_back', 'sent_back', 'reject')
-                    )::int                                     AS send_backs,
-                    COALESCE(rj.role_days, '{}'::jsonb)        AS role_days
-                FROM ev
-                LEFT JOIN role_json rj ON rj.invoice_id = ev.invoice_id
-                GROUP BY ev.invoice_id, rj.role_days
-                """,
-                (tenant, brand_id, brand_id),
-            )
-            rows = cur.fetchall()
-    finally:
-        put_conn(conn)
-
-    def iso(v):
-        return v.isoformat() if v is not None else None
-
-    return {
-        "rows": [
-            {
-                "invoice_id": r["invoice_id"],
-                "first_at": iso(r["first_at"]),
-                "approved_at": iso(r["approved_at"]),
-                "send_backs": r["send_backs"],
-                "role_days": r["role_days"] or {},
-            }
-            for r in rows
-        ],
-    }
 
 @router.get("/api/reports/expense-xlsx")
 def expense_xlsx(

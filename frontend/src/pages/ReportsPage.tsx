@@ -12,6 +12,7 @@
  * legend is a control (click to isolate a category) rather than a caption.
  */
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { RefreshCw, Download } from 'lucide-react'
 import { useBills } from '../hooks/useBills'
 import { useService } from '../auth/EntitlementsContext'
@@ -471,9 +472,17 @@ export default function ReportsPage() {
   const { bills, loading, refresh } = useBills()
   const { user } = useAuth()
   const fxEnabled = useService('fx')
-  const [tab, setTab] = useState<'dashboard' | 'spend' | 'category' | 'aging' | 'approval' | 'vendor' | 'fx'>(
-    'dashboard',
-  )
+  const [params, setParams] = useSearchParams()
+  const requestedTab = params.get('tab')
+  const tab = requestedTab === 'spend' || requestedTab === 'category' || requestedTab === 'aging'
+    || requestedTab === 'approval' || requestedTab === 'vendor' || (requestedTab === 'fx' && fxEnabled)
+    ? requestedTab : 'dashboard'
+  const setTab = (next: typeof tab) => {
+    const updated = new URLSearchParams(params)
+    if (next === 'dashboard') updated.delete('tab')
+    else updated.set('tab', next)
+    setParams(updated)
+  }
   const [apiCategories, setApiCategories] = useState<Category[]>([])
   const [expHeadMap, setExpHeadMap] = useState<Record<string, string>>({})
   const [fxReport, setFxReport] = useState<FxReportData | null>(null)
@@ -481,7 +490,7 @@ export default function ReportsPage() {
 
   useEffect(() => {
     fetchCategories(user?.company_id)
-      .then(setApiCategories)
+      .then(categories => setApiCategories(categories ?? []))
       .catch(() => {})
     fetchCategoryExpHeads(user?.company_id)
       .then(setExpHeadMap)
@@ -489,7 +498,6 @@ export default function ReportsPage() {
   }, [user?.company_id])
 
   useEffect(() => {
-    if (tab === 'fx' && !fxEnabled) setTab('dashboard')
     if (tab === 'fx' && fxEnabled) {
       let current = true
       setFxReportLoading(true)

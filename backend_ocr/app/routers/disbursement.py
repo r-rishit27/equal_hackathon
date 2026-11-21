@@ -346,7 +346,7 @@ def _get_supplier_kyb(cur, tenant_id: str, supplier_id: str) -> Optional[dict]:
 # ── GET /api/vendors/{supplier_id}/payment-profile ───────────────────────────
 
 @router.get("/vendors/{supplier_id}/payment-profile")
-def payment_profile(supplier_id: str, company_id: Optional[str] = None):
+def payment_profile(supplier_id: str, company_id: Optional[str] = None, brand_id: Optional[str] = None):
     tenant_id = _tid(company_id)
     conn = get_conn()
     try:
@@ -389,8 +389,9 @@ def payment_profile(supplier_id: str, company_id: Optional[str] = None):
             cur.execute(
                 """SELECT invoice_id, invoice_number AS id, invoice_date, due_date, total_amount, outstanding_amount
                    FROM fact_invoices WHERE tenant_id=%s AND supplier_id=%s AND outstanding_amount > 0
+                     AND COALESCE(soft_status, 'active')='active' AND (%s::uuid IS NULL OR brand_id = %s::uuid)
                    ORDER BY due_date ASC NULLS LAST""",
-                (tenant_id, supplier_id),
+                (tenant_id, supplier_id, brand_id, brand_id),
             )
             bills = [_jsonable_row(r) for r in cur.fetchall()]
 
@@ -996,7 +997,7 @@ def put_demo_settings(body: DemoSettingsBody):
 
 
 @router.get("/disbursements/stats")
-def disbursement_stats(company_id: Optional[str] = None, bank: Optional[str] = None):
+def disbursement_stats(company_id: Optional[str] = None, bank: Optional[str] = None, brand_id: Optional[str] = None):
     """The remitter account and payment counts for the Payment Hub card.
 
     `bank` picks which bank's remitter account is described: each bank pays
@@ -1020,6 +1021,11 @@ def disbursement_stats(company_id: Optional[str] = None, bank: Optional[str] = N
             # payments, 25 failed" when AU had six payments and two failures,
             # the other 23 being ICICI's and HDFC's.
             where, params = "tenant_id=%s", [tenant_id]
+            if brand_id:
+                where += """ AND EXISTS (SELECT 1 FROM fact_invoices i
+                             WHERE i.tenant_id=fact_disbursements.tenant_id AND i.invoice_id=fact_disbursements.invoice_id
+                               AND i.brand_id=%s::uuid)"""
+                params.append(brand_id)
             if code:
                 where += " AND bank_provider=%s"
                 params.append(code)
@@ -1064,7 +1070,7 @@ def disbursement_stats(company_id: Optional[str] = None, bank: Optional[str] = N
 # aggregated per vendor instead of fetched one at a time.
 
 @router.get("/disbursements/queue")
-def disbursement_queue(company_id: Optional[str] = None):
+def disbursement_queue(company_id: Optional[str] = None, brand_id: Optional[str] = None):
     tenant_id = _tid(company_id)
     conn = get_conn()
     try:
@@ -1073,6 +1079,12 @@ def disbursement_queue(company_id: Optional[str] = None):
             conn.commit()
             cur.execute(
                 """
+                WITH scoped_disbursements AS (
+                    SELECT d.* FROM fact_disbursements d
+                    WHERE d.tenant_id=%s AND (%s::uuid IS NULL OR EXISTS (
+                        SELECT 1 FROM fact_invoices i WHERE i.tenant_id=d.tenant_id
+                          AND i.invoice_id=d.invoice_id AND i.brand_id=%s::uuid))
+                )
                 SELECT
                     s.supplier_id::text AS supplier_id,
                     s.name AS vendor_name,
@@ -1137,7 +1149,7 @@ def disbursement_queue(company_id: Optional[str] = None):
                         -- rest of the batch stranded on PENDING_OTP.
                         (
                             SELECT array_agg(b.disbursement_id::text ORDER BY b.created_at)
-                            FROM fact_disbursements b
+                            FROM scoped_disbursements b
                             WHERE b.tenant_id = d.tenant_id
                               AND b.supplier_id = d.supplier_id
                               AND b.status = d.status
@@ -1150,13 +1162,13 @@ def disbursement_queue(company_id: Optional[str] = None):
                         -- payment read as "releasing ₹3,71,200".
                         (
                             SELECT SUM(b.amount)
-                            FROM fact_disbursements b
+                            FROM scoped_disbursements b
                             WHERE b.tenant_id = d.tenant_id
                               AND b.supplier_id = d.supplier_id
                               AND b.status = d.status
                               AND b.otp_code_hash IS NOT DISTINCT FROM d.otp_code_hash
                         ) AS batch_amount
-                    FROM fact_disbursements d
+                    FROM scoped_disbursements d
                     WHERE d.tenant_id = s.tenant_id AND d.supplier_id = s.supplier_id
                       AND d.status IN ('PENDING_OTP', 'PENDING')
                     ORDER BY d.created_at DESC LIMIT 1
@@ -1177,18 +1189,19 @@ def disbursement_queue(company_id: Optional[str] = None):
                             'failed_at', d.updated_at
                         ) ORDER BY d.updated_at DESC
                     ) AS failures
-                    FROM fact_disbursements d
+                    FROM scoped_disbursements d
                     WHERE d.tenant_id = s.tenant_id AND d.supplier_id = s.supplier_id
                       AND d.status = 'FAILED'
                 ) lf ON true
-                WHERE s.tenant_id = %s
+                WHERE s.tenant_id = %s AND COALESCE(i.soft_status, 'active')='active'
+                  AND (%s::uuid IS NULL OR i.brand_id=%s::uuid)
                 GROUP BY s.supplier_id, s.name, s.gstn, s.status, s.bank_verified, s.bank_account,
                          sba.any_verified, pd.status, pd.disbursement_id,
                          pd.otp_expires_at, pd.batch_ids, pd.batch_amount, lf.failures,
                          bacct.account_number, bacct.bank_name
                 ORDER BY earliest_due ASC NULLS LAST, payable_amount DESC
                 """,
-                (tenant_id,),
+                (tenant_id, brand_id, brand_id, tenant_id, brand_id, brand_id),
             )
             vendors = []
             for row in cur.fetchall():
@@ -1207,7 +1220,7 @@ def disbursement_queue(company_id: Optional[str] = None):
 # here is scoped to one bill or one vendor.
 
 @router.get("/disbursements/recent")
-def disbursement_recent(limit: int = 25, company_id: Optional[str] = None):
+def disbursement_recent(limit: int = 25, company_id: Optional[str] = None, brand_id: Optional[str] = None):
     tenant_id = _tid(company_id)
     limit = max(1, min(limit, 100))
     conn = get_conn()
@@ -1231,11 +1244,11 @@ def disbursement_recent(limit: int = 25, company_id: Optional[str] = None):
                 FROM fact_disbursements d
                 LEFT JOIN dim_suppliers s ON s.supplier_id = d.supplier_id AND s.tenant_id = d.tenant_id
                 LEFT JOIN fact_invoices fi ON fi.invoice_id = d.invoice_id AND fi.tenant_id = d.tenant_id
-                WHERE d.tenant_id = %s
+                WHERE d.tenant_id = %s AND (%s::uuid IS NULL OR fi.brand_id=%s::uuid)
                 ORDER BY d.created_at DESC
                 LIMIT %s
                 """,
-                (tenant_id, limit),
+                (tenant_id, brand_id, brand_id, limit),
             )
             return {"disbursements": [_jsonable_row(r) for r in cur.fetchall()]}
     finally:

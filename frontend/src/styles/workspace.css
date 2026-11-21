@@ -127,7 +127,7 @@
   background: var(--brand-100);
 }
 
-.shell__content :is(.u-pagehead__title, .bp__title, .vp__title, .rh__title, .rp__title, .de__title, .ah-deck__title, .pay__title, .up__title, .sp__page-title, .inventory-heading h1) {
+.shell__content :is(.u-pagehead__title, .bp__title, .vp__title, .rh__title, .rp__title, .de__title, .pay__title, .up__title, .sp__page-title, .inventory-heading h1) {
   color: var(--brand-900);
   font-family: var(--font-display);
   font-size: clamp(1.375rem, 2.5vw, 1.875rem);

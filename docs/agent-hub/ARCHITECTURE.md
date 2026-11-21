@@ -6,6 +6,10 @@ Source of truth: `onsumm-agenthub-lowlevel.html` (interactive low-level architec
 
 A pipeline of specialized agents that takes a bill from "an email or PDF landed somewhere" to "paid, posted to the ERP, and learned from" — with a knowledge graph as shared memory in the middle, and a non-negotiable human approval gate before any money moves. Agents draft and judge; a named human confirms the payment.
 
+## Running the workspace
+
+Open Automation → Agent Hub for agent evidence, mailbox scanning controls and the Fact Graph. Open Automation → CFO Orchestrator for a read-only review of one invoice. The run shows vendor KYC, vendor master setup, reconciliation, approval and payment readiness in sequence. [CFO control evidence](../ARCHITECTURE.md#cfo-invoice-controls) · [Runtime ownership and commands](agent-runtime.md)
+
 ## The five stages
 
 | # | Stage | Folder | What happens |
