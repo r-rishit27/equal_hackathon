@@ -180,6 +180,8 @@ def _is_retryable(exc: Exception) -> bool:
 def _sampling(model: str, temperature: float, max_tokens: int) -> dict:
     """gpt-5 family models are reasoning models: they take no temperature, count output against
     max_completion_tokens, and run with reasoning off here (fast, and enough for reading a document)."""
+    if model == "gpt-6-luna":
+        return {"max_completion_tokens": max_tokens}
     if model.startswith(("gpt-5", "o3", "o4")):
         return {"max_completion_tokens": max_tokens,
                 "reasoning_effort": os.getenv("LLM_REASONING_EFFORT", "none")}

@@ -22,6 +22,7 @@ from ..security.auth import current_actor, current_role, current_username, is_im
 router = APIRouter(prefix="/api/finance-desk/assistant", tags=["Finance Desk"])
 ROLES = {"admin", "finance_controller", "accountant", "approver", "auditor"}
 QUESTIONS = {
+    "Show bills and decision history I can access.": "records",
     "Which bills are in my approval queue?": "queue",
     "Which pending bills are overdue?": "overdue",
     "Show supplier relationships for pending bills.": "relationships",
@@ -33,24 +34,25 @@ class Query(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     question: str = Field(min_length=1, max_length=2000)
     bill_id: UUID | None = None
+    offset: int = Field(default=0, ge=0, le=2147483647)
 
 
 class Intent(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    intent: Literal["queue", "overdue", "relationships", "unsupported"]
+    intent: Literal["queue", "overdue", "relationships", "records", "unsupported"]
     citation: int = Field(default=0, ge=0, le=LIMIT)
     focus: Literal["stage", "supplier", "last_action"] = "stage"
 
 
-def actor():
-    tenant = require_tenant()
+def actor(tenant=None):
+    tenant = tenant or require_tenant()
     role, username = current_role(), current_username()
     if current_actor() or is_impersonating() or role not in ROLES or not username:
         raise HTTPException(403, "Copilot is unavailable for this session.")
     return tenant, username, role
 
 
-def verify_actor(cur, tenant, username, role):
+def verify_actor(cur, tenant, username, role, services=("bills", "approvals", "fact_graph")):
     # Fail closed on revoked roles and entitlements, including a still-valid old JWT.
     cur.execute("""
         SELECT u.name,
@@ -59,16 +61,16 @@ def verify_actor(cur, tenant, username, role):
         FROM users u WHERE u.company_id=%s AND u.username=%s AND u.role=%s
           AND (SELECT count(*) FROM service_catalog c LEFT JOIN tenant_service ts
                 ON ts.tenant_id=u.company_id AND ts.service_key=c.service_key
-               WHERE c.service_key IN ('bills','approvals','fact_graph') AND c.retired_at IS NULL
-                 AND coalesce(ts.enabled,c.default_enabled))=3
-    """, (tenant, username, role))
+               WHERE c.service_key=ANY(%s) AND c.retired_at IS NULL
+                 AND coalesce(ts.enabled,c.default_enabled))=%s
+    """, (tenant, username, role, list(services), len(services)))
     row = cur.fetchone()
     if not row:
         raise HTTPException(403, "Copilot access is unavailable.")
     return (row["name"] or "").strip() if row["unique_name"] else None
 
 
-def stage_scope(config, role, name):
+def stage_scope(config, role, name, *, all_stages=False):
     by_department = defaultdict(list)
     for step in config:
         by_department[step["department"]].append(step)
@@ -78,7 +80,7 @@ def stage_scope(config, role, name):
         for index, step in enumerate(s for s in chain if not s.get("locked")):
             names = step.get("assignees")
             assigned = not names or (name and name in [n.strip() for n in names if isinstance(n, str)])
-            if role == "admin" or (role == step["role"] and assigned):
+            if all_stages or role == "admin" or (role == step["role"] and assigned):
                 rules.append(dict(dept=department, status=_step_idx_to_status(index),
                                   label=step["label"], step_role=step["role"]))
     return rules, [d for d in by_department if d is not None]
@@ -88,18 +90,34 @@ EVIDENCE_SQL = """
     WITH stages AS (SELECT * FROM jsonb_to_recordset(%(rules)s::jsonb)
         AS r(dept text,status text,label text,step_role text)),
     visible AS (
-        SELECT fi.invoice_id, fi.tenant_id, fi.supplier_id, fi.invoice_number, fi.due_date,
-               fi.status, r.label AS stage, r.step_role
-        FROM fact_invoices fi JOIN stages r ON r.status=fi.status::text
+        SELECT fi.invoice_id, fi.tenant_id, fi.supplier_id, fi.invoice_number, fi.total_amount::text AS total_amount, fi.currency_code, fi.due_date,
+               fi.status, coalesce(r.label, fi.status::text) AS stage, r.step_role,
+               coalesce(fi.soft_status, 'active') AS record_state
+        FROM fact_invoices fi LEFT JOIN stages r ON r.status=fi.status::text
          AND r.dept IS NOT DISTINCT FROM
              (CASE WHEN fi.department=ANY(%(departments)s::text[]) THEN fi.department END)
-        WHERE fi.tenant_id=%(tenant)s AND coalesce(fi.soft_status,'active')='active'
+        WHERE fi.tenant_id=%(tenant)s AND (%(include_archived)s OR coalesce(fi.soft_status,'active')='active')
+          AND (r.status IS NOT NULL OR (%(records)s AND (
+                %(tenant_reader)s OR EXISTS (
+                    SELECT FROM bill_approval_chain past WHERE past.tenant_id=fi.tenant_id
+                    AND past.invoice_id=fi.invoice_id AND past.actor_name=%(name)s
+                    AND past.action IN ('submit','approve','send_back')
+                ))))
+          AND (NOT %(exact)s OR lower(fi.invoice_number)=lower(%(search)s))
+          AND (%(search)s='' OR strpos(lower(coalesce(fi.invoice_number,'')), lower(%(search)s))>0
+               OR EXISTS (SELECT FROM dim_suppliers sv WHERE sv.tenant_id=fi.tenant_id AND sv.supplier_id=fi.supplier_id
+                          AND strpos(lower(sv.name), lower(%(search)s))>0))
           AND (%(bill)s::uuid IS NULL OR fi.invoice_id=%(bill)s::uuid)
           AND (NOT %(overdue)s OR fi.due_date < (now() AT TIME ZONE 'Asia/Kolkata')::date)
-        ORDER BY fi.due_date NULLS LAST, fi.invoice_id LIMIT %(limit)s
+        ORDER BY fi.due_date NULLS LAST, fi.invoice_id LIMIT %(limit)s OFFSET %(offset)s
     )
-    SELECT v.invoice_id::text AS id, v.invoice_number, v.due_date, v.stage, v.step_role,
+    SELECT v.invoice_id::text AS id, v.invoice_number, v.total_amount, v.currency_code, v.due_date, v.stage, v.step_role, v.record_state,
            s.name AS supplier, history.action AS latest_action, history.created_at AS action_at,
+           CASE WHEN %(bill)s::uuid IS NOT NULL AND %(records)s THEN
+               (SELECT coalesce(jsonb_agg(jsonb_build_object('action',a.action,'role',a.actor_role,
+                        'at',a.created_at) ORDER BY a.created_at,a.id), '[]'::jsonb)
+                FROM bill_approval_chain a WHERE a.tenant_id=v.tenant_id AND a.invoice_id=v.invoice_id
+                  AND a.step<>99) ELSE '[]'::jsonb END AS decision_history,
            EXISTS(SELECT FROM fact_graph_nodes b JOIN fact_graph_edges e
                     ON e.tenant_id=b.tenant_id AND e.dst_node_id=b.node_id AND e.relation='has_bill'
                   JOIN fact_graph_nodes n ON n.tenant_id=e.tenant_id AND n.node_id=e.src_node_id
@@ -113,7 +131,17 @@ EVIDENCE_SQL = """
 """
 
 
-def retrieve(identity, intent, bill_id=None):
+def bill_scope(config, role, name, intent):
+    if role not in ROLES:
+        raise HTTPException(403, "Copilot access is unavailable.")
+    tenant_reader = role in {"admin", "accountant", "finance_controller"}
+    rules, departments = stage_scope(config, role, name, all_stages=tenant_reader and intent != "queue")
+    return dict(rules=Json(rules), departments=departments, records=intent=="records",
+                tenant_reader=tenant_reader, name=name or None,
+                include_archived=role=="admin" and intent=="records")
+
+
+def retrieve(identity, intent, bill_id=None, offset=0, search="", exact=False):
     tenant, username, role = identity
     conn = get_conn()
     try:
@@ -123,9 +151,9 @@ def retrieve(identity, intent, bill_id=None):
             name = verify_actor(cur, tenant, username, role)
             cur.execute("""SELECT department,label,role,locked,assignees FROM tenant_chain_config
                            WHERE tenant_id=%s AND is_snapshot=false ORDER BY department,step_order,id""", (tenant,))
-            rules, departments = stage_scope(cur.fetchall(), role, name)
-            cur.execute(EVIDENCE_SQL, dict(rules=Json(rules), departments=departments, tenant=tenant,
-                        bill=str(bill_id) if bill_id else None, overdue=intent=="overdue", limit=LIMIT+1))
+            scope = bill_scope(cur.fetchall(), role, name, intent)
+            cur.execute(EVIDENCE_SQL, dict(**scope, tenant=tenant, bill=str(bill_id) if bill_id else None,
+                                          overdue=intent=="overdue", limit=LIMIT+1, offset=offset, search=search, exact=exact))
             return jsonable_encoder(cur.fetchall())
     finally:
         put_conn(conn)
@@ -148,12 +176,12 @@ def grounded_answer(identity, intent, bill_id, rows, selection=None):
     evidence = [dict(row, citation=f"B{i}", path=f"/bills/{row['id']}") for i, row in enumerate(rows[:LIMIT], 1)]
     more = len(rows) > LIMIT
     if not evidence:
-        summary = "No matching pending bills are visible in your approval scope."
+        summary = "No matching bills on this page within your access scope."
     else:
         count = f"At least {LIMIT+1}" if more else str(len(evidence))
         noun = "bill" if len(evidence) == 1 else "bills"
-        topic = ("overdue pending " if intent == "overdue" else "pending ") + noun
-        summary = f"{count} {topic} in your approval scope. Earliest due dates are shown first."
+        topic = {"overdue": "overdue pending ", "records": ""}.get(intent, "pending ") + noun
+        summary = f"{count} {topic} in this result window. Earliest due dates are shown first."
         if intent=="relationships":
             linked = sum(bool(r["graph_link"]) for r in evidence)
             summary += f" The PostgreSQL Fact Graph confirms supplier links for {linked} of the {len(evidence)} bills shown."
@@ -197,9 +225,9 @@ async def query_copilot(body: Query, response: Response):
             hints.append({"citation": index, "relationships": edges})
         try:
             route = await asyncio.wait_for(complete_json(
-                tenant_id=identity[0], purpose="finance_copilot_intent",
-                system="Classify the question. Return JSON with intent queue, overdue, relationships or unsupported. "
-                       "Only general pending approval queue, overdue pending bills, or supplier links of pending bills "
+                tenant_id=identity[0], purpose="finance_copilot_intent", model="gpt-6-luna",
+                system="Classify the question. Return JSON with intent queue, overdue, relationships, records or unsupported. "
+                       "General bill visibility or decision history uses records. Pending approval queues, overdue pending bills and supplier links "
                        "are supported. Specific invoice references without an attached bill, amounts, time ranges, "
                        "actions and unrelated questions are unsupported. Choose an optional citation index and focus "
                        "(stage, supplier or last_action) from the authorized graph context. Never invent a citation.",
@@ -213,5 +241,5 @@ async def query_copilot(body: Query, response: Response):
     if intent=="unsupported":
         return dict(answer="Choose an approval queue, overdue bills, or supplier relationships question below.",
                     intent=intent, evidence=[], partial=False)
-    rows = await asyncio.to_thread(retrieve, identity, intent, body.bill_id)
+    rows = await asyncio.to_thread(retrieve, identity, intent, body.bill_id, body.offset)
     return grounded_answer(identity, intent, body.bill_id, rows, selection)

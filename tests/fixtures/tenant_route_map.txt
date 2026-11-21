@@ -230,6 +230,7 @@ POST    /api/disbursements/{disbursement_id}/refresh-status                     
 POST    /api/disbursements/{disbursement_id}/resend-otp                          scoped
 POST    /api/disbursements/{disbursement_id}/verify-otp                          scoped
 POST    /api/enrich-invoice                                                      scoped
+POST    /api/finance-desk/assistant/chat                                         scoped
 POST    /api/finance-desk/assistant/query                                        scoped
 POST    /api/finance-desk/inventory/compare                                      scoped
 POST    /api/fx/alerts/{alert_id}/dismiss                                        scoped

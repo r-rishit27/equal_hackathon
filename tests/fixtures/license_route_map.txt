@@ -231,6 +231,7 @@ POST    /api/disbursements/{disbursement_id}/refresh-status                    d
 POST    /api/disbursements/{disbursement_id}/resend-otp                        disbursement
 POST    /api/disbursements/{disbursement_id}/verify-otp                        disbursement
 POST    /api/enrich-invoice                                                    upload_ocr
+POST    /api/finance-desk/assistant/chat                                       fact_graph
 POST    /api/finance-desk/assistant/query                                      fact_graph
 POST    /api/finance-desk/inventory/compare                                    reports
 POST    /api/fx/alerts/{alert_id}/dismiss                                      fx

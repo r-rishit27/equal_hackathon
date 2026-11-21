@@ -182,7 +182,7 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
   const isVisible = (item: NavItem) => {
     // has() is false while entitlements are still loading, so a licensed-only item
     // never flashes into view and then disappears.
-    if (item.page === 'copilot' && (!user || user.role === 'member' || (!has('bills') || !has('approvals')))) return false
+    if (item.page === 'copilot' && (!user || user.role === 'member')) return false
     if (item.requiredService && !has(item.requiredService)) return false
     if (!item.requiredPermission) return true
     if (!user) return false

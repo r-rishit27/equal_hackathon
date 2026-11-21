@@ -16,6 +16,7 @@ import { EntitlementsProvider } from './auth/EntitlementsContext'
 import { RequireRole, RequireService } from './auth/guards'
 import { can } from './auth/permissions'
 import Sidebar from './components/Sidebar'
+import { CopilotLauncher, ConversationProvider } from './pages/WorkspaceChat'
 import MobileNav from './components/MobileNav'
 import TopBar from './components/TopBar'
 import RecordCardHost from './components/records/RecordCardHost'
@@ -213,7 +214,7 @@ function AppShell() {
   const scrolls = location.pathname.startsWith(PATHS.upload) || location.pathname === PATHS['ar-upload']
 
   return (
-    <div className="shell">
+    <ConversationProvider key={[user?.company_id,user?.username,user?.role].join('/')}><div className="shell">
       <Sidebar pendingCount={pendingCount} />
       <div className="shell__main">
         {/* Renders nothing unless ops is viewing this account. */}
@@ -282,7 +283,7 @@ function AppShell() {
                   </RequireService>
                 }
               />
-              <Route path={PATHS.copilot} element={<RequireService service="fact_graph"><RequireService service="bills"><RequireService service="approvals"><RequireRole roles={['admin','finance_controller','accountant','approver','auditor']}><CopilotPage /></RequireRole></RequireService></RequireService></RequireService>} />
+              <Route path={PATHS.copilot} element={<RequireService service="fact_graph"><RequireRole roles={['admin','finance_controller','accountant','approver','auditor']}><CopilotPage /></RequireRole></RequireService>} />
               <Route path={PATHS.inventory} element={<RequireService service="reports"><InventoryPage /></RequireService>} />
               <Route path={PATHS.reports} element={<ReportsPage />} />
               <Route
@@ -467,7 +468,8 @@ function AppShell() {
       {/* Bill and vendor cards opened by id from any page. */}
       <RecordCardHost />
       <MobileNav pendingCount={pendingCount} />
-    </div>
+      <CopilotLauncher />
+    </div></ConversationProvider>
   )
 }
 

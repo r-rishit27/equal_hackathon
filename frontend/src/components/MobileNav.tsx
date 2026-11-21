@@ -52,7 +52,7 @@ export default function MobileNav({ pendingCount = 0 }: { pendingCount?: number 
   const allowed = (perm: string | string[]) =>
     (Array.isArray(perm) ? perm : [perm]).some(p => can(user.role, p as Parameters<typeof can>[1]))
   const primary = PRIMARY.filter(i => allowed(i.perm))
-  const overflow = OVERFLOW.filter(i => (i.page !== 'copilot' || (user?.role !== 'member' && has('bills') && has('approvals'))) && allowed(i.perm) && (!i.service || has(i.service)))
+  const overflow = OVERFLOW.filter(i => (i.page !== 'copilot' || (user?.role !== 'member')) && allowed(i.perm) && (!i.service || has(i.service)))
 
   return (
     <>

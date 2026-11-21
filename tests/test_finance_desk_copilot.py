@@ -90,3 +90,24 @@ def test_model_unavailable_presets_still_work(monkeypatch):
     result = asyncio.run(cp.query_copilot(cp.Query(question=next(iter(cp.QUESTIONS))),Response()))
     assert result["evidence"][0]["citation"]=="B1"
     assert model.await_count==1
+
+@pytest.mark.parametrize("role,all_active,all_states", [
+    ("admin", True, True), ("finance_controller", True, False),
+    ("accountant", True, False), ("approver", False, False), ("auditor", False, False),
+])
+def test_records_role_matrix(role, all_active, all_states):
+    scope = cp.bill_scope([], role, "Alice", "records")
+    assert scope["records"] and scope["tenant_reader"] == all_active
+    assert scope["include_archived"] == all_states
+    # A broad right to read evidence does not assign someone else's approval.
+    queue = cp.bill_scope([], role, "Alice", "queue")
+    assert not queue["records"] and not queue["include_archived"]
+    for step in queue["rules"].adapted:
+        assert role == "admin" or step["step_role"] == role
+
+
+@pytest.mark.parametrize("role", ["member", "support", "platform_admin", "unknown"])
+def test_records_scope_fails_closed(role):
+    with pytest.raises(HTTPException) as exc:
+        cp.bill_scope([], role, "Alice", "records")
+    assert exc.value.status_code == 403
