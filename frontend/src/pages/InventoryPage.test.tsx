@@ -30,18 +30,25 @@ it('clears the current recommendation and ignores responses for an earlier bill 
   const line = { id: 'first', supplier_id: 'v', supplier: 'Vendor', item: 'Cable', bill_date: '2026-09-08',
     unit: 'm', billed_units: 10, price: 20, payment_terms_days: 30 }
   const projection = { units: 2, spend_paise: 4000, remaining_paise: 0, additional_demand_covered: 2,
-    price_basis: 'historical', reasons: [], days: [] }
+    price_basis: 'historical', reasons: [], days: [
+      { date: '2026-11-21', incoming: 0, closing: 1, unmet: 0, no_order_closing: 1 },
+      { date: '2026-11-22', incoming: 2, closing: 2, unmet: 0, no_order_closing: 0 },
+    ] }
   let finish!: (value: Response) => void
   vi.stubGlobal('fetch', vi.fn()
     .mockResolvedValueOnce(Response.json([line, { ...line, id: 'second', item: 'Wire' }]))
     .mockResolvedValueOnce(Response.json(projection))
     .mockReturnValueOnce(new Promise<Response>(resolve => { finish = resolve })))
   render(<InventoryPage />)
-  fireEvent.change(await screen.findByLabelText('Vendor'), { target: { value: 'v' } })
+  fireEvent.click(await screen.findByRole('button', { name: 'Select Vendor, 2 invoice lines' }))
   const picker = screen.getByLabelText('Invoice line item')
   fireEvent.change(picker, { target: { value: 'first' } })
   fireEvent.submit(screen.getByText('Optimize stock order').closest('form')!)
   await screen.findByRole('region', { name: 'Recommended order' })
+  const day = screen.getByRole('button', { name: /without order 0, with order 2 m/ })
+  fireEvent.click(day)
+  expect(day).toHaveAttribute('aria-pressed', 'true')
+  expect(screen.getByText(/2 on hand at close/)).toBeInTheDocument()
   fireEvent.change(picker, { target: { value: 'second' } })
   expect(screen.queryByRole('region', { name: 'Recommended order' })).toBeNull()
   fireEvent.submit(screen.getByText('Optimize stock order').closest('form')!)

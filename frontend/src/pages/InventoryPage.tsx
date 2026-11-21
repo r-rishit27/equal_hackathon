@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
-import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp } from 'lucide-react'
+import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp, Activity, Boxes } from 'lucide-react'
 import './inventory.css'
 
 interface Price {
@@ -94,13 +94,18 @@ function Planner() {
     finally { if (current === revision.current) setBusy(false) }
   }
   return <main className="inventory-desk">
-    <header className="inventory-heading"><span className="inventory-mark"><Package size={26} /></span><div><p>Finance Desk</p><h1>Inventory optimization</h1>
-      <p>Plan seven days of stock using supplier bill prices and confirmed purchasing terms.</p></div></header>
+    <header className="inventory-heading">
+      <div><p className="terminal-brand"><Boxes size={20} /> Finance Desk / Supply chain</p>
+        <h1>Inventory terminal</h1><p>Plan your next purchase against seven days of demand and available cash.</p>
+      </div>
+      <dl className="terminal-counts"><div><dt>Vendors</dt><dd>{loading || (!prices.length && error) ? '?' : vendors.length}</dd></div>
+        <div><dt>Priced invoice lines</dt><dd>{loading || (!prices.length && error) ? '?' : prices.length.toLocaleString('en-IN')}</dd></div></dl>
+    </header>
     {loading && <p role="status">Loading bill lines…</p>}
     {error && <p role="alert">{error} {!prices.length && <button onClick={() => setRequest(n => n + 1)}>Retry</button>}</p>}
     {!loading && !error && !prices.length && <p>No priced INR bill lines with a supplier and unit are available for this account.</p>}
-    {prices.length > 0 && <section className="inventory-card">
-      <h2><Building2 size={19} /> Vendor and invoice</h2>
+    {prices.length > 0 && <div className="inventory-overview"><section className="inventory-card">
+      <h2><Building2 size={19} /> Select a purchase</h2>
       <div className="inventory-pickers">
         <label>Vendor<select value={vendor} onChange={e => { setVendor(e.target.value); selectLine('') }}>
           <option value="">Choose a vendor</option>
@@ -111,8 +116,8 @@ function Planner() {
           {lines.map(p => <option key={p.id} value={p.id}>{p.item} · {p.bill_number || p.bill_date} · {money(Number(p.price))}/{p.unit}</option>)}
         </select></label>
       </div>
-    </section>}
-    {price && <form onSubmit={calculate} key={price.id}>
+    </section><VendorActivity prices={prices} vendor={vendor} onSelect={id => { setVendor(id); selectLine('') }} /></div>}
+    {price && <form onSubmit={calculate} key={price.id} onChange={() => { revision.current++; setRun(null); setBusy(false) }}>
       <section className="inventory-card inventory-source"><h2><ClipboardList size={19} /> {price.item}</h2>
         <p>{price.supplier} · Bill {price.bill_number || price.id} · {price.bill_date}</p>
         <dl><div><dt>Invoice quantity</dt><dd>{Number(price.billed_units).toLocaleString('en-IN')} {price.unit}</dd></div>
@@ -130,8 +135,8 @@ function Planner() {
         <label>Stock on hand<input key={"stock-" + allocation} defaultValue={allocation === "stock" ? Number(price.billed_units) : undefined} name="stock" step="any" type="number" min="0" required /></label>
         <label>Reserved stock<input defaultValue={0} name="reserved" step="any" type="number" min="0" required /></label>
         <label>Daily demand<input name="demand" type="number" step="any" min="0.000001" required /></label>
-        <label>Firm inbound units (optional)<input key={"inbound-" + allocation} defaultValue={allocation === "inbound" ? Number(price.billed_units) : 0} name="inbound" step="any" type="number" min="0" /></label>
-        <label>Firm inbound date<input name="inboundDate" type="date" /></label>
+        <label>Firm inbound units (confirmed deliveries)<input key={"inbound-" + allocation} defaultValue={allocation === "inbound" ? Number(price.billed_units) : 0} name="inbound" step="any" type="number" min="0" /></label>
+        <label>Expected delivery date<input name="inboundDate" type="date" /></label>
         </div></section>
       <section className="inventory-card"><h2><SlidersHorizontal size={19} /> Purchasing terms</h2>
         <div className="inventory-controls">
@@ -149,16 +154,55 @@ function Planner() {
   </main>
 }
 
+function VendorActivity({ prices, vendor, onSelect }: { prices: Price[]; vendor: string; onSelect: (id: string) => void }) {
+  const counts = new Map<string, { name: string; count: number }>()
+  for (const row of prices) {
+    const entry = counts.get(row.supplier_id) ?? { name: row.supplier, count: 0 }
+    entry.count++
+    counts.set(row.supplier_id, entry)
+  }
+  const leaders = [...counts.entries()].sort((a, b) => b[1].count - a[1].count || a[1].name.localeCompare(b[1].name)).slice(0, 5)
+  return <section className="inventory-card vendor-activity">
+    <h2><Activity size={19} /> Vendors by invoice lines</h2>
+    <div>{leaders.map(([id, { name, count }]) => <button type="button" key={id} aria-pressed={vendor === id}
+      aria-label={`Select ${name}, ${count} invoice lines`} onClick={() => onSelect(id)}>
+      <span>{name}</span><strong>{count}</strong><i aria-hidden="true" style={{ width: (100 * count / leaders[0][1].count) + '%' }} />
+    </button>)}</div>
+  </section>
+}
+
+const shortDate = (iso: string) => new Date(iso + 'T00:00:00').toLocaleDateString('en-IN', { day: 'numeric', month: 'short' })
+const quantity = (value: number) => Number(value).toLocaleString('en-IN', { maximumFractionDigits: 8 })
+
 function Recommendation({ result, price: source, start, budget }: Run) {
+  const [index, setIndex] = useState(0)
+  const day = result.days[index]
+  const peak = Math.max(1, ...result.days.flatMap(d => [d.closing, d.no_order_closing]))
+  const share = budget > 0 ? (result.spend_paise / (budget * 100)) * 100 : 0
   return <section className="inventory-run" aria-label="Recommended order">
-      <h2>{source.item} · {source.supplier}</h2>
-      <p>{start} · Bill {source.bill_number || source.id} · {result.price_basis === 'historical' ? 'Historical price estimate' : 'Entered planning rate'}</p>
-      <h3>{result.units ? result.units + ' ' + source.unit + ' · ' + money(result.spend_paise / 100) : (result.days.some(d => d.unmet > 0) ? 'No feasible reorder' : 'Stock covers the horizon')}</h3>
-      <p>Invest {money(result.spend_paise / 100)} of {money(budget)} to cover {result.additional_demand_covered} additional {source.unit} of demand. Cash remaining: {money(result.remaining_paise / 100)}.</p>
-      {result.reasons.map(reason => <p className="inventory-risk" key={reason}>{reason}</p>)}
-      <div className="inventory-scroll"><table><thead><tr><th>Date</th><th>Without order</th><th>Incoming</th><th>With order</th><th>Unmet demand</th></tr></thead>
-        <tbody>{result.days.map(d => <tr key={d.date}><th scope="row">{d.date}</th><td>{d.no_order_closing}</td><td>{d.incoming}</td><td>{d.closing}</td><td>{d.unmet}</td></tr>)}</tbody></table></div>
-    </section>
+    <h2><TrendingUp size={19} /> Purchase recommendation</h2>
+    <h3>{result.units ? `Order ${quantity(result.units)} ${source.unit}` : (result.days.some(d => d.unmet > 0) ? 'No feasible reorder' : 'Stock covers the week')}</h3>
+    <p>{source.item} · {source.supplier} · Bill {source.bill_number || source.id} · {shortDate(start)}</p>
+    <div className="capital-panel"><div><span>Order cost</span><strong>{money(result.spend_paise / 100)}</strong></div>
+      <div><span>Cash remaining</span><strong>{money(result.remaining_paise / 100)}</strong></div>
+      <div><span>Additional demand covered</span><strong>{quantity(result.additional_demand_covered)} {source.unit}</strong></div>
+    </div>
+    <div className="capital-meter" aria-hidden="true"><i style={{ width: share + '%' }} /></div>
+    <p>{share.toLocaleString('en-IN', { maximumFractionDigits: 1 })}% of {money(budget)} purchasing cash allocated · {result.price_basis === 'historical' ? 'Invoice price estimate' : 'Entered planning rate'}</p>
+    {result.reasons.map(reason => <p className="inventory-risk" key={reason}>{reason}</p>)}
+    {day && <section className="stock-outlook"><h2>Closing stock by day</h2>
+      <p className="stock-legend"><i /> Without order <i /> With order · {source.unit}</p>
+      <div className="stock-chart">{result.days.map((d, i) => <button type="button" key={d.date}
+        aria-pressed={i === index} aria-label={`${shortDate(d.date)}, without order ${d.no_order_closing}, with order ${d.closing} ${source.unit}`}
+        onClick={() => setIndex(i)}>
+        <span className="stock-bars"><i style={{ height: (100 * d.no_order_closing / peak) + '%' }} /><i style={{ height: (100 * d.closing / peak) + '%' }} /></span>
+        <span>{shortDate(d.date)}</span>
+      </button>)}</div>
+      <p aria-live="polite"><strong>{shortDate(day.date)}</strong> · {quantity(day.incoming)} arriving · {quantity(day.closing)} on hand at close · {quantity(day.unmet)} unfilled ({source.unit})</p>
+    </section>}
+    <details><summary>Daily stock figures</summary><div className="inventory-scroll"><table><thead><tr><th>Date</th><th>Without order</th><th>Arriving</th><th>With order</th><th>Unfilled demand</th></tr></thead>
+      <tbody>{result.days.map(d => <tr key={d.date}><th scope="row">{d.date}</th><td>{d.no_order_closing}</td><td>{d.incoming}</td><td>{d.closing}</td><td>{d.unmet}</td></tr>)}</tbody></table></div></details>
+  </section>
 }
 
 export default function InventoryPage() {
