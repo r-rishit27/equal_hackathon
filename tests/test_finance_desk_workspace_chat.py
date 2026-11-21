@@ -73,3 +73,25 @@ def test_followup_context_is_scoped_to_identity_and_expiry(monkeypatch):
     assert chat.context_plan(("t","u","auditor"),token) is None
     monkeypatch.setattr(chat,"monotonic",lambda:float("inf"))
     assert chat.context_plan(ident,token) is None
+
+def test_bill_attention_stays_in_queue_when_model_fails(monkeypatch):
+    monkeypatch.setattr(chat, "require_tenant", lambda: "tenant")
+    monkeypatch.setattr(chat, "actor", lambda tenant: (tenant, "viewer", "approver"))
+    def read(identity, domains=(), search="", overview=False):
+        assert not overview
+        if domains:
+            assert domains == ["approvals"]
+        return ["approvals", "vendors"], [dict(title="INV-1", domain="approvals", stage="Review", due="2026-11-21", path="/bills/id")] if domains else []
+    monkeypatch.setattr(chat, "workspace", read)
+    provider = AsyncMock(side_effect=chat.LLMError("unavailable"))
+    monkeypatch.setattr(chat, "completion", provider)
+    reply = asyncio.run(chat.chat(Response(), '{"question":"Which bills need attention?"}', None))
+    assert "INV-1" in reply["message"] and "Review" in reply["message"] and "[S1]" in reply["message"]
+    assert [s["domain"] for s in reply["sources"]] == ["approvals"]
+    assert provider.await_count == 1
+
+
+def test_empty_and_unlicensed_approval_queue_are_distinct():
+    assert chat.approval_summary({})[1] == []
+    message, sources = chat.approval_summary({"S1": {"matching_records": 0}})
+    assert "no pending bills" in message and sources == ["S1"]
