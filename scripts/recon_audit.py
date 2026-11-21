@@ -1,6 +1,6 @@
 """Audit a recon database, and the SQL that talks to it.
 
-Written during the stress run in `STRESS_TESTING.md`, where each of these
+Written during the stress run in `docs/reconciliation/STRESS_TESTING.md`, where each of these
 checks found something. They are here so the next person can run them instead
 of rediscovering them.
 
@@ -103,7 +103,7 @@ def dead_methods() -> tuple[list[str], list[tuple[str, int]]]:
     """Repository methods nothing calls, and ones no test calls.
 
     The second list is where the next silent breakage will be: both save-path
-    bugs in STRESS_TESTING.md §1.5 lived in methods with callers and no tests.
+    bugs in docs/reconciliation/STRESS_TESTING.md §1.5 lived in methods with callers and no tests.
     """
     repo = ROOT / "backend_ocr/app/recon/repo.py"
     app = list((ROOT / "backend_ocr").rglob("*.py")) + list((ROOT / "scripts").rglob("*.py"))

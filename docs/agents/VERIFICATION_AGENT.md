@@ -8,7 +8,7 @@
 | **Status** | 🟡 Partial — the three KYB calls are built; the agent wrapper, MSME check and trust score are not |
 | **Default autonomy** | **L2** — act with gate (checks are read-only; the gate is on *marking a vendor payable*) |
 | **Difficulty** | Easy — the highest-value-per-effort agent in the fleet |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.3 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.3 |
 | **Last updated** | 2026-08-06 |
 
 ---
@@ -56,7 +56,7 @@ verification, and Recon annotates findings with vendor trust.
 | `verify_pan(pan, name)` | **reuse** | [`sandbox_kyb.verify_pan`](../../backend_ocr/app/sandbox_kyb.py) — validity + name match |
 | `verify_bank(account, ifsc, name)` | **reuse** | [`sandbox_kyb.verify_bank_account`](../../backend_ocr/app/sandbox_kyb.py) — penny-less name match |
 | `check_msme(udyam_or_pan)` | **new** | Udyam registration lookup. Drives MSME 45-day payment terms, so it is a payables input, not a nicety |
-| `check_gst_filing_status(gstin)` | **wrap** | Sandbox "track return filing" per [Sandbox_GST_COMPLIANCE_INTERGRATION.md](../Sandbox_GST_COMPLIANCE_INTERGRATION.md) §3.2 — a vendor who stopped filing is an ITC risk |
+| `check_gst_filing_status(gstin)` | **wrap** | Sandbox "track return filing" per [Sandbox_GST_COMPLIANCE_INTERGRATION.md](../finance-operations/Sandbox_GST_COMPLIANCE_INTERGRATION.md) §3.2 — a vendor who stopped filing is an ITC risk |
 | `compute_trust_score(results)` | **new** | Deterministic weighted score (§6). No LLM |
 | `persist_verification(vendor_id, verdict)` | **wrap** | Writes across `supplier_gstins`, `supplier_bank_accounts`, `dim_suppliers`; logic exists inside [`gst_verification.py`](../../pipelines/gst_verification.py) and [`bank_verification.py`](../../pipelines/bank_verification.py) but is currently worker-shaped, not tool-shaped |
 
@@ -170,7 +170,7 @@ the prior row false in the same transaction.
 
 ## 10. API
 
-Standard Hub surface (see [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §15):
+Standard Hub surface (see [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §15):
 `POST /api/agents/verification/run`, `GET /api/agents/runs/{run_id}`.
 
 Agent-specific reads:

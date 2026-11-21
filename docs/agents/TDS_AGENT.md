@@ -8,8 +8,8 @@
 | **Status** | 🟡 Partial — computation, sections, mapping rules and the YTD ledger are built; return assembly and filing are not |
 | **Default autonomy** | **L0 → L1** — compute and draft. Filing is never autonomous |
 | **Difficulty** | Medium — the engine exists; correctness bar is statutory |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.8 |
-| **Related** | [TDS_SETTINGS_IMPLEMENTATION_PLAN.md](../TDS_SETTINGS_IMPLEMENTATION_PLAN.md) |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.8 |
+| **Related** | [TDS_SETTINGS_IMPLEMENTATION_PLAN.md](../finance-operations/TDS_SETTINGS_IMPLEMENTATION_PLAN.md) |
 | **Last updated** | 2026-08-06 |
 
 ---

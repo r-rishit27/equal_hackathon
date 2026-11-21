@@ -8,7 +8,7 @@
 | **Status** | 🟡 Partial — FX briefings and per-domain stats endpoints exist; there is no cross-domain rollup |
 | **Default autonomy** | **L1** — drafts the report and the digest email, sends nothing |
 | **Difficulty** | Medium — the work is query design and trust, not orchestration |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.4 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.4 |
 | **Last updated** | 2026-08-06 |
 
 ---
@@ -53,7 +53,7 @@ quietly failing, this is where it shows up.
 
 | Tool | Source | Implementation |
 |---|---|---|
-| `query_spend(period, scope)` | **wrap** | Aggregate `fact_invoices` / `fact_bills` by vendor, category, cost center. COA semantics in [COA_RULES_AND_REPORTS.md](../COA_RULES_AND_REPORTS.md) |
+| `query_spend(period, scope)` | **wrap** | Aggregate `fact_invoices` / `fact_bills` by vendor, category, cost center. COA semantics in [COA_RULES_AND_REPORTS.md](../finance-operations/COA_RULES_AND_REPORTS.md) |
 | `query_exceptions(period)` | **wrap** | Open `billing_reconciliation_discrepancies`, RED verifications, failed disbursements, OCR failures |
 | `query_approvals(period)` | **wrap** | `bill_approval_chain` + `wf_tasks` — pending, overdue, median time-to-approve |
 | `query_ageing(as_of)` | **new** | AP ageing buckets (0–30/31–60/61–90/90+) from `fact_invoices` + `payment_schedules` |

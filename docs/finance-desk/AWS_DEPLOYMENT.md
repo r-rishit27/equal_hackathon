@@ -4,7 +4,7 @@
 
 ## Current integration and rollout path
 
-The [UAT2 notes](../DEV_ENVIRONMENT.md) describe Amplify for the frontend and a FastAPI process on EC2 behind HTTPS, with PostgreSQL access and a separate worker process. They also document a historical shared development/production database arrangement. Confirm the actual deployment topology with the operator before changing it. The [application architecture](../ARCHITECTURE.md), [backend composition](../../backend_ocr/app/main.py) and [worker process](../../main.py) remain the integration points.
+The [UAT2 notes](../aws-deploy/DEV_ENVIRONMENT.md) describe Amplify for the frontend and a FastAPI process on EC2 behind HTTPS, with PostgreSQL access and a separate worker process. They also document a historical shared development/production database arrangement. Confirm the actual deployment topology with the operator before changing it. The [application architecture](../architecture/ARCHITECTURE.md), [backend composition](../../backend_ocr/app/main.py) and [worker process](../../main.py) remain the integration points.
 
 1. **Hackathon:** Use the existing application shell and a seeded adapter with a local plan database. Set a separate development OpenAI project key only if live AI is used. Keep bank, procurement and email integrations out of the demo execution path.
 2. **First AWS pilot:** Serve under a feature-gated route on the existing application, with finance data in an isolated development or pilot database and separate signing/secrets configuration. Keep calls internal and apply the three domain boundaries in-process. Make read-only source access and migration credentials separate. Verify bank and procurement side effects remain disabled for these services.

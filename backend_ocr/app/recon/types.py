@@ -457,7 +457,7 @@ class RuleConfig:
     cap_at_po: bool = True
     flag_under_use: bool = True
 
-    # ── Bata's confirmed rules (QUESTIONS_FOR_BATA.md, 16 Nov 2026) ───────────
+    # ── Bata's confirmed rules (docs/reconciliation/QUESTIONS_FOR_BATA.md, 16 Nov 2026) ───────────
     # R2: "the rate is fixed on the PO" and may not change — any variation needs
     # a new PO. With this on, the rate tolerances above do not apply to a rate
     # ABOVE the PO: an exact match is required. Off by default so existing

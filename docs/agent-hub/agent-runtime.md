@@ -15,7 +15,7 @@ The application and standalone processes share the Python implementation. The st
 | `gst` | GST registration verification worker |
 | `receivable` | Cash application queue |
 
-The CFO Orchestrator runs on demand in the API and evaluates five stages for a selected invoice. Agent Hub also provides a shorter advisory invoice check. [CFO control sequence](../ARCHITECTURE.md#cfo-invoice-controls) The console's **Live** badge describes the module's release status. Communications also shows the mailbox's current pause setting.
+The CFO Orchestrator runs on demand in the API and evaluates five stages for a selected invoice. Agent Hub also provides a shorter advisory invoice check. [CFO control sequence](../architecture/ARCHITECTURE.md#cfo-invoice-controls) The console's **Live** badge describes the module's release status. Communications also shows the mailbox's current pause setting.
 
 ## Deploy one worker separately
 

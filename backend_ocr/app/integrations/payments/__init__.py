@@ -134,7 +134,7 @@ def _icici_txn_status(f: dict) -> Optional[str]:
 
 _ADAPTERS: dict[str, _Adapter] = {
     "ICICI": _Adapter(
-        # docs/DISBURSEMENT_IMPS_API.md: "Minimum: Rs 1 (ICICI requirement)",
+        # docs/payments_docs/DISBURSEMENT_IMPS_API.md: "Minimum: Rs 1 (ICICI requirement)",
         # "ICICI hard limit: Rs 5,00,000".
         "ICICI", "ICICI Bank", "ICICI", min_amount=1, max_amount=500000,
         txn_status=_icici_txn_status,

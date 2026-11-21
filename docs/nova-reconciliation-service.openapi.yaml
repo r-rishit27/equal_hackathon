@@ -9,8 +9,8 @@ info:
     recorded; (3) is Nova's own billed rate within tolerance of the certified rate card, and is
     Nova's own arithmetic (ops x rate = cost) internally consistent.
 
-    Full design and worked examples: `docs/NOVA_RECONCILIATION_LOGIC.md`.
-    Database schema: `docs/NOVA_RECONCILIATION_LOGIC.md#9-database-schema`.
+    Full design and worked examples: `docs/nova/NOVA_RECONCILIATION_LOGIC.md`.
+    Database schema: `docs/nova/NOVA_RECONCILIATION_LOGIC.md#9-database-schema`.
 
     This service does not call the Nova API itself, and does not extract invoice line items
     itself — callers pass the raw Nova API response and the extracted invoice line items as the

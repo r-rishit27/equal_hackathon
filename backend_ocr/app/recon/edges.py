@@ -1,4 +1,4 @@
-"""The match surface as a rebuildable projection (RECON_IMPLEMENTATION_PLAN.md §3, R-III).
+"""The match surface as a rebuildable projection (docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §3, R-III).
 
 Rule R-III: *wipe it, rebuild it, lose nothing.* Everything here is derived from
 `recon_line_results` and `recon_decisions`; nothing is authored in an edge. That

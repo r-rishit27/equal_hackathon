@@ -6195,9 +6195,9 @@ The following licensing and platform administration notes describe the applicati
 
 # Licensing & Platform Admin (added 2026-08-15)
 
-Defined in [`backend_ocr/app/licensing_schema.py`](../backend_ocr/app/licensing_schema.py),
+Defined in [`backend_ocr/app/licensing_schema.py`](../../backend_ocr/app/licensing_schema.py),
 applied by the app's startup hook and by `scripts/licensing_migrate.py --target both`.
-See [LICENSING_AND_ADMIN.md](LICENSING_AND_ADMIN.md) for the model and the runbook.
+See [LICENSING_AND_ADMIN.md](../administration/LICENSING_AND_ADMIN.md) for the model and the runbook.
 
 > Note: every table in this document above the Licensing heading comes from a live
 > introspection pull, so the inventory is complete as of that pull. The tables in

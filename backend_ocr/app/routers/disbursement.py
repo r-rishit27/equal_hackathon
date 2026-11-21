@@ -411,12 +411,12 @@ def payment_profile(supplier_id: str, company_id: Optional[str] = None, brand_id
 
 
 def _gen_tran_ref_no() -> str:
-    # Bank caps this at 20 chars (docs/DISBURSEMENT_IMPS_API.md).
+    # Bank caps this at 20 chars (docs/payments_docs/DISBURSEMENT_IMPS_API.md).
     return "PAY" + uuid.uuid4().hex[:14].upper()
 
 
 def _get_vendor_name_and_month(cur, tenant_id: str, invoice_id: str, supplier_id: Optional[str]) -> tuple:
-    """Resolves the two Vendor Payment Module metadata fields (docs/DISBURSEMENT_IMPS_API.md
+    """Resolves the two Vendor Payment Module metadata fields (docs/payments_docs/DISBURSEMENT_IMPS_API.md
     § Vendor Payment Module — `vendorName`/`month`) for a bill: the payee's name and the
     billing period being settled. Never persisted as new fact_disbursements columns since
     they're always re-derivable from invoice_id/supplier_id, which are already stored.
@@ -454,7 +454,7 @@ def _get_vendor_name_and_month(cur, tenant_id: str, invoice_id: str, supplier_id
 def _mock_imps_initiate(tran_ref_no: str, amount: float, beneficiary_name: str,
                          vendor_name: Optional[str] = None, month: Optional[str] = None) -> dict:
     """Fabricates a response shaped like the real POST /vendor-payment/pay
-    (docs/DISBURSEMENT_IMPS_API.md § Vendor Payment Module) — no network call. This
+    (docs/payments_docs/DISBURSEMENT_IMPS_API.md § Vendor Payment Module) — no network call. This
     endpoint exclusively pays vendor bills, so it mirrors that module (not the generic
     /disbursement/imps/initiate) — `vendorInfo.endpoint` reflects that, and the
     request-only `vendorName`/`month` metadata fields are echoed under `requestMetadata`
@@ -790,7 +790,7 @@ def status_explanation(bank_provider: Optional[str], body: dict, status: str,
 
 def _real_imps_status(cur, disbursement: dict) -> dict:
     """Real replacement for _mock_imps_status. Uses bank_tran_ref_no (the
-    value the `pay` response returned) per docs/DISBURSEMENT_IMPS_API.md's
+    value the `pay` response returned) per docs/payments_docs/DISBURSEMENT_IMPS_API.md's
     "Important — tranRefNo in Response" note — AU Bank's own reference, or
     ICICI's echo of ours; never the tran_ref_no we originally generated.
     Every status poll is logged to disbursement_gateway_calls (see

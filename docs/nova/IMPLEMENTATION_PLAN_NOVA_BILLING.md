@@ -77,7 +77,7 @@ Indexes: `(tenant_id, status)`, `(tenant_id, severity)`, `(run_id)`,
   re-runnable with no errors.
 - `python3 scripts/seed_billing_vendor_module_alias.py` → 57 alias rows; verify
   count query.
-- `docs/full_database_schema.md` updated with the 8 tables.
+- `docs/architecture/full_database_schema.md` updated with the 8 tables.
 
 ---
 

@@ -1,6 +1,6 @@
 # Payment Guardrails
 
-Application-level controls governing when and how a vendor payment can be initiated, on top of the bank-side rails documented in [`DISBURSEMENT_IMPS_API.md`](./DISBURSEMENT_IMPS_API.md) (Disbursement IMPS API + Vendor Payment Module). That doc covers what the bank accepts and returns; this doc covers what our application must enforce *before* a request ever reaches the bank.
+Application-level controls governing when and how a vendor payment can be initiated, on top of the bank-side rails documented in [`DISBURSEMENT_IMPS_API.md`](DISBURSEMENT_IMPS_API.md) (Disbursement IMPS API + Vendor Payment Module). That doc covers what the bank accepts and returns; this doc covers what our application must enforce *before* a request ever reaches the bank.
 
 Status key used below: **Implemented** (live in `backend_ocr/app/routers/disbursement.py` / `frontend/src/pages/PaymentGatewayPage.tsx` / `frontend/src/pages/BillsPage.tsx` today), **Partial**, or **Not yet built** (requirement stated, no implementation exists).
 

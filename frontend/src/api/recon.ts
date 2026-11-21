@@ -264,7 +264,7 @@ export interface LineCompare {
 export type ExtractedRow = { [key: string]: unknown; _cmp?: LineCompare | null }
 export interface ExtractedTable {
   title: string
-  /** `code`: the column's vocabulary role (docs/RECON_VOCABULARY.md), e.g. QTY_CLAIMED for a sheet's "Vendor Qty". */
+  /** `code`: the column's vocabulary role (docs/reconciliation/RECON_VOCABULARY.md), e.g. QTY_CLAIMED for a sheet's "Vendor Qty". */
   columns: { key: string; label: string; fmt: ValueFmt; code?: string }[]
   rows: ExtractedRow[]
 }
@@ -290,7 +290,7 @@ export interface CaseDocument {
   case?: CaseContext | null
   /** For a part of an uploaded file: where it stands. */
   status?: SegmentStatus; vendor_name?: string | null
-  /** What the part is, in the recon vocabulary (docs/RECON_VOCABULARY.md). */
+  /** What the part is, in the recon vocabulary (docs/reconciliation/RECON_VOCABULARY.md). */
   vocab?: DocVocab
 }
 /** Vocabulary codes for a document part: its role, which leg of the match it fills, how much a receipt can

@@ -1120,7 +1120,7 @@ async def _ensure_recon_tables():
         with conn.cursor() as cur:
             for stmt in DDL:
                 cur.execute(stmt)
-            # The recon vocabulary (docs/RECON_VOCABULARY.md): codes, aliases, generated code columns, FKs.
+            # The recon vocabulary (docs/reconciliation/RECON_VOCABULARY.md): codes, aliases, generated code columns, FKs.
             stats = vocab.sync(cur)
         conn.commit()
         import logging as _lg; _lg.info("[migrate] recon vocabulary %s", stats)

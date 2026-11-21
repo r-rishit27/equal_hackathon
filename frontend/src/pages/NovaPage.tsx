@@ -4,7 +4,7 @@ import NovaRawExplorer from '../components/NovaRawExplorer'
 import { PageHeader } from '../ui'
 
 // Nova ownership & rate certification (services/nova_reconciliation/,
-// docs/NOVA_RECONCILIATION_LOGIC.md). The older invoice-vs-Nova-ledger view that
+// docs/nova/NOVA_RECONCILIATION_LOGIC.md). The older invoice-vs-Nova-ledger view that
 // used to share this page (pipelines/billing_reconciliation.py, /api/billing/*) has
 // been retired — this is the one Nova reconciliation system now.
 //

@@ -114,7 +114,7 @@ def imps_status(
 ) -> dict:
     """POST /disbursement/imps/status. `tran_ref_no` is the value from the
     `initiate` response's `data.tranRefNo` (see the "Important — tranRefNo in
-    Response" note in docs/DISBURSEMENT_IMPS_API.md). `date` is `MM/DD/YYYY`."""
+    Response" note in docs/payments_docs/DISBURSEMENT_IMPS_API.md). `date` is `MM/DD/YYYY`."""
     payload = {
         "tranRefNo": tran_ref_no,
         "date": date,
@@ -134,7 +134,7 @@ def vendor_payment_pay(
     bene_code: Optional[str] = None, idempotency_key: Optional[str] = None,
 ) -> dict:
     """POST /vendor-payment/pay. Returns the raw response body (matches
-    docs/DISBURSEMENT_IMPS_API.md's Success/Error Response shape) — callers
+    docs/payments_docs/DISBURSEMENT_IMPS_API.md's Success/Error Response shape) — callers
     read `data.status` (SUCCESS/PENDING/FAILED) and `data.bankRRN`/
     `data.tranRefNo`, the same fields the mock's return value already carried,
     so no caller-side reshaping is needed to swap mock for real.
@@ -174,7 +174,7 @@ def vendor_payment_status(
 ) -> dict:
     """POST /vendor-payment/status. `tran_ref_no` here is the value from the
     `pay` response's `data.tranRefNo` (the bank's own reference for AU Bank,
-    or our original one echoed back for ICICI — see docs/DISBURSEMENT_IMPS_API.md's
+    or our original one echoed back for ICICI — see docs/payments_docs/DISBURSEMENT_IMPS_API.md's
     "Important — tranRefNo in Response" note), not necessarily what we originally
     generated. `date` is `MM/DD/YYYY`."""
     payload = {

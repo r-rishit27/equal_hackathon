@@ -1,6 +1,6 @@
-"""Bata's confirmed business rules (QUESTIONS_FOR_BATA.md, call of 16 Nov 2026).
+"""Bata's confirmed business rules (docs/reconciliation/QUESTIONS_FOR_BATA.md, call of 16 Nov 2026).
 
-Covers acceptance tests 13, 15 and 16 of RECON_IMPLEMENTATION_PLAN.md §12:
+Covers acceptance tests 13, 15 and 16 of docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §12:
 the ₹100 receipt variance, the single-PO prohibition, and the fixed PO rate.
 """
 from decimal import Decimal as D

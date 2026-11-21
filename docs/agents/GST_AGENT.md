@@ -8,8 +8,8 @@
 | **Status** | 🟡 Partial — GSTIN validation is built; filing-status checks, 2A/2B reconciliation and return assembly are designed but not built |
 | **Default autonomy** | **L0 → L1** — verify and draft. Filing is never autonomous |
 | **Difficulty** | Medium per capability, large in aggregate |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.9 |
-| **Related** | [Sandbox_GST_COMPLIANCE_INTERGRATION.md](../Sandbox_GST_COMPLIANCE_INTERGRATION.md) — the integration contract this agent implements |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.9 |
+| **Related** | [Sandbox_GST_COMPLIANCE_INTERGRATION.md](../finance-operations/Sandbox_GST_COMPLIANCE_INTERGRATION.md) — the integration contract this agent implements |
 | **Last updated** | 2026-08-06 |
 
 ---
@@ -26,7 +26,7 @@ interest. This agent makes that visible *before* payment.
 [`pipelines/gst_verification.py`](../../pipelines/gst_verification.py) already
 validates GSTINs against Sandbox. The design for the rest — filing-status tracking,
 GSTR-2A/2B reconciliation job flow, `fact_gst_reconciliation` — is specified in
-[Sandbox_GST_COMPLIANCE_INTERGRATION.md](../Sandbox_GST_COMPLIANCE_INTERGRATION.md)
+[Sandbox_GST_COMPLIANCE_INTERGRATION.md](../finance-operations/Sandbox_GST_COMPLIANCE_INTERGRATION.md)
 §3–4 and §9–10. This agent is the orchestration and audit layer over that plan, in
 its three phases.
 
@@ -204,7 +204,7 @@ CREATE TABLE IF NOT EXISTS gst_return_drafts (
 ## 11. Build plan
 
 Follows the phasing already set out in
-[Sandbox_GST_COMPLIANCE_INTERGRATION.md](../Sandbox_GST_COMPLIANCE_INTERGRATION.md) §10.
+[Sandbox_GST_COMPLIANCE_INTERGRATION.md](../finance-operations/Sandbox_GST_COMPLIANCE_INTERGRATION.md) §10.
 
 **Phase 1 — GSTIN validation as an agent (2 days).** Wrap the existing worker with
 audit. Low effort, immediate value.

@@ -1,6 +1,6 @@
 # Nova Reconciliation Service
 
-Standalone microservice. Design: `docs/NOVA_RECONCILIATION_LOGIC.md`. API contract:
+Standalone microservice. Design: `docs/nova/NOVA_RECONCILIATION_LOGIC.md`. API contract:
 `docs/nova-reconciliation-service.openapi.yaml`. Not a stage inside `pipelines/` or
 `backend_ocr/` — its own process, own DB pool, own deploy.
 
@@ -41,7 +41,7 @@ Health check: `GET http://localhost:8100/health`.
 The three owned tables (`nova_reconciliation_module_aliases`, `nova_reconciliation_runs`,
 `nova_reconciliation_lines`) already exist on the shared platform DB — the migration was applied
 directly and the one-shot `schema.sql` removed rather than kept around as a file that could drift
-from what's actually live. Full DDL is documented in `docs/NOVA_RECONCILIATION_LOGIC.md` §9.2 if
+from what's actually live. Full DDL is documented in `docs/nova/NOVA_RECONCILIATION_LOGIC.md` §9.2 if
 it ever needs to be re-applied elsewhere (a fresh DB, a different environment).
 
 ## Configuration (env vars)

@@ -452,7 +452,7 @@ def set_tenant_services(tenant_id: str, body: LicensingUpdate, request: Request,
 
     # Bust the cache so the change is visible on the next request rather than up to
     # LICENSE_CACHE_TTL later. Note this only clears *this* worker; see
-    # docs/LICENSING_AND_ADMIN.md for the cross-worker caveat.
+    # docs/administration/LICENSING_AND_ADMIN.md for the cross-worker caveat.
     invalidate_license(tenant_id)
     return {"ok": True, "changed": len(body.changes)}
 

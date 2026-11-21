@@ -16,9 +16,9 @@ Product references inform workflow choices. This is not a market-wide feature co
 
 | Source | How the design uses it |
 |---|---|
-| [Reckon.ai README](../../README.md) and [backend structure](../BACKEND_STRUCTURE.md) | Current app boundaries, integrations, and deployment setup. |
+| [Reckon.ai README](../../README.md) and [backend structure](../architecture/BACKEND_STRUCTURE.md) | Current app boundaries, integrations, and deployment setup. |
 | [Receivables implementation and rollout](../receivables/README.md) | Statement intake, matching, review and apply/unapply behavior. |
-| [Payment guardrails](../PAYMENT_GUARDRAILS.md) | Approval and release remain in the existing payment workflow. |
+| [Payment guardrails](../payments_docs/PAYMENT_GUARDRAILS.md) | Approval and release remain in the existing payment workflow. |
 | [Fact Graph implementation](../../backend_ocr/app/domain/fact_graph.py) and [Agent Hub routes](../../backend_ocr/app/routers/agent_hub.py) | Existing graph entities, search and neighbor traversal. |
 | [PostgreSQL transaction isolation](https://www.postgresql.org/docs/current/transaction-iso.html) | Snapshot consistency and concurrent decisions. |
 | [PostgreSQL constraints](https://www.postgresql.org/docs/current/ddl-constraints.html) | Unique occurrence keys, idempotency and relationship invariants. |

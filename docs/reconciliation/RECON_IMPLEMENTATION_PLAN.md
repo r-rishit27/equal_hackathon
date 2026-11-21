@@ -10,10 +10,10 @@ append-only decision log**, and the match surface as a **rebuildable projection*
 | Source | What it contributes |
 |---|---|
 | `RECON_APPROACH_RESEARCH.html` · `RECON_APPROACH_BAKEOFF_SUMMARY.html` | The bake-off: C 89.2 / 16-of-16 vs A 78.6 / 13 vs B 48.4 / 8 |
-| `QUESTIONS_FOR_BATA.md` | Bata's confirmed business rules (16 Nov 2026 call) |
-| `docs/RECON_VOCABULARY.md` | The dictionary **as adopted** — §17a engine outcomes, §21 machine form |
-| `RECON_SCHEMA_V1.md` | The rev-2 proposal. **Superseded in part** — see §2.3 |
-| `docs/full_database_schema.md` | What is actually in the database (pulled 18 Nov 2026) |
+| `docs/reconciliation/QUESTIONS_FOR_BATA.md` | Bata's confirmed business rules (16 Nov 2026 call) |
+| `docs/reconciliation/RECON_VOCABULARY.md` | The dictionary **as adopted** — §17a engine outcomes, §21 machine form |
+| `docs/reconciliation/RECON_SCHEMA_V1.md` | The rev-2 proposal. **Superseded in part** — see §2.3 |
+| `docs/architecture/full_database_schema.md` | What is actually in the database (pulled 18 Nov 2026) |
 
 ---
 
@@ -98,7 +98,7 @@ the *inputs plus the decisions in force*. So a re-run after a reviewer decision 
 the previous verdict, and a replay a year later shows today's decisions rather than the ones
 that were in force. Bake-off findings 4.2 confirm both.
 
-### 2.3 What `RECON_SCHEMA_V1.md` contributes, and where it is now wrong
+### 2.3 What `docs/reconciliation/RECON_SCHEMA_V1.md` contributes, and where it is now wrong
 
 Rev 2 proposed a single `recon_extractions` JSONB row. **That is not what shipped, and it is
 not what we are building.** The bake-off scored that shape (Plan B) **48.4**, and the live
@@ -108,8 +108,8 @@ What rev 2 still contributes, and this plan keeps: the leg model, `receipt_granu
 keeping two evidence layers apart, `QTY_PAYABLE` never stored on an extraction, and §11 —
 the Bata rules, which are the whole of §5 below.
 
-**Action:** mark `RECON_SCHEMA_V1.md` §0–§6 superseded by this document, and keep its §11.
-`RECON_SCALABILITY.md` argues for the Plan B shape and is now a historical note — say so at
+**Action:** mark `docs/reconciliation/RECON_SCHEMA_V1.md` §0–§6 superseded by this document, and keep its §11.
+`docs/reconciliation/RECON_SCALABILITY.md` argues for the Plan B shape and is now a historical note — say so at
 its top rather than deleting it.
 
 ---
@@ -706,7 +706,7 @@ Without that, every credit-note case would show three red checks for one cause.
 
 ## 5. Phase 2 — the Bata rule set
 
-Confirmed on the 16 Nov call (`QUESTIONS_FOR_BATA.md`). Codes are the adopted ones from
+Confirmed on the 16 Nov call (`docs/reconciliation/QUESTIONS_FOR_BATA.md`). Codes are the adopted ones from
 vocabulary §17a, so nothing new enters the dictionary.
 
 ### 5.1 The legs
@@ -955,7 +955,7 @@ Non-negotiable rules, two of which the adopted vocabulary §21 already enforces:
 Of the five terms the bake-off flagged as missing (which would have made all three plans
 reject the Thane report), the adopted dictionary has fixed two:
 
-| Term | `docs/RECON_VOCABULARY.md` | `recon/vocab.py` | Note |
+| Term | `docs/reconciliation/RECON_VOCABULARY.md` | `recon/vocab.py` | Note |
 |---|---|---|---|
 | `evidence_layer` | present | present | fixed |
 | `date_role` | present | present | fixed |
@@ -1020,7 +1020,7 @@ Tests 1–3 are already met by the shipped engine and must not regress. 4–7 ar
 | **GRN extract not yet received** | The receipt leg has no real input; the column set is a guess | Build the loader on a declared mapping file; chase Harminder |
 | **Stable-key confidence on unnumbered lines** | Some invoices and all emails have no printed line numbers | The ladder's rung 3 plus an explicit re-confirm task; never silent |
 | **`recon_match_overrides` migration** | Live reviewer confirmations must not be lost in the move | Backfill as decisions first, verify counts, then swap to the view |
-| **Dynamics posting unanswered** | Decides whether we need write access and who guarantees no double-post | Open question in `QUESTIONS_FOR_BATA.md` §6 |
+| **Dynamics posting unanswered** | Decides whether we need write access and who guarantees no double-post | Open question in `docs/reconciliation/QUESTIONS_FOR_BATA.md` §6 |
 | **₹100 per invoice or per line** | Changes the exception volume materially | Written confirmation before coding `R_VARIANCE_100` |
 | **Two GSTINs fail checksum** | Consignor GSTIN on the POD, and the dictionary's "corrected" Karnataka GSTIN | Verify against Bata master data before seeding |
 
@@ -1040,8 +1040,8 @@ which needs approval to use client documents plus ~200 labelled examples.
 | Document | Status |
 |---|---|
 | **This file** | The build plan. Current. |
-| `QUESTIONS_FOR_BATA.md` | Current — the business-rule record |
-| `docs/RECON_VOCABULARY.md` | Current — the adopted dictionary. **The root-level copy is stale; delete it** |
+| `docs/reconciliation/QUESTIONS_FOR_BATA.md` | Current — the business-rule record |
+| `docs/reconciliation/RECON_VOCABULARY.md` | Current — the adopted dictionary. **The root-level copy is stale; delete it** |
 | `RECON_APPROACH_RESEARCH.html` | Current — the evidence for Plan C |
-| `RECON_SCHEMA_V1.md` | §0–§6 **superseded** by this plan; §11 (Bata rules) still current |
-| `RECON_SCALABILITY.md` | **Historical.** It argues the Plan B shape, which lost the bake-off |
+| `docs/reconciliation/RECON_SCHEMA_V1.md` | §0–§6 **superseded** by this plan; §11 (Bata rules) still current |
+| `docs/reconciliation/RECON_SCALABILITY.md` | **Historical.** It argues the Plan B shape, which lost the bake-off |

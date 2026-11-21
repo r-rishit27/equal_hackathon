@@ -1,4 +1,4 @@
-"""Stable line identity (RECON_IMPLEMENTATION_PLAN.md §6.1).
+"""Stable line identity (docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §6.1).
 
 Why this exists
 ---------------

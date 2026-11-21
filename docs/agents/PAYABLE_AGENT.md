@@ -8,8 +8,8 @@
 | **Status** | 🟡 Partial — disbursement, OTP and approval chain are built; the agent layer, follow-up automation and cash allocation are not |
 | **Default autonomy** | **L1** — prepare only. L2 (act-with-gate) once trusted. **L3 is out of scope** |
 | **Difficulty** | Medium to build, highest consequence in the fleet |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.6 |
-| **Related** | [DISBURSEMENT_IMPS_API.md](../DISBURSEMENT_IMPS_API.md), [DISBURSEMENT_PAYMENT_INTEGRATION_PLAN.md](../DISBURSEMENT_PAYMENT_INTEGRATION_PLAN.md), [PAYMENT_GUARDRAILS.md](../PAYMENT_GUARDRAILS.md) |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.6 |
+| **Related** | [DISBURSEMENT_IMPS_API.md](../payments_docs/DISBURSEMENT_IMPS_API.md), [DISBURSEMENT_PAYMENT_INTEGRATION_PLAN.md](../payments_docs/DISBURSEMENT_PAYMENT_INTEGRATION_PLAN.md), [PAYMENT_GUARDRAILS.md](../payments_docs/PAYMENT_GUARDRAILS.md) |
 | **Last updated** | 2026-08-06 |
 
 ---
@@ -161,7 +161,7 @@ happens at the tool boundary (`_mask_account`, `_mask_email` exist for this).
 
 ## 8. Guardrails
 
-Beyond [PAYMENT_GUARDRAILS.md](../PAYMENT_GUARDRAILS.md):
+Beyond [PAYMENT_GUARDRAILS.md](../payments_docs/PAYMENT_GUARDRAILS.md):
 
 - **Verified vendors only.** No verification, or not `payable` → refuse. Not a
   warning; a refusal.

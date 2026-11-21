@@ -1,6 +1,6 @@
 # Reckon.ai Recon Vocabulary (v1-draft) — SUPERSEDED
 
-> ⚠ **Not the dictionary. Use [`docs/RECON_VOCABULARY.md`](docs/RECON_VOCABULARY.md).**
+> ⚠ **Not the dictionary. Use [`docs/reconciliation/RECON_VOCABULARY.md`](../RECON_VOCABULARY.md).**
 >
 > This is the 14 Nov 2026 draft. The adopted version lives in `docs/`, is 100 lines
 > longer, and is the one `backend_ocr/app/recon/vocab.py` is tested against

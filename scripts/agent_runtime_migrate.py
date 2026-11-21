@@ -1,5 +1,5 @@
 """
-Agent runtime — DB migration. Implements docs/PRD_AGENT_HUB.md §11.
+Agent runtime — DB migration. Implements docs/agent-hub/PRD_AGENT_HUB.md §11.
 
 This is Phase 0 of the Agent Hub: the audit and cost substrate every agent
 writes to. It ships with the Review Agent because that is the first agent to

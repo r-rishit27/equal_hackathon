@@ -203,7 +203,7 @@ REFRESH_TOKEN_TTL_DAYS = int(os.getenv("REFRESH_TOKEN_TTL_DAYS", "30"))  # long-
 #   1. A different signing key makes it cryptographically impossible for a tenant
 #      token to be accepted on /api/admin/* or vice versa. That is the primary
 #      barrier; the `typ` claim check is only defence in depth.
-#   2. Dev and prod currently share JWT_SECRET (docs/DEV_ENVIRONMENT.md §6), so a
+#   2. Dev and prod currently share JWT_SECRET (docs/aws-deploy/DEV_ENVIRONMENT.md §6), so a
 #      shared default would make a token minted on dev valid against production's
 #      cross-tenant admin surface. Set a DIFFERENT value per environment.
 # Unset => /api/admin/* returns 503 rather than falling back to something weaker.

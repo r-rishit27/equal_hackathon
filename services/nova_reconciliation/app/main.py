@@ -1,7 +1,7 @@
 """
 Nova Reconciliation Service — entrypoint.
 
-Standalone FastAPI app (docs/NOVA_RECONCILIATION_LOGIC.md §1): its own process,
+Standalone FastAPI app (docs/nova/NOVA_RECONCILIATION_LOGIC.md §1): its own process,
 own DB pool, own CORS policy. Run with:
     uvicorn app.main:app --port 8100 --reload
 from services/nova_reconciliation/.

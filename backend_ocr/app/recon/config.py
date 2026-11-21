@@ -20,7 +20,7 @@ CROP_DPI = 300
 MAX_UPLOAD_MB = 25
 
 # Page images (scanned POs, invoices, memos, PODs, field sheets): gpt-5.4 with reasoning off. In the parser
-# evaluation (docs/RECON_PARSER_EVAL.md) gpt-4o scored 82.1 and invented 23 money rows; gpt-5.4 scored 93.0
+# evaluation (docs/reconciliation/RECON_PARSER_EVAL.md) gpt-4o scored 82.1 and invented 23 money rows; gpt-5.4 scored 93.0
 # with none, at about the same price per page.
 VISION_MODEL = os.getenv("RECON_VISION_MODEL", "gpt-5.4")
 FAST_MODEL = os.getenv("RECON_FAST_MODEL", "gpt-4o-mini")

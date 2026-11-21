@@ -1,10 +1,10 @@
 # Reckon.ai Recon Schema v1 — what to build now
 
 **Status:** Proposed for build · 2026-11-14 (rev 2: one extraction table) · **rev 2.1, 2026-11-18: business rules confirmed by Bata — see §11**
-**Pairs with:** `RECON_VOCABULARY.md` (what every code means) and the CAPEX four-way architecture (where each component runs).
+**Pairs with:** `docs/reconciliation/design/RECON_VOCABULARY.md` (what every code means) and the CAPEX four-way architecture (where each component runs).
 
 > ### Basic principle: the vocabulary is the dictionary; the schema is derived from it
-> - **Vocabulary = dictionary** (`RECON_VOCABULARY.md`): defines every code, its meaning, its aliases and its ambiguity rules. It holds no data.
+> - **Vocabulary = dictionary** (`docs/reconciliation/design/RECON_VOCABULARY.md`): defines every code, its meaning, its aliases and its ambiguity rules. It holds no data.
 > - **Schema = storage derived from the dictionary** (this file): generic code columns and JSON fields whose allowed values and keys come from the vocabulary. `vocab_codes` and `vocab_aliases` are loaded from it, and every code — in a column or inside JSON — is checked against `vocab_codes`.
 > - **Vocabulary first, schema second.** Add the word to the vocabulary; only promote it to a column here when the linker or the graph loader must find a document by it.
 > - **Nothing in this schema without a vocabulary entry.**
@@ -13,7 +13,7 @@
 
 > ⚠⚠ **Sections 0–6 are superseded, as of 18 November 2026.** The single-JSONB-row
 > `recon_extractions` design below was tested as **Plan B in the architecture bake-off and
-> lost** (48.4 vs 89.2). The build follows **`RECON_IMPLEMENTATION_PLAN.md`** — the hybrid,
+> lost** (48.4 vs 89.2). The build follows **`docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md`** — the hybrid,
 > on the relational tables that actually shipped in `backend_ocr/app/recon/`. What remains
 > current here: **§11** (the Bata business rules), the leg model, `receipt_granularity`, and
 > keeping two evidence layers apart.
@@ -264,7 +264,7 @@ BEGIN
 
     IF bad IS NOT NULL THEN
         RAISE EXCEPTION 'recon_extractions: unknown or deprecated vocabulary code(s): %', bad
-          USING HINT = 'add the code to RECON_VOCABULARY.md and reseed vocab_codes, or map the raw label in vocab_aliases';
+          USING HINT = 'add the code to docs/reconciliation/design/RECON_VOCABULARY.md and reseed vocab_codes, or map the raw label in vocab_aliases';
     END IF;
     RETURN NEW;
 END $$ LANGUAGE plpgsql;
@@ -538,7 +538,7 @@ Three things this table settles:
 
 ## 7. Which vocabulary kinds are enforced where
 
-| Vocab kind (`RECON_VOCABULARY.md`) | Enforced by |
+| Vocab kind (`docs/reconciliation/design/RECON_VOCABULARY.md`) | Enforced by |
 |---|---|
 | `doc_role`, `recon_leg` | **DB foreign key** (generated-kind pattern, §3.1) |
 | `line_origin`, `charge_type`, `work_package`, `line_nature`, `uom`, `uom_family`, `rate_role`, `pricing_basis`, `qty_role`, `measure_basis`, `evidence_layer` | **DB trigger** against `vocab_codes`, including the deprecated check (§3.3) |
@@ -546,7 +546,7 @@ Three things this table settles:
 | JSON key sets: `item_spec`, `verification`, `conditions`, `header` | Pydantic models generated from the vocab registry |
 | Everything else in the vocabulary (tier L) | Seeded in `vocab_codes` so it is ready, but no extractor asks for it yet |
 
-**Seeding:** a script parses `RECON_VOCABULARY.md` (or a `vocab/v1.yaml` exported from it) and upserts `vocab_codes` + `vocab_aliases (source='SEED')`. Rows are never deleted; only `deprecated = true` is set. Because the trigger rejects deprecated codes, deprecating one is a breaking change for extractors and must ship with the extractor that stops emitting it.
+**Seeding:** a script parses `docs/reconciliation/design/RECON_VOCABULARY.md` (or a `vocab/v1.yaml` exported from it) and upserts `vocab_codes` + `vocab_aliases (source='SEED')`. Rows are never deleted; only `deprecated = true` is set. Because the trigger rejects deprecated codes, deprecating one is a breaking change for extractors and must ship with the extractor that stops emitting it.
 
 ---
 
@@ -593,7 +593,7 @@ New with rev 2:
 ## 11. Confirmed business rules (Bata call, 16 November 2026) — and what changes in v1
 
 Source: call "Bata X Reckon.ai: Data Clarification", 16 Nov 2026, Harminder Singh (Bata).
-Full question-and-answer record in `QUESTIONS_FOR_BATA.md`.
+Full question-and-answer record in `docs/reconciliation/QUESTIONS_FOR_BATA.md`.
 
 ### 11.1 The rules, as stated
 
@@ -663,7 +663,7 @@ Three things worth stating because they are easy to get wrong:
 
 **Closed by the call:** the variance threshold, the out-of-PO process, the authority of the
 audit quantity, the advance question, and the meaning of "GRN" — which had been an open item
-in both this document and `RECON_VOCABULARY.md` §20 since the first draft.
+in both this document and `docs/reconciliation/design/RECON_VOCABULARY.md` §20 since the first draft.
 
 **Still open:**
 

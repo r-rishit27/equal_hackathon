@@ -1,6 +1,6 @@
 """Recon vocabulary — the machine form of docs/RECON_VOCABULARY.md.
 
-docs/RECON_VOCABULARY.md is the dictionary people read; this module is the same dictionary for the code
+docs/reconciliation/RECON_VOCABULARY.md is the dictionary people read; this module is the same dictionary for the code
 and the database. tests/recon/test_vocab.py fails if a code here is missing from the document.
 
 Three jobs:

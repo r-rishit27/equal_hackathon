@@ -91,7 +91,7 @@ Vendor reconciliation and its dashboard are available from the vendor card's **D
 - Review Hub records changes and selected before-and-after values. Workflow audit records, payment events, and receivables actions provide additional history. Selected stored credentials, including email OAuth tokens and Nova API keys, use Fernet encryption.
 - Matching policies can auto-apply eligible incoming receipts. Ambiguous cases are routed for human review, and applied allocations can be reversed through the receivables workflow.
 
-[Licensing and administration](docs/LICENSING_AND_ADMIN.md) · [Payment guardrails](docs/PAYMENT_GUARDRAILS.md) · [Review audit](backend_ocr/app/review/audit.py) · [Cash application controls](docs/receivables/05_HUMAN_IN_THE_LOOP.md)
+[Licensing and administration](docs/administration/LICENSING_AND_ADMIN.md) · [Payment guardrails](docs/payments_docs/PAYMENT_GUARDRAILS.md) · [Review audit](backend_ocr/app/review/audit.py) · [Cash application controls](docs/receivables/05_HUMAN_IN_THE_LOOP.md)
 
 </details>
 
@@ -100,14 +100,14 @@ Vendor reconciliation and its dashboard are available from the vendor card's **D
 
 | Topic | Reference |
 |---|---|
-| API composition and ownership | [Backend structure](docs/BACKEND_STRUCTURE.md) |
-| Payables reconciliation and document evidence | [Reconciliation agent](docs/RECON_AGENT.md) |
+| API composition and ownership | [Backend structure](docs/architecture/BACKEND_STRUCTURE.md) |
+| Payables reconciliation and document evidence | [Reconciliation agent](docs/reconciliation/RECON_AGENT.md) |
 | Receivables matching, settlement, and exception handling | [Cash application overview](docs/receivables/README.md) · [User flows](docs/receivables/03_USER_FLOWS.md) |
-| Review Hub and communication agents | [Design and implementation](docs/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md) |
-| Tax, COA, and FX | [TDS configuration](docs/TDS_SETTINGS_IMPLEMENTATION_PLAN.md) · [COA rules and reports](docs/COA_RULES_AND_REPORTS.md) · [FX workflows](docs/FX_CURRENCY_STANDARDIZATION.md) |
-| Nova billing reconciliation | [Standalone reconciliation service](services/nova_reconciliation/README.md) |
+| Review Hub and communication agents | [Design and implementation](docs/review/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md) |
+| Tax, COA, and FX | [TDS configuration](docs/finance-operations/TDS_SETTINGS_IMPLEMENTATION_PLAN.md) · [COA rules and reports](docs/finance-operations/COA_RULES_AND_REPORTS.md) · [FX workflows](docs/finance-operations/FX_CURRENCY_STANDARDIZATION.md) |
+| Nova billing reconciliation | [Standalone reconciliation service](docs/nova/README.md) |
 | Finance Desk proposal | [PRD, requirements, architecture, and delivery plan](docs/finance-desk/README.md) |
-| Deployment, database, and API migrations | [UAT2 deployment](docs/DEV_ENVIRONMENT.md) · [Database schema reference](docs/full_database_schema.md) · [Migration runner](scripts/run_api_migrations.py) |
+| Deployment, database, and API migrations | [UAT2 deployment](docs/aws-deploy/DEV_ENVIRONMENT.md) · [Database schema reference](docs/architecture/full_database_schema.md) · [Migration runner](scripts/run_api_migrations.py) |
 
 </details>
 
@@ -131,7 +131,7 @@ The React workspace calls FastAPI over REST and multipart uploads. FastAPI and a
 | CFO Orchestrator · `/cfo-orchestrator` | Select an invoice, run the five-stage control review, and inspect the evidence behind each passed, review or blocked result. Available to admins and finance controllers with Agent Hub access. |
 | Bills and Payment Hub · `/bills`, `/payments` | Switch brands to refresh approval badges, notifications, outstanding bills, payment history and bank-specific transaction totals. The Acme workspace switcher offers Acme group, Bata India Limited and Diensten Tech Limited. |
 
-The CFO review reads the vendor master, reconciliation case, approval decision and payment records. Payment authorization stays in the payment workflow. See the [control sequence and API contract](docs/ARCHITECTURE.md#cfo-invoice-controls) and the [standalone agent commands](docs/agent-hub/agent-runtime.md).
+The CFO review reads the vendor master, reconciliation case, approval decision and payment records. Payment authorization stays in the payment workflow. See the [control sequence and API contract](docs/architecture/ARCHITECTURE.md#cfo-invoice-controls) and the [standalone agent commands](docs/agent-hub/agent-runtime.md).
 
 ### Components and integrations
 
@@ -231,7 +231,7 @@ flowchart TD
     class Apply,Metrics outcome;
 ```
 
-[Payables reconciliation lifecycle](docs/RECON_AGENT.md) · [Receivables user flows](docs/receivables/03_USER_FLOWS.md)
+[Payables reconciliation lifecycle](docs/reconciliation/RECON_AGENT.md) · [Receivables user flows](docs/receivables/03_USER_FLOWS.md)
 
 ### Deployment architecture
 
@@ -281,8 +281,8 @@ flowchart LR
     class Providers external;
 
     click Amplify href "https://github.com/r-rishit27/equal_hackathon/blob/main/frontend/amplify.yml" "Open the Amplify build spec" _blank
-    click Proxy href "https://github.com/r-rishit27/equal_hackathon/blob/main/docs/DEV_ENVIRONMENT.md" "Open the deployment routing notes" _blank
-    click Nova href "https://github.com/r-rishit27/equal_hackathon/blob/main/services/nova_reconciliation/README.md" "Open Nova service setup" _blank
+    click Proxy href "https://github.com/r-rishit27/equal_hackathon/blob/dev/docs/aws-deploy/DEV_ENVIRONMENT.md" "Open the deployment routing notes" _blank
+    click Nova href "https://github.com/r-rishit27/equal_hackathon/blob/dev/docs/nova/README.md" "Open Nova service setup" _blank
 ```
 
 <details>
@@ -297,7 +297,7 @@ flowchart LR
 
 </details>
 
-Use the diagram nodes to open configuration files in renderers that support Mermaid links. [Frontend build spec](frontend/amplify.yml) · [AWS deployment guide](docs/aws-deploy/README.md) · [Development routing](docs/DEV_ENVIRONMENT.md) · [Nova service](services/nova_reconciliation/README.md)
+Use the diagram nodes to open configuration files in renderers that support Mermaid links. [Frontend build spec](frontend/amplify.yml) · [AWS deployment guide](docs/aws-deploy/README.md) · [Development routing](docs/aws-deploy/DEV_ENVIRONMENT.md) · [Nova service](docs/nova/README.md)
 
 ---
 
@@ -1383,7 +1383,7 @@ Fiscal period is stored on every `fact_invoices`, `fact_bills`, and `fact_paymen
 
 ## 10. Testing
 
-[Consolidated application stress-testing report](docs/APPLICATION_STRESS_TEST_REPORT.md) covers feature tests, load measurements, Copilot evaluations and outstanding failures.
+[Consolidated application stress-testing report](STRESS_TESTING.md) covers feature tests, load measurements, Copilot evaluations and outstanding failures.
 
 ### Unit tests (no live DB required)
 
@@ -1413,7 +1413,7 @@ All unit tests use `unittest.mock` with asyncpg mocks.
 python test_pipelines.py   # 21 tests
 ```
 
-Requires `DB_URL` in `.env` pointing to a live Neon (or PostgreSQL) instance with the full schema applied. Full results are documented in `PIPELINE_TEST_REPORT.md`.
+Requires `DB_URL` in `.env` pointing to a live Neon (or PostgreSQL) instance with the full schema applied. Full results are documented in [the pipeline test report](docs/pipelines/PIPELINE_TEST_REPORT.md).
 
 ---
 
@@ -1456,7 +1456,7 @@ venv/bin/python main.py
 - Run `npm test` and `VITE_API_URL= npm run build` from `frontend/`. The Python suite spans API and worker code. Use a Python 3.12 test environment with the API requirements plus `pytest`, `pytest-asyncio`, and `requests`, then run `python -m pytest tests/ --tb=short` from the repository root.
 - Set `RECON_WORKER_ENABLED` or `CASHAPP_WORKER_ENABLED` before starting the API when testing the corresponding background worker against isolated data. Database test suites use dedicated throwaway databases.
 
-[UAT2 deployment reference](docs/DEV_ENVIRONMENT.md) · [Frontend CI](.github/workflows/frontend-ci.yml) · [Worker scheduler](backend_ocr/app/review/scheduler.py)
+[UAT2 deployment reference](docs/aws-deploy/DEV_ENVIRONMENT.md) · [Frontend CI](.github/workflows/frontend-ci.yml) · [Worker scheduler](backend_ocr/app/review/scheduler.py)
 
 ---
 
@@ -1548,11 +1548,11 @@ Processing_Pipline/
 |-- logs/                            Runtime pipeline logs
 |-- .env                             Environment configuration (not committed)
 |-- docs/
-|   |-- PIPELINE_README.md           Worker-by-worker operational reference
-|   |-- PIPELINE_TEST_REPORT.md      Combined test results
-|   |-- COA_RULES_AND_REPORTS.md     COA rules + expense report spec
-|   |-- full_database_schema.md      Full DB schema reference
-|   |-- Design.md                    System design notes
+|   |-- pipelines/PIPELINE_README.md           Worker-by-worker operational reference
+|   |-- pipelines/PIPELINE_TEST_REPORT.md      Combined test results
+|   |-- finance-operations/COA_RULES_AND_REPORTS.md     COA rules + expense report spec
+|   |-- architecture/full_database_schema.md      Full DB schema reference
+|   |-- architecture/Design.md                    System design notes
 |
 |-- README.md                        This document
 ```

@@ -1,4 +1,4 @@
-"""Check every number STRESS_TESTING.md asserts against the live state.
+"""Check every number docs/reconciliation/STRESS_TESTING.md asserts against the live state.
 
 A record of a stress test is only worth having if its figures are still true.
 This prints each claim beside what dev and the source actually say, and exits

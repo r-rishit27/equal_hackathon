@@ -29,7 +29,7 @@ main.py
        └─ TallySyncWorker        int_connections (Tally)   → bidirectional PUSH+PULL (optional)
 ```
 
-All workers extend `BaseWorker` ([pipelines/base.py](pipelines/base.py)).
+All workers extend `BaseWorker` ([pipelines/base.py](base.py)).
 
 ---
 
@@ -92,7 +92,7 @@ exponential-backoff polling with the cadence defined in `PIPELINE_CFG`.
 | `dim_end_customers` | INSERT | `ch_gst_verification` | GstVerificationWorker |
 | `dim_suppliers` | INSERT | `ch_bank_verification` | BankVerificationWorker |
 
-Triggers are created by `create_notify_triggers()` in [pipelines/cdc.py](pipelines/cdc.py).
+Triggers are created by `create_notify_triggers()` in [pipelines/cdc.py](cdc.py).
 The function is **idempotent** (`DROP TRIGGER IF EXISTS` + `CREATE`) — safe on every restart.
 
 ---
@@ -192,7 +192,7 @@ Processing_Pipline/
 
 ## Workers
 
-### 1. ApiSyncWorker ([pipelines/api_sync.py](pipelines/api_sync.py))
+### 1. ApiSyncWorker ([pipelines/api_sync.py](api_sync.py))
 
 **Source:** `raw_api_payloads` where `is_processed = false`
 **CDC channel:** `ch_api_sync`
@@ -212,7 +212,7 @@ Marks each row `is_processed = true` on success. Rows with `NULL tenant_id` are 
 
 ---
 
-### 2. WebhookWorker ([pipelines/webhook.py](pipelines/webhook.py))
+### 2. WebhookWorker ([pipelines/webhook.py](webhook.py))
 
 **Source:** `raw_webhook_events` where `is_processed = false AND is_signature_verified = true`
 **CDC channel:** `ch_webhook`
@@ -226,7 +226,7 @@ Writes to `stg_payments`. Same tenant null guard and dead letter queue as ApiSyn
 
 ---
 
-### 3. UploadOcrWorker ([pipelines/upload_ocr.py](pipelines/upload_ocr.py))
+### 3. UploadOcrWorker ([pipelines/upload_ocr.py](upload_ocr.py))
 
 **Source:** `raw_invoice_uploads`
 **CDC channel:** `ch_upload_ocr`
@@ -248,7 +248,7 @@ RECEIVED → PREPROCESSING → OCR_PRIMARY → OCR_FALLBACK? → VALIDATING → 
 
 ---
 
-### 4. StagingPromotionWorker ([pipelines/staging_promotion.py](pipelines/staging_promotion.py))
+### 4. StagingPromotionWorker ([pipelines/staging_promotion.py](staging_promotion.py))
 
 **Source:** `stg_invoices`, `stg_bills`, `stg_payments` where `sync_status = 'PENDING'`
 **CDC channel:** `ch_staging_promotion`
@@ -262,7 +262,7 @@ Promotes staged records to the fact layer:
 
 ---
 
-### 5. TdsProcessingWorker ([pipelines/tds_processing.py](pipelines/tds_processing.py))
+### 5. TdsProcessingWorker ([pipelines/tds_processing.py](tds_processing.py))
 
 **Source:** `stg_bills` where `tds_status = 'PENDING' OR tds_status IS NULL`
 **CDC channel:** `ch_tds_processing` (fires on both INSERT and UPDATE of `stg_bills`)
@@ -302,7 +302,7 @@ Run `scripts/fix_tds_tenant_rules.py` once to copy seed rules to all tenants.
 
 ---
 
-### 6. ApprovalWorker ([pipelines/approval.py](pipelines/approval.py))
+### 6. ApprovalWorker ([pipelines/approval.py](approval.py))
 
 **skip_backfill:** `True` (time-driven)
 **Poll interval:** 30 s, idle cap: 90 s
@@ -328,7 +328,7 @@ Falls back to `AUTO_APPROVE_THRESHOLD` env var (default ₹50,000).
 
 ---
 
-### 7. TallyReadWorker ([pipelines/tally_read.py](pipelines/tally_read.py))
+### 7. TallyReadWorker ([pipelines/tally_read.py](tally_read.py))
 
 **skip_backfill:** `True` (time-driven)
 **Poll interval:** 60 s, idle cap: 120 s
@@ -345,7 +345,7 @@ to_date   = date.today()
 
 ---
 
-### 8. DeduplicationWorker ([pipelines/deduplication.py](pipelines/deduplication.py))
+### 8. DeduplicationWorker ([pipelines/deduplication.py](deduplication.py))
 
 **Source:** `stg_bills` and `stg_invoices` in `PENDING` sync_status
 **CDC channel:** `ch_deduplication`
@@ -363,7 +363,7 @@ Anomaly types: `DUPLICATE_BILL`, `DUPLICATE_INVOICE`, `SOFT_DUPLICATE_BILL`, `SO
 
 ---
 
-### 9. GstVerificationWorker ([pipelines/gst_verification.py](pipelines/gst_verification.py))
+### 9. GstVerificationWorker ([pipelines/gst_verification.py](gst_verification.py))
 
 **Source:** `dim_end_customers` (kyc_status=PENDING) + `dim_suppliers` (status=UNVERIFIED)
 **CDC channel:** `ch_gst_verification`
@@ -375,7 +375,7 @@ PAN is back-filled from the API response when the DB row has none.
 
 ---
 
-### 10. BankVerificationWorker ([pipelines/bank_verification.py](pipelines/bank_verification.py))
+### 10. BankVerificationWorker ([pipelines/bank_verification.py](bank_verification.py))
 
 **Source:** `dim_end_customers` + `dim_suppliers` where `bank_verified = false`
 **CDC channel:** `ch_bank_verification`
@@ -386,7 +386,7 @@ Three-state outcome: `true` (confirmed) / `NULL` (checked, does not exist) / unc
 
 ---
 
-### 11. CategoryEnrichmentWorker ([pipelines/category_enrichment.py](pipelines/category_enrichment.py))
+### 11. CategoryEnrichmentWorker ([pipelines/category_enrichment.py](category_enrichment.py))
 
 **Source:** `fact_invoices` where `category IS NULL OR category = ''`
 **CDC channel:** `ch_category_enrichment`
@@ -405,7 +405,7 @@ Writes to `fact_invoices.category`, `stg_bills.category`, and `dim_suppliers.cat
 
 ---
 
-### 12. TallySyncWorker ([pipelines/tally_sync.py](pipelines/tally_sync.py))
+### 12. TallySyncWorker ([pipelines/tally_sync.py](tally_sync.py))
 
 **skip_backfill:** `True` (time-driven)
 **Poll interval:** 60 s, idle cap: 120 s
@@ -583,7 +583,7 @@ TDS path         → stg_bills.tds_status: CALCULATED / NA / PENDING / ERROR
 
 | File | TODO |
 |---|---|
-| [pipelines/upload_ocr.py](pipelines/upload_ocr.py) | `_parse_structured_file()` requires actual file bytes on disk — integrate with your storage layer (S3/local path) once `storage_path` is a real path |
-| [pipelines/upload_ocr.py](pipelines/upload_ocr.py) | Sarvam OCR fallback activates automatically once `SARVAM_API_KEY` is set in `.env` |
-| [backend_ocr/app/main.py](backend_ocr/app/main.py) | 11 startup migration handlers each open a separate Neon connection (~60 s cold-start) — consolidate into a single connection to eliminate the delay |
-| [pipelines/tds_processing.py](pipelines/tds_processing.py) | 54 `stg_bills` rows remain `PENDING` — their suppliers have no `vendor_category_id` assigned. Assign categories via the TDS Settings UI or `scripts/fix_tds_tenant_rules.py` |
+| [pipelines/upload_ocr.py](upload_ocr.py) | `_parse_structured_file()` requires actual file bytes on disk — integrate with your storage layer (S3/local path) once `storage_path` is a real path |
+| [pipelines/upload_ocr.py](upload_ocr.py) | Sarvam OCR fallback activates automatically once `SARVAM_API_KEY` is set in `.env` |
+| [backend_ocr/app/main.py](../backend_ocr/app/main.py) | 11 startup migration handlers each open a separate Neon connection (~60 s cold-start) — consolidate into a single connection to eliminate the delay |
+| [pipelines/tds_processing.py](tds_processing.py) | 54 `stg_bills` rows remain `PENDING` — their suppliers have no `vendor_category_id` assigned. Assign categories via the TDS Settings UI or `scripts/fix_tds_tenant_rules.py` |

@@ -8,7 +8,7 @@
 | **Status** | 🟡 Partial — Gmail OAuth read/send, thread reading and outreach logging exist; there is no single gated, capped send path |
 | **Default autonomy** | **L1** — render and draft; send behind a gate |
 | **Difficulty** | Easy to build, easy to get wrong in a way customers see |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.10, §17 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.10, §17 |
 | **Last updated** | 2026-08-06 |
 
 ---
@@ -158,7 +158,7 @@ This agent is the fleet's outbound blast radius, so its guardrails are the stric
 - **Reply-to routes to a human**, not to an agent inbox that nobody reads.
 - **Kill switch** halts all fleet outbound immediately, per tenant.
 
-**Known infrastructure risk (from [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §17):**
+**Known infrastructure risk (from [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §17):**
 sending currently relies on a Gmail App Password for `admin@onsumm.ai`. That is
 rate-limited, tied to one account, and will be the first thing to break under agent
 volume. **Move to SES or SendGrid before enabling any auto-send**, or the caps above

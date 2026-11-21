@@ -1,4 +1,4 @@
-"""GRN ingest — the RECEIPT leg (RECON_IMPLEMENTATION_PLAN.md §7).
+"""GRN ingest — the RECEIPT leg (docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §7).
 
 Bata's goods receipt is **an entry inside Microsoft Dynamics**, not a document:
 no copy is issued, and the vendor never provides one (call of 16 Nov 2026). It

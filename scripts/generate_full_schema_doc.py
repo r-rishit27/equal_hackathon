@@ -9,7 +9,7 @@ import psycopg2
 from dotenv import load_dotenv
 
 ROOT = Path(__file__).resolve().parents[1]
-DOCUMENT = ROOT / "docs/full_database_schema.md"
+DOCUMENT = ROOT / "docs/architecture/full_database_schema.md"
 APPENDIX = "## Appendix scope"
 
 

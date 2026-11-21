@@ -5,7 +5,7 @@ that agent: triggers, tools (with the module that already implements them), step
 outcome schema, audit mapping, guardrails, and a phased build plan.
 
 The system-level design — runtime, registry, `agent_runs` audit store, autonomy
-levels, orchestration flows — lives in **[PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md)**.
+levels, orchestration flows — lives in **[PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md)**.
 These docs deliberately do not restate it; they reference it.
 
 ---
@@ -14,7 +14,7 @@ These docs deliberately do not restate it; they reference it.
 
 | # | Agent | Spec | Priority | Status | Default autonomy |
 |---|---|---|---|---|---|
-| 0 | **Vendor Bill** | [VENDOR_BILL_AGENT.md](../VENDOR_BILL_AGENT.md) | shipped | ✅ live | L1 (drafts only) |
+| 0 | **Vendor Bill** | [VENDOR_BILL_AGENT.md](../vendors/VENDOR_BILL_AGENT.md) | shipped | ✅ live | L1 (drafts only) |
 | 1 | **Verification** | [VERIFICATION_AGENT.md](VERIFICATION_AGENT.md) | 🔴 P0 · 🔧 Util | 🟡 tools exist | L2 |
 | 2 | **Recon** | [RECON_AGENT.md](RECON_AGENT.md) | 🔴 P0 · 🔥 HARD · ⭐ IMP | 🟡 partial | L1 |
 | 3 | **Analytics** | [ANALYTICS_AGENT.md](ANALYTICS_AGENT.md) | 🔴 P0 · 🟦 MED | 🟡 partial | L1 |

@@ -8,7 +8,7 @@
 | **Status** | ❌ Mostly new — customer tables and sales invoice staging exist; AR tracking, dunning and receipt matching do not |
 | **Default autonomy** | **L1** — draft follow-ups, send nothing unattended |
 | **Difficulty** | Medium — the least-built domain in the platform |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.7 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.7 |
 | **Last updated** | 2026-08-06 |
 
 ---

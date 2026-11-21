@@ -1,11 +1,11 @@
-"""Named rule profiles (RECON_IMPLEMENTATION_PLAN.md §5).
+"""Named rule profiles (docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §5).
 
 A client's billing policy is configuration, not code. `RuleConfig`'s defaults
 stay as they shipped so existing tenants are unaffected; a profile is an
 explicit, named departure from them.
 
 Bata's profile is not a preference — every value traces to a statement made on
-the call of 16 November 2026, recorded in `QUESTIONS_FOR_BATA.md`. Each one
+the call of 16 November 2026, recorded in `docs/reconciliation/QUESTIONS_FOR_BATA.md`. Each one
 carries the rule number it implements so a future reader can check it against
 the source rather than guess why it is set.
 """

@@ -8,7 +8,7 @@
 | **Status** | 🟡 Partial — invoice OCR is production-grade; contract parsing and term extraction are new |
 | **Default autonomy** | **L1** — extract and link, never enforce |
 | **Difficulty** | Medium — extraction is tractable; *trusting* extracted terms is the hard part |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.5 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.5 |
 | **Last updated** | 2026-08-06 |
 
 ---

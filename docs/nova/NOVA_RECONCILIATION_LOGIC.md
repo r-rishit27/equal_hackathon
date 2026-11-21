@@ -765,7 +765,7 @@ outcome (§2.1, §4) rather than a false `CERTIFIED` or a misleading plain `UNCE
 ### 9.1 Existing tables this service reads (read-only)
 
 **`dim_tenants`**, **`dim_cost_centres`**, **`dim_suppliers`**, **`fact_invoices`**,
-**`stg_bill_line_items`**, **`stg_bills`** — full column lists in `docs/full_database_schema.md`.
+**`stg_bill_line_items`**, **`stg_bills`** — full column lists in `docs/architecture/full_database_schema.md`.
 The orchestrator additionally reads `stg_bills.service_month` (§0.4) and
 `fact_invoices.cost_center_id` / `stg_bill_line_items.cost_centre_id` (§0.2), beyond what the
 original design anticipated needing.
@@ -905,6 +905,6 @@ always points at only the latest one.
 **What's deliberately not a foreign key:** `nova_reconciliation_module_aliases`, every
 `canonical_service` string, and `vendor_rates[].verified` are all validated against
 `lendix/nova_vendor_mapping.json` at request/sweep time, not against a DB table — the mapping JSON
-is not mirrored into any table in `docs/full_database_schema.md`. If it's ever migrated into its
+is not mirrored into any table in `docs/architecture/full_database_schema.md`. If it's ever migrated into its
 own `dim_*` tables, `canonical_service` should become a real FK; until then it's a validated text
 column, and `verified` is a JSON-only concept the DB schema doesn't need to know about at all.

@@ -719,7 +719,7 @@ class CommExtractionWorker(BaseWorker):
             claim["new_value"] = red.restore(str(claim.get("new_value") or ""))
             claim["evidence_quote"] = red.restore(str(claim.get("evidence_quote") or ""))
             # A real GSTIN always passes its mod-36 check character; one that fails was misread
-            # (no parser in docs/RECON_PARSER_EVAL.md read every GSTIN exactly) and must not reach the
+            # (no parser in docs/reconciliation/RECON_PARSER_EVAL.md read every GSTIN exactly) and must not reach the
             # vendor record.
             if claim.get("scope") == "vendor_gstin" and not gstin_valid(claim["new_value"]):
                 logger.warning("[comm-extract] contract %s: dropped GSTIN %r — its check character is wrong",

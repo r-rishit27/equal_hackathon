@@ -2,7 +2,7 @@
 
 Status: DRAFT (for review)
 Owner: TBD
-Related docs: [`DISBURSEMENT_IMPS_API.md`](./DISBURSEMENT_IMPS_API.md), [`full_database_schema.md`](./full_database_schema.md)
+Related docs: [`DISBURSEMENT_IMPS_API.md`](DISBURSEMENT_IMPS_API.md), [`full_database_schema.md`](../architecture/full_database_schema.md)
 
 ## 1. Goal
 

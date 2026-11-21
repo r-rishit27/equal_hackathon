@@ -1,12 +1,12 @@
 # Why one JSONB row per document scales to the next client
 
-**Status:** 2026-11-14 · companion to `RECON_VOCABULARY.md` (the dictionary) and `RECON_SCHEMA_V1.md` (the storage)
+**Status:** 2026-11-14 · companion to `docs/reconciliation/design/RECON_VOCABULARY.md` (the dictionary) and `docs/reconciliation/RECON_SCHEMA_V1.md` (the storage)
 
 > ⚠ **Historical, as of 18 November 2026.** This page argues for the single-JSONB-row shape,
 > which was tested as **Plan B in the architecture bake-off and lost** (48.4 vs 89.2 for the
 > hybrid), on decision durability and operational risk rather than on storage. The storage
 > arithmetic below is correct but was found immaterial at Bata's volume. Build from
-> `RECON_IMPLEMENTATION_PLAN.md`. Keep this page for the vocabulary-carries-the-variation
+> `docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md`. Keep this page for the vocabulary-carries-the-variation
 > argument in §3 and the leg argument in §6, which the hybrid design retains.
 
 Bata is client one. The design question is what client two costs. This page argues that the cost is **a mapping, not a migration** — and names the two cases where that is not true.
@@ -115,7 +115,7 @@ For client two, in order:
 
 1. Collect five real documents per `doc_role` they use.
 2. Add their column headings to `vocab_aliases`, scoped to their tenant. **No code.**
-3. Add any genuinely new concept to `RECON_VOCABULARY.md`, reseed `vocab_codes`. **No DDL.**
+3. Add any genuinely new concept to `docs/reconciliation/design/RECON_VOCABULARY.md`, reseed `vocab_codes`. **No DDL.**
 4. Point an existing extractor at their layout, or write one if the layout is structurally new. It writes one row.
 5. Declare their template: which `doc_role` fills which leg, and the `receipt_granularity` each proves.
 6. Set their tolerance bands and approval routes in settings; the rule compiler emits a new signed version.
@@ -154,7 +154,7 @@ Eleven link/provenance columns plus two JSONB columns. A PO, an audit report, an
 a carrier's POD all land in exactly this. **No new client adds a column to this list** unless
 they join on a key we have never indexed (§2, row 6).
 
-> Every code in the examples below is a code `RECON_VOCABULARY.md` already defines, with one
+> Every code in the examples below is a code `docs/reconciliation/design/RECON_VOCABULARY.md` already defines, with one
 > exception: the `date_role` values (`ISSUE_DATE`, `AUDIT_DATE`, `RECEIVED_DATE` …) are used by
 > §5.2 of the schema but are not yet enumerated as a vocab kind. That kind needs adding before
 > the seeder runs — a vocabulary gap, not a schema one, which is the point.

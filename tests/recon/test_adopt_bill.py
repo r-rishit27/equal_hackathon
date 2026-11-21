@@ -1,7 +1,7 @@
 """`adopt_bill`, the method two production bugs came out of.
 
 It had no test because it is raw SQL and the suite has no database. That was
-the largest gap in STRESS_TESTING.md, and it is closable without one: the part
+the largest gap in docs/reconciliation/STRESS_TESTING.md, and it is closable without one: the part
 that was wrong both times is the **decision** — which key to look under,
 whether a deleted row counts, whether to revive it — not the SQL itself.
 

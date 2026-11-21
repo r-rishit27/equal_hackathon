@@ -1607,7 +1607,7 @@ def rescan(body: RescanRequest, tenant: Tenant):
 # and delegates to the code that already owns the operation. Anything that moves
 # money or carries an approval decision is a deep link instead, so the user ends
 # up on the screen that already has the OTP gate, the confirmations and the audit
-# trail (docs/PAYMENT_GUARDRAILS.md).
+# trail (docs/payments_docs/PAYMENT_GUARDRAILS.md).
 
 
 class MergeMisreadVendorRequest(BaseModel):

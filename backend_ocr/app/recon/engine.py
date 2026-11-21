@@ -510,7 +510,7 @@ class LineChecks:
         ln.add(LineStatus.NOT_IN_PO, B if (qty > self.cfg.qty_tol or amt > self.cfg.money_tol) else I)
         # R5: the remedy is fixed, so say it rather than leaving a reviewer to
         # work it out. An email approval does NOT make this line payable on this
-        # PO (QUESTIONS_FOR_BATA.md §2).
+        # PO (docs/reconciliation/QUESTIONS_FOR_BATA.md §2).
         ln.r.remedy = (f"Obtain a credit note from the vendor for {fmt_inr(amt)}; "
                        "the balance needs a new PO and a new invoice")
         self._arith(ln, l)

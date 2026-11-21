@@ -42,10 +42,10 @@ not force a feature on.
 
 ### Adding a service
 
-1. Add a `ServiceDef` to `SERVICES` in [backend_ocr/app/services.py](../backend_ocr/app/services.py).
-2. Add a rule to `_RULES` in [backend_ocr/app/licensing.py](../backend_ocr/app/licensing.py)
+1. Add a `ServiceDef` to `SERVICES` in [backend_ocr/app/services.py](../../backend_ocr/app/services.py).
+2. Add a rule to `_RULES` in [backend_ocr/app/licensing.py](../../backend_ocr/app/licensing.py)
    mapping its routes to the key.
-3. Mirror the key and label in [frontend/src/auth/services.ts](../frontend/src/auth/services.ts).
+3. Mirror the key and label in [frontend/src/auth/services.ts](../../frontend/src/auth/services.ts).
 4. Run `python3.12 tests/test_license_route_map.py --write` and review the diff.
 
 The catalog syncs into `service_catalog` on every boot, so the key is available to
@@ -59,7 +59,7 @@ tuple stamps `retired_at`, which preserves the historical `tenant_service` rows.
 Two layers, neither of which requires touching a handler:
 
 1. **`license_gate`** — an app-level dependency registered after `auth_context`
-   ([main.py](../backend_ocr/app/main.py)). It resolves the matched route to a
+   ([main.py](../../backend_ocr/app/main.py)). It resolves the matched route to a
    service and 403s if the tenant is not licensed.
 2. **Router-level `require_service(...)`** on the four routers that are entirely
    one service (tds, fx, billing/nova, disbursement). Redundant on purpose: a route
@@ -98,7 +98,7 @@ bounds the staleness, which is no worse than the flag it replaced.
 
 ### The guard test
 
-[tests/test_license_route_map.py](../tests/test_license_route_map.py) asserts that
+[tests/test_license_route_map.py](../../tests/test_license_route_map.py) asserts that
 every route resolves to a known service, and pins the whole resolution table to
 `tests/fixtures/license_route_map.txt`. Totality alone would let someone silently
 re-license `/api/bills` by widening a rule; the snapshot makes it a reviewable diff.
@@ -118,13 +118,13 @@ Completely separate from tenant auth:
 
 `PLATFORM_JWT_SECRET` has **no default and no fallback to `JWT_SECRET`**. If unset,
 `/api/admin/*` returns 503. Set a **different value in dev and prod** — they
-currently share `JWT_SECRET` (see [DEV_ENVIRONMENT.md](DEV_ENVIRONMENT.md) §6), so a
+currently share `JWT_SECRET` (see [DEV_ENVIRONMENT.md](../aws-deploy/DEV_ENVIRONMENT.md) §6), so a
 shared value would make a dev ops token valid against production.
 
 Three independent reasons a platform token cannot act as a tenant: different
 signing key, the explicit `typ` rejection in `auth_context`, and the absence of a
 `company_id` claim (so `require_tenant()` raises). Pinned by
-[tests/test_platform_auth_isolation.py](../tests/test_platform_auth_isolation.py).
+[tests/test_platform_auth_isolation.py](../../tests/test_platform_auth_isolation.py).
 
 ### Ops roles
 
@@ -158,7 +158,7 @@ Never allowlist: anything under `disbursement` (money movement), `/api/users*`
 
 ## 5. Schema
 
-Defined once in [backend_ocr/app/licensing_schema.py](../backend_ocr/app/licensing_schema.py)
+Defined once in [backend_ocr/app/licensing_schema.py](../../backend_ocr/app/licensing_schema.py)
 and imported by both the startup hook and the migration script, so they cannot drift.
 
 | Table | Purpose |
@@ -231,7 +231,7 @@ all-or-nothing — a half-provisioned tenant (a company with no admin, or an adm
 cannot approve anything because no chain exists) is worse than a clean failure, and
 is exactly what manual onboarding kept producing.
 
-Steps, all in [tenant_defaults.py](../backend_ocr/app/tenant_defaults.py):
+Steps, all in [tenant_defaults.py](../../backend_ocr/app/tenant_defaults.py):
 
 1. `dim_tenants` row (GSTIN stored as NULL if it collides, so provisioning survives)
 2. Default brand, named after **this** tenant

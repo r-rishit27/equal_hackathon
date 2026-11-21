@@ -1,4 +1,4 @@
-"""The recon vocabulary (docs/RECON_VOCABULARY.md ↔ backend_ocr/app/recon/vocab.py) and its use in the DB.
+"""The recon vocabulary (docs/reconciliation/RECON_VOCABULARY.md ↔ backend_ocr/app/recon/vocab.py) and its use in the DB.
 
 Unit tests: the registry is complete for every internal code Recon emits, every mapped value is a known code,
 and the document and the registry agree. DB tests (RECON_TEST_DB_URL): the generated code columns carry the
@@ -17,13 +17,13 @@ from backend_ocr.app.recon import vocab as V
 from backend_ocr.app.recon.types import AuditVerdict, DocClass, LineStatus, MatchMethod, SegmentKind, Severity
 
 ROOT = Path(__file__).resolve().parents[2]
-DOC = (ROOT / "docs/RECON_VOCABULARY.md").read_text()
+DOC = (ROOT / "docs/reconciliation/RECON_VOCABULARY.md").read_text()
 ENGINE = (ROOT / "backend_ocr/app/recon/engine.py").read_text()
 
 
 def test_every_code_is_written_in_the_vocabulary_document():
     missing = [f"{k}.{c}" for k, items in V.CODES.items() for c, *_ in items if not re.search(rf"`{c}`|\b{c}\b", DOC)]
-    assert not missing, f"codes in recon/vocab.py but not in docs/RECON_VOCABULARY.md: {missing}"
+    assert not missing, f"codes in recon/vocab.py but not in docs/reconciliation/RECON_VOCABULARY.md: {missing}"
 
 
 def test_every_kind_is_named_in_the_document():

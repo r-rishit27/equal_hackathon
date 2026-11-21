@@ -11,7 +11,7 @@ Output shape per document (JSON-safe once passed through the router's _j):
    fields: [{label, value, fmt}],               fmt: text | money | qty | date | pct
    tables: [{title, columns: [{key, label, fmt, code?}], rows: [{..., _flag, _alts}]},
    vocab: {doc_role, recon_leg, receipt_granularity, pv_format, evidence_layer}}
-Codes are from the recon vocabulary (docs/RECON_VOCABULARY.md, recon/vocab.py); column `code` is a qty_role / rate_role.
+Codes are from the recon vocabulary (docs/reconciliation/RECON_VOCABULARY.md, recon/vocab.py); column `code` is a qty_role / rate_role.
 """
 from __future__ import annotations
 
@@ -459,7 +459,7 @@ def _c(key: str, label: str, fmt: str = "text") -> dict:
 
 
 def _part_vocab(seg: dict | None, kind: str) -> dict:
-    """A part's vocabulary codes (docs/RECON_VOCABULARY.md): from the segment's generated columns when it
+    """A part's vocabulary codes (docs/reconciliation/RECON_VOCABULARY.md): from the segment's generated columns when it
     has a row, else from its kind (a PO from the register, a bill already in the app)."""
     seg = seg or {}
     layout = None

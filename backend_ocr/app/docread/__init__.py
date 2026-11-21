@@ -3,7 +3,7 @@
 Bills keep their own path (utils/ocr_engine.py, OCR_TO_USE) and must not import this.
 Recon, contracts and insertion orders read through here.
 
-How a page is read (docs/RECON_PARSER_EVAL.md, decisions D1–D7):
+How a page is read (docs/reconciliation/RECON_PARSER_EVAL.md, decisions D1–D7):
   1. PDF text layer, when the page has one: free and exact.
   2. Otherwise OpenAI vision (DOCREAD_VISION_MODEL, gpt-5.4 by default, reasoning off): the most
      accurate parser in the evaluation (93.0 quality, 84.0 on handwriting).

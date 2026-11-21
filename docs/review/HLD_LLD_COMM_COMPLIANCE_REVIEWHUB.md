@@ -5,7 +5,7 @@
 | **Status** | Draft v1.0 — for review before implementation |
 | **Owner** | Subhash Bishnoi |
 | **Last updated** | 2026-09-17 |
-| **Related docs** | [PRD_AGENT_HUB.md](PRD_AGENT_HUB.md), [REVIEW_HUB_DESIGN_BRIEF.md](REVIEW_HUB_DESIGN_BRIEF.md) |
+| **Related docs** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md), [REVIEW_HUB_DESIGN_BRIEF.md](REVIEW_HUB_DESIGN_BRIEF.md) |
 | **Scope source** | Whiteboard spec: Communication Agent, Compliance Agent, Review Hub (Sep 2026) |
 
 ---
@@ -33,7 +33,7 @@ brief to what's already shipped, and isolates exactly what's missing. Everything
 after that is designed to **extend** the existing substrate — same tables, same
 `FindingDraft`/adapter contract, same `BaseWorker` pattern, same autonomy model —
 not to stand up a parallel system. This is a direct application of the "reuse
-over rebuild" principle already adopted in [PRD_AGENT_HUB.md](PRD_AGENT_HUB.md)
+over rebuild" principle already adopted in [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md)
 §8.
 
 ---

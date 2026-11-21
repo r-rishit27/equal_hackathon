@@ -91,8 +91,8 @@
           <section class="lane">
             <h2 class="label">01 / Capture</h2>
             <div class="cards">
-              <a class="card" href="../ARCHITECTURE.md"><strong>Invoice intake</strong><span>Upload or mailbox → OCR → draft review</span></a>
-              <a class="card" href="../RECON_AGENT.md"><strong>Vendor evidence</strong><span>POs, goods receipts and site audit reports</span></a>
+              <a class="card" href="../architecture/ARCHITECTURE.md"><strong>Invoice intake</strong><span>Upload or mailbox → OCR → draft review</span></a>
+              <a class="card" href="../reconciliation/RECON_AGENT.md"><strong>Vendor evidence</strong><span>POs, goods receipts and site audit reports</span></a>
               <a class="card" href="../receivables/README.md"><strong>Customer receipts</strong><span>Sales invoices, bank statements and remittance</span></a>
             </div>
             <div class="arrows" aria-hidden="true"><span>↓</span><span>↓</span><span>↓</span></div>
@@ -100,7 +100,7 @@
           <section class="lane">
             <h2 class="label">02 / Apply rules</h2>
             <div class="cards">
-              <a class="card" href="../BACKEND_STRUCTURE.md"><strong>Accounts payable</strong><span>Normalize → deduplicate → code to COA</span></a>
+              <a class="card" href="../architecture/BACKEND_STRUCTURE.md"><strong>Accounts payable</strong><span>Normalize → deduplicate → code to COA</span></a>
               <a class="card" href="../../backend_ocr/app/recon/fourway.py"><strong>Vendor reconciliation</strong><span>Link evidence → compare quantity, rate and amount</span></a>
               <a class="card" href="../../backend_ocr/app/receivables/matching.py"><strong>Cash application</strong><span>Match credits → rank candidates → apply policy</span></a>
             </div>
@@ -109,8 +109,8 @@
           <section class="lane">
             <h2 class="label">03 / Decide</h2>
             <div class="cards">
-              <a class="card" href="../PAYMENT_GUARDRAILS.md"><strong>Approvals &amp; payouts</strong><span>Approval chain → beneficiary checks → OTP → IMPS</span></a>
-              <a class="card" href="../RECON_AGENT.md"><strong>Recon dashboard</strong><span>Line variances → correct evidence → rerun or sign off</span></a>
+              <a class="card" href="../payments_docs/PAYMENT_GUARDRAILS.md"><strong>Approvals &amp; payouts</strong><span>Approval chain → beneficiary checks → OTP → IMPS</span></a>
+              <a class="card" href="../reconciliation/RECON_AGENT.md"><strong>Recon dashboard</strong><span>Line variances → correct evidence → rerun or sign off</span></a>
               <a class="card" href="../receivables/05_HUMAN_IN_THE_LOOP.md"><strong>Cash application board</strong><span>Apply, split or reverse allocations · review exceptions</span></a>
             </div>
           </section>
@@ -118,15 +118,15 @@
             <h2 class="label">04 / Work across modules</h2>
             <div class="cards">
               <a class="card" href="../../backend_ocr/app/review/audit.py"><strong>Review Hub</strong><span>Prioritize findings, inspect evidence, resolve or snooze</span></a>
-              <a class="card" href="../HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md"><strong>Agent Hub</strong><span>Watch contacts and turn mailbox evidence into drafts</span></a>
-              <a class="card" href="../COA_RULES_AND_REPORTS.md"><strong>Reports &amp; compliance</strong><span>Spend, outstanding balances, GST, TDS and exports</span></a>
+              <a class="card" href="../review/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md"><strong>Agent Hub</strong><span>Watch contacts and turn mailbox evidence into drafts</span></a>
+              <a class="card" href="../finance-operations/COA_RULES_AND_REPORTS.md"><strong>Reports &amp; compliance</strong><span>Spend, outstanding balances, GST, TDS and exports</span></a>
             </div>
           </section>
           <section class="lane">
             <h2 class="label">05 / Tenant-enabled services</h2>
             <div class="cards">
               <a class="card" href="../../backend_ocr/app/routers/playground.py"><strong>Vendor Playground</strong><span>Run vendor-specific checks in a visual workflow</span></a>
-              <a class="card" href="../../services/nova_reconciliation/README.md"><strong>Nova reconciliation</strong><span>Compare invoice charges with usage and certified rates</span></a>
+              <a class="card" href="../nova/README.md"><strong>Nova reconciliation</strong><span>Compare invoice charges with usage and certified rates</span></a>
               <a class="card" href="../../pipelines/api_sync.py"><strong>Accounting connectors</strong><span>Tally voucher/ledger sync · Apideck ingestion · SAP mapping</span></a>
             </div>
           </section>

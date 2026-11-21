@@ -28,7 +28,7 @@ from typing import Optional, TypedDict
 
 # Anchored on this module's own directory, never by counting parents — the
 # latter is what silently pointed four other modules at the wrong directory
-# when they moved packages (docs/BACKEND_STRUCTURE.md).
+# when they moved packages (docs/architecture/BACKEND_STRUCTURE.md).
 _DATA_PATH = Path(__file__).with_name("hdfc_status_codes.json")
 
 

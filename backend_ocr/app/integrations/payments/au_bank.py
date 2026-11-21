@@ -30,7 +30,7 @@ from pathlib import Path
 from typing import Optional, TypedDict
 
 # Anchored on this module's own directory, never by counting parents — see
-# docs/BACKEND_STRUCTURE.md on what parent-counting did to four other modules.
+# docs/architecture/BACKEND_STRUCTURE.md on what parent-counting did to four other modules.
 _DATA_PATH = Path(__file__).with_name("au_bank_status_codes.json")
 
 

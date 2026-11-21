@@ -7,9 +7,9 @@ numbers we measure it by.
 *Written for engineers and analysts operating or extending the recon agent. It
 describes what the code does today, with thresholds quoted from
 `backend_ocr/app/recon/config.py` and measurements from the dev database on
-20 November 2026. Companion documents: `RECON_IMPLEMENTATION_PLAN.md` (why it is
-built this way), `docs/RECON_VOCABULARY.md` (every code it can emit), and
-`QUESTIONS_FOR_BATA.md` (what the business still has to tell us).*
+20 November 2026. Companion documents: `docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md` (why it is
+built this way), `docs/reconciliation/RECON_VOCABULARY.md` (every code it can emit), and
+`docs/reconciliation/QUESTIONS_FOR_BATA.md` (what the business still has to tell us).*
 
 ---
 
@@ -408,7 +408,7 @@ Each of these was a real document that broke something.
 |---|---|---|
 | Evidence rows receiving a **trusted** identity | **94.4%** | dev, all cases |
 | Invoice lines receiving a trusted identity | **100%** | dev, all cases |
-| Parser accuracy, `gpt-5.4` vs `gpt-4o` | **93.0 vs 82.1** | `docs/RECON_PARSER_EVAL.md` |
+| Parser accuracy, `gpt-5.4` vs `gpt-4o` | **93.0 vs 82.1** | `docs/reconciliation/RECON_PARSER_EVAL.md` |
 | Invented money rows, `gpt-5.4` vs `gpt-4o` | **0 vs 23** | same |
 | Lines in genuine doubt after deterministic matching | **27 of 90** (case 2), **6 of 46** (case 1) | dev, 20 Nov 2026 |
 | Evidence rows carrying a rate | **78 of 86** | Inner Space site report |
@@ -448,7 +448,7 @@ Any verdict can be explained and reproduced:
   `rule_version` which tenant profile applied.
 - `recon_decisions` is append-only, so `as_of` replays any past state.
 - Every emitted code exists in both `recon/vocab.py` and
-  `docs/RECON_VOCABULARY.md`, enforced by a guard test — the engine cannot
+  `docs/reconciliation/RECON_VOCABULARY.md`, enforced by a guard test — the engine cannot
   invent a status that the vocabulary does not define.
 - `recon_edges` is a rebuildable projection, walked by a recursive CTE for
   evidence chains. Apache AGE was evaluated and is **not** available on this RDS
@@ -474,4 +474,4 @@ Any verdict can be explained and reproduced:
 | Tenant rule profiles | `recon/profiles.py` |
 | Model judgements | `recon/decisions.py` |
 | Persistence, decision log | `recon/repo.py` |
-| Codes and their meanings | `recon/vocab.py`, `docs/RECON_VOCABULARY.md` |
+| Codes and their meanings | `recon/vocab.py`, `docs/reconciliation/RECON_VOCABULARY.md` |

@@ -30,7 +30,7 @@ class StagingValidationAdapter(FindingAdapter):
                    b.validation_flag::text AS vflag, b.sync_status::text AS sync_status,
                    b.supplier_id, b.upload_id,
                    -- Extraction confidence is NOT a column on stg_bills, despite
-                   -- what docs/full_database_schema.md implies: only stg_invoices
+                   -- what docs/architecture/full_database_schema.md implies: only stg_invoices
                    -- (the AR side) carries one. For bills it lives in the OCR
                    -- result envelope, written by pipelines/upload_ocr.py.
                    (SELECT (o.confidence_jsonb ->> 'overall')::numeric

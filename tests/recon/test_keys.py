@@ -1,4 +1,4 @@
-"""Stable line identity (recon/keys.py, RECON_IMPLEMENTATION_PLAN.md §6.1).
+"""Stable line identity (recon/keys.py, docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §6.1).
 
 The property under test is the one the bake-off measured: the same printed line
 must yield the same key on a second extraction, and a key that cannot be trusted

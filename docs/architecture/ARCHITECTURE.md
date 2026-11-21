@@ -1,6 +1,6 @@
 # Reckon.ai — Architecture Overview
 
-> Pilot-testing reference. High-level architecture, tech stack, and services for the Reckon.ai AP/AR cashflow platform. For the full endpoint-by-endpoint reference see [`README.md`](../README.md); for the router/module layout of the API see [`BACKEND_STRUCTURE.md`](BACKEND_STRUCTURE.md).
+> Pilot-testing reference. High-level architecture, tech stack, and services for the Reckon.ai AP/AR cashflow platform. For the full endpoint-by-endpoint reference see [`README.md`](../../README.md); for the router/module layout of the API see [`BACKEND_STRUCTURE.md`](BACKEND_STRUCTURE.md).
 
 ## 1. System overview
 
@@ -108,7 +108,7 @@ The guardrails sit above the Lendix/ICICI rail (§3.2) as application-level cont
 - **Manual override**: bypassing the verified-account default requires `override_account_number` / `ifsc` / `beneficiary_name` / `reason`, logged to `disbursement_overrides` and `wf_audit_log`.
 - **Bulk payment**: same-vendor batches with independent per-bill amounts, a shared OTP, and a per-bill override/audit row each.
 - **Settlement**: `POST /api/disbursements/{id}/refresh-status` polls Lendix for `PENDING → SUCCESS`, updates `amount_paid` / `outstanding_amount` / `payment_status`, and writes a step-99 row to `bill_approval_chain`.
-- Amount is capped at the bill's TDS-net `outstanding_amount`; per-environment bank-side caps (UAT ₹10 / Staging ₹1,000 / Prod ₹1,50,000, ICICI hard cap ₹5,00,000) are not yet mirrored at the application layer — tracked as an open gap in `docs/PAYMENT_GUARDRAILS.md`.
+- Amount is capped at the bill's TDS-net `outstanding_amount`; per-environment bank-side caps (UAT ₹10 / Staging ₹1,000 / Prod ₹1,50,000, ICICI hard cap ₹5,00,000) are not yet mirrored at the application layer — tracked as an open gap in `docs/payments_docs/PAYMENT_GUARDRAILS.md`.
 
 ### 3.7 Nova reconciliation service
 
@@ -122,7 +122,7 @@ A standalone microservice, deployed and run independently of both the API and th
 
 ### 3.8 Review Hub — the compliance & communication agent
 
-Production feature (`docs/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md`, `docs/REVIEW_HUB_DESIGN_BRIEF.md`), router `backend_ocr/app/routers/review_hub.py`, backed by `rh_findings` plus seven satellite tables. It's the layer that turns raw ingestion into flagged, human-reviewable findings — the recent "flag the one bill a vendor filed differently" and GST-detail-drift work both landed here.
+Production feature (`docs/review/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md`, `docs/review/REVIEW_HUB_DESIGN_BRIEF.md`), router `backend_ocr/app/routers/review_hub.py`, backed by `rh_findings` plus seven satellite tables. It's the layer that turns raw ingestion into flagged, human-reviewable findings — the recent "flag the one bill a vendor filed differently" and GST-detail-drift work both landed here.
 
 **Compliance side** — 12 deterministic adapters plus an LLM review agent, evaluated per fact as it lands:
 - `vendor_identity.py`, `gst_name_overwrite.py`, `billing_discrepancies.py` are the adapters already shipping.
@@ -160,11 +160,11 @@ flowchart LR
 
 **Brand scope.** Approval notification counts are cached by tenant, role and brand. Payment queues and vendor payment profiles select active outstanding invoices for the chosen brand. Payment history and transaction totals use the brand of the linked invoice. The remitter balance belongs to the bank account. Switching brands clears open payment selections.
 
-**Ingestion and worker ownership.** After invoice ingestion commits, the shared hook schedules Fact Graph enrichment and signals reconciliation. The API serves the CFO evidence on demand. Ten Python entry points expose existing agent implementations to process supervisors. [Agent runtime and ownership](agent-hub/agent-runtime.md)
+**Ingestion and worker ownership.** After invoice ingestion commits, the shared hook schedules Fact Graph enrichment and signals reconciliation. The API serves the CFO evidence on demand. Ten Python entry points expose existing agent implementations to process supervisors. [Agent runtime and ownership](../agent-hub/agent-runtime.md)
 
 ### 3.9 Agent Hub &amp; the Vendor Bill Agent
 
-`docs/PRD_AGENT_HUB.md` frames Agent Hub as a CFO-orchestrator layer over capabilities that already exist elsewhere in the platform (OCR, KYB, Nova reconciliation, disbursement, FX, TDS) — each wrapped as a governed "agent" with a WHY/WHAT/WHOM/HOW audit trail. Agent-by-agent specs live in `docs/agents/` (`CFO_ORCHESTRATOR_AGENT.md`, `VERIFICATION_AGENT.md`, `RECON_AGENT.md`, `PAYABLE_AGENT.md`, …).
+`docs/agent-hub/PRD_AGENT_HUB.md` frames Agent Hub as a CFO-orchestrator layer over capabilities that already exist elsewhere in the platform (OCR, KYB, Nova reconciliation, disbursement, FX, TDS) — each wrapped as a governed "agent" with a WHY/WHAT/WHOM/HOW audit trail. Agent-by-agent specs live in `docs/agents/` (`CFO_ORCHESTRATOR_AGENT.md`, `VERIFICATION_AGENT.md`, `RECON_AGENT.md`, `PAYABLE_AGENT.md`, …).
 
 - **`/api/agents/*`** (`routers/agent_hub.py`) is the orchestration surface: `GET /fact-graph`, `/fact-graph/search`, `/fact-graph/neighbors`, `/fact-graph/stream` (server-sent events), `GET /payment-context` — all reading `domain/fact_graph.py`, tenant-scoped through `security/auth.require_tenant()`.
 - **`/api/agent/*`** (singular, `routers/agent.py`) is a distinct, older surface: the **Vendor Bill Agent** itself — status/toggle/scan/events/POCs/drafts.

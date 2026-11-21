@@ -1,4 +1,4 @@
-"""Decision-aware input fingerprint (RECON_IMPLEMENTATION_PLAN.md §8).
+"""Decision-aware input fingerprint (docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §8).
 
 Acceptance test 6: "re-running after a decision produces a fresh result, not the
 cached one". That only holds if a decision changes the fingerprint, so these

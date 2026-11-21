@@ -6,7 +6,7 @@
 | **Owner** | Subhash Bishnoi |
 | **Last updated** | 2026-07-18 |
 | **Source** | Whiteboard architecture session (Jul 2026) |
-| **Related docs** | [IMPLEMENTATION_PLAN_NOVA_BILLING.md](IMPLEMENTATION_PLAN_NOVA_BILLING.md), [PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md](PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md), [Sandbox_GST_COMPLIANCE_INTERGRATION.md](Sandbox_GST_COMPLIANCE_INTERGRATION.md), [DISBURSEMENT_IMPS_API.md](DISBURSEMENT_IMPS_API.md), [tally_architecture.html](tally_architecture.html), [full_database_schema.md](full_database_schema.md) |
+| **Related docs** | [IMPLEMENTATION_PLAN_NOVA_BILLING.md](../nova/IMPLEMENTATION_PLAN_NOVA_BILLING.md), [PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md](../PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md), [Sandbox_GST_COMPLIANCE_INTERGRATION.md](../finance-operations/Sandbox_GST_COMPLIANCE_INTERGRATION.md), [DISBURSEMENT_IMPS_API.md](../payments_docs/DISBURSEMENT_IMPS_API.md), [tally_architecture.html](../tally_architecture.html), [full_database_schema.md](../architecture/full_database_schema.md) |
 
 ---
 

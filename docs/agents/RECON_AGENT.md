@@ -8,7 +8,7 @@
 | **Status** | 🟡 Partial — Nova reconciliation is built and in production; PO matching and bank recon are not |
 | **Default autonomy** | **L1** — surface findings, never adjust a bill |
 | **Difficulty** | Hard — matching is genuinely ambiguous and the blast radius of a wrong match is a wrong payment |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.2 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.2 |
 | **Related** | [PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md](../PRD_NOVA_VENDOR_BILLING_RECONCILIATION.md), [PRD_NOVA_RECONCILIATION_AT_APPROVAL.md](../PRD_NOVA_RECONCILIATION_AT_APPROVAL.md), [PRD_NOVA_BILLING_DISCREPANCY_ROOT_CAUSE.md](../PRD_NOVA_BILLING_DISCREPANCY_ROOT_CAUSE.md) |
 | **Last updated** | 2026-08-06 |
 

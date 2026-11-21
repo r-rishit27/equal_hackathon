@@ -1,6 +1,6 @@
 """
 Communication + Compliance agent runtime — DB migration.
-Implements docs/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md §5.1.2, §5.1.3, §5.1.1 Phase 0+1.
+Implements docs/review/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md §5.1.2, §5.1.3, §5.1.1 Phase 0+1.
 
 Everything here is additive: new tables (`comm_thread_state`, `comm_extractions`),
 new columns on the existing `poc_email_messages` table, and two `agent_registry`

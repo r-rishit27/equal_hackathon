@@ -8,7 +8,7 @@
 | **Status** | ❌ New |
 | **Default autonomy** | **L1** — produces a plan, executes read-only steps, gates every side effect |
 | **Difficulty** | Medium mechanically, high in failure modes |
-| **Parent spec** | [PRD_AGENT_HUB.md](../PRD_AGENT_HUB.md) §13.1, §14 |
+| **Parent spec** | [PRD_AGENT_HUB.md](../agent-hub/PRD_AGENT_HUB.md) §13.1, §14 |
 | **Last updated** | 2026-08-06 |
 
 ---

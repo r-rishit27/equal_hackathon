@@ -269,7 +269,7 @@ DDL: tuple[str, ...] = (
     "CREATE INDEX IF NOT EXISTS idx_revents_doc ON recon_events (tenant_id, doc_id, at)",
 
     # ── Stable line identity + append-only decisions ───────────────────────────
-    # RECON_IMPLEMENTATION_PLAN.md §6. Line identity used to be the row's
+    # docs/reconciliation/RECON_IMPLEMENTATION_PLAN.md §6. Line identity used to be the row's
     # surrogate uuid, which re-extraction destroys (repo._save_* delete and
     # re-insert), orphaning every decision keyed on it. A natural key derived
     # from what the document prints (recon/keys.py) survives re-extraction;

@@ -5,7 +5,7 @@ from backend_ocr.app.domain.copilot_sql import Analysis, CATALOG, compile_query
 
 
 def test_reporting_tables_in_documented_schema():
-    schema = (Path(__file__).resolve().parents[1] / "docs/full_database_schema.md").read_text(encoding="utf8")
+    schema = (Path(__file__).resolve().parents[1] / "docs/architecture/full_database_schema.md").read_text(encoding="utf8")
     for table, *_ in CATALOG.values():
         assert f"## Table: `{table}`" in schema
 
