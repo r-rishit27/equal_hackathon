@@ -2,7 +2,7 @@
 
 Application-level controls governing when and how a vendor payment can be initiated, on top of the bank-side rails documented in [`DISBURSEMENT_IMPS_API.md`](./DISBURSEMENT_IMPS_API.md) (Disbursement IMPS API + Vendor Payment Module). That doc covers what the bank accepts and returns; this doc covers what our application must enforce *before* a request ever reaches the bank.
 
-Status key used below: **Implemented** (live in `backend_ocr/app/disbursement_api.py` / `frontend/src/pages/PaymentGatewayPage.tsx` / `frontend/src/pages/BillsPage.tsx` today), **Partial**, or **Not yet built** (requirement stated, no implementation exists).
+Status key used below: **Implemented** (live in `backend_ocr/app/routers/disbursement.py` / `frontend/src/pages/PaymentGatewayPage.tsx` / `frontend/src/pages/BillsPage.tsx` today), **Partial**, or **Not yet built** (requirement stated, no implementation exists).
 
 ---
 
@@ -11,7 +11,7 @@ Status key used below: **Implemented** (live in `backend_ocr/app/disbursement_ap
 | Rule | Status |
 |---|---|
 | Pay Now is only enabled on **Approved** bills — not Draft, Pending, or any other status. | Implemented (`BillsPage.tsx`, row-level and bulk-bar Pay Now both gate on `bill.status === 'APPROVED'`) |
-| Payment initiation, OTP verification, and the admin-override path are **admin-role only**. | Implemented (`disbursement_api.py`: `if (body.actor_role or "").lower() != "admin": raise ...`; frontend also hides Pay Now unless `user?.role === 'admin'`) |
+| Payment initiation, OTP verification, and the admin-override path are **admin-role only**. | Implemented (`disbursement.py`: `if (body.actor_role or "").lower() != "admin": raise ...`; frontend also hides Pay Now unless `user?.role === 'admin'`) |
 | The payment approval chain itself (who can trigger a disbursement, who can override) is admin-only — no secondary approver role currently exists for payments. | Implemented |
 
 ---
@@ -25,7 +25,7 @@ A vendor qualifies for this no-manual-entry path when **all three** are true:
 - Bank account on file and verified (`bank_verified = true`)
 - The above two combine into a single `can_pay = bank_verified AND gstin_verified` flag surfaced to the UI as "Ready to pay" vs "Needs verification"
 
-If any check fails, beneficiary details are **not** auto-populated and the payment is blocked until an admin manually supplies substitute details via override — see §3. That override path (typing in account/IFSC/name + a reason) is the *exception*; it only appears when verification is missing, never for an already-verified vendor. This gate is enforced server-side (not just UI), so a client can't bypass it: `disbursement_api.py`'s guardrail function raises `HTTPException` with *"Vendor bank account and/or GSTIN not verified — an admin override with a reason is required"* when `gstin_verified` is false and no override is attached.
+If any check fails, beneficiary details are **not** auto-populated and the payment is blocked until an admin manually supplies substitute details via override — see §3. That override path (typing in account/IFSC/name + a reason) is the *exception*; it only appears when verification is missing, never for an already-verified vendor. This gate is enforced server-side (not just UI), so a client can't bypass it: `disbursement.py`'s guardrail function raises `HTTPException` with *"Vendor bank account and/or GSTIN not verified — an admin override with a reason is required"* when `gstin_verified` is false and no override is attached.
 
 **Status: Implemented.** Note: a separate *unattended/scheduled* auto-payment queue (bills paid on a cadence with no admin click at all) is a different, larger feature and does **not** exist — no `pipelines/` worker initiates disbursements today. If that's ever built, it must still stop for OTP and still run through this same eligibility gate; that's out of scope for the "auto" behavior described here, which is about skipping manual data entry, not skipping the admin/OTP step.
 
@@ -82,7 +82,7 @@ When GSTIN/KYC/bank verification fails, an admin can override with substitute be
 
 Initiating a payment (OTP verification) does not by itself guarantee the bank has moved money — the bank can also return `PENDING`, in which case the app must call the status API before treating a bill as settled.
 
-- **On OTP verify:** the app calls the bank's initiate/status result immediately. If it comes back `SUCCESS`, settlement runs right away in the same transaction as OTP verification (`_apply_success`, in `disbursement_api.py`) — no separate status call is needed for the immediate-success case.
+- **On OTP verify:** the app calls the bank's initiate/status result immediately. If it comes back `SUCCESS`, settlement runs right away in the same transaction as OTP verification (`_apply_success`, in `disbursement.py`) — no separate status call is needed for the immediate-success case.
 - **On `PENDING`:** `POST /api/disbursements/{disbursement_id}/refresh-status` calls the bank's status endpoint (`/disbursement/imps/status` / `/vendor-payment/status` per `DISBURSEMENT_IMPS_API.md`). If that check now reports `SUCCESS`, settlement runs at that point instead. A disbursement not in `PENDING` short-circuits and returns its current status unchanged — refresh only ever does work on a genuinely pending transaction.
 - **Settlement, once `SUCCESS` is confirmed (either path):**
   - The bill's `amount_paid` is incremented by the amount just paid, and `outstanding_amount` is recomputed as `total_amount − amount_paid` (floored at 0).
@@ -91,7 +91,7 @@ Initiating a payment (OTP verification) does not by itself guarantee the bank ha
   - A `bill_approval_chain` row (`step=99`, action `payment_paid` or `payment_partial`) records the settlement itself as part of the bill's own audit trail, separate from the `wf_audit_log` override trail in §3 — every settlement is traceable back to the specific bank RRN that produced it.
 - **Bulk batches:** each bill in a batch is settled independently by the same logic — one bill coming back `SUCCESS` while another in the same batch is `PENDING`/`FAILED` does not block or roll back the others; each is judged on its own bank result.
 
-**Status: Implemented** (`_apply_success`, `verify_otp`, `refresh_status`, and their batch equivalents in `backend_ocr/app/disbursement_api.py`).
+**Status: Implemented** (`_apply_success`, `verify_otp`, `refresh_status`, and their batch equivalents in `backend_ocr/app/routers/disbursement.py`).
 
 ---
 

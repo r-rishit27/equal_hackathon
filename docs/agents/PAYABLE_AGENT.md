@@ -19,7 +19,7 @@
 Get the right amount to the right verified vendor at the right time — with a human
 signature on every rupee that leaves.
 
-The pieces exist: [`disbursement_api.py`](../../backend_ocr/app/disbursement_api.py)
+The pieces exist: [`disbursement.py`](../../backend_ocr/app/routers/disbursement.py)
 prepares and initiates IMPS disbursements with OTP verification, status refresh and
 an audit trail; [`pipelines/approval.py`](../../pipelines/approval.py) drives the
 approval chain, nudges and escalations. What is missing is the layer that decides

@@ -1,14 +1,14 @@
-"""Schema migrations executed at application startup.
+"""Ordered schema migrations executed by scripts/run_api_migrations.py.
 
 Moved verbatim out of app/main.py; see docs/BACKEND_STRUCTURE.md.
 """
 from __future__ import annotations
 
 import psycopg2
-from .config import DB_URL, TENANT_ID, OPENAI_API_KEY, SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASSWORD, SMTP_ADMIN_EMAIL, APPROVAL_SECRET, JWT_SECRET, APP_URL, ACCESS_TOKEN_TTL_MIN, REFRESH_TOKEN_TTL_DAYS, get_conn, put_conn
-from .routers.email_connection import router as email_router, ensure_user_email_connections_table
+from .config import DB_URL, TENANT_ID, get_conn, put_conn
+from .routers.email_connection import ensure_user_email_connections_table
 from .routers.sso import ensure_sso_tables
-from .routers.agent import router as agent_router, ensure_agent_tables, start_agent_poller
+from .routers.agent import ensure_agent_tables, start_agent_poller
 from .domain.fact_graph import init_fact_graph_schema
 from .security.licensing_schema import DDL as LICENSING_DDL, sync_catalog_sql
 from .security.services import SERVICES, sort_order as service_sort_order
@@ -531,7 +531,7 @@ def _ensure_refresh_tokens_table():
         put_conn(conn)
 
 def _ensure_approval_tables():
-    import psycopg2, traceback
+    import traceback
     try:
         conn = get_conn()
         with conn.cursor() as cur:
@@ -608,11 +608,8 @@ def _ensure_approval_tables():
         print("[startup] ERROR creating approval tables:")
         traceback.print_exc()
 
-async def on_startup():
-    _ensure_approval_tables()
-
 def _ensure_supplier_bank_accounts_table():
-    import psycopg2, traceback
+    import traceback
     try:
         conn = get_conn()
         cur = conn.cursor()
@@ -638,9 +635,6 @@ def _ensure_supplier_bank_accounts_table():
     except Exception:
         print("[startup] ERROR creating supplier_bank_accounts table:")
         traceback.print_exc()
-
-async def on_startup_bank_accounts():
-    _ensure_supplier_bank_accounts_table()
 
 def _ensure_supplier_contacts_table():
     import traceback
@@ -1165,8 +1159,8 @@ MIGRATION_STEPS = (
     _migrate_fx_convert_existing,
     _migrate_perf_indexes,
     _ensure_refresh_tokens_table,
-    on_startup,
-    on_startup_bank_accounts,
+    _ensure_approval_tables,
+    _ensure_supplier_bank_accounts_table,
     on_startup_supplier_contacts,
     _migrate_custom_categories,
     _ensure_vendor_documents_table,

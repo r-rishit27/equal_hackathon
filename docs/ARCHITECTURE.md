@@ -100,7 +100,7 @@ Every worker inherits `pipelines/base.py:BaseWorker` and runs a two-phase lifecy
 
 ### 3.6 Payment Hub — approval guardrails
 
-The guardrails sit above the Lendix/ICICI rail (§3.2) as application-level controls in `backend_ocr/app/disbursement_api.py`, not bank-side limits:
+The guardrails sit above the Lendix/ICICI rail (§3.2) as application-level controls in `backend_ocr/app/routers/disbursement.py`, not bank-side limits:
 
 - **Eligibility gate**: `can_pay = bank_verified AND gstin_verified`, enforced server-side before a bill can be paid at all.
 - **Access control**: Pay Now is gated to `status = 'APPROVED'` bills; initiating a payment, entering the OTP, or overriding beneficiary details is admin-role only (`frontend/src/pages/BillsPage.tsx`, `PaymentGatewayPage.tsx`).

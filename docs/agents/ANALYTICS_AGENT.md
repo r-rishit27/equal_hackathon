@@ -57,7 +57,7 @@ quietly failing, this is where it shows up.
 | `query_exceptions(period)` | **wrap** | Open `billing_reconciliation_discrepancies`, RED verifications, failed disbursements, OCR failures |
 | `query_approvals(period)` | **wrap** | `bill_approval_chain` + `wf_tasks` — pending, overdue, median time-to-approve |
 | `query_ageing(as_of)` | **new** | AP ageing buckets (0–30/31–60/61–90/90+) from `fact_invoices` + `payment_schedules` |
-| `query_disbursements(period)` | **reuse** | `GET /api/disbursements/stats` in [`disbursement_api.py`](../../backend_ocr/app/disbursement_api.py) |
+| `query_disbursements(period)` | **reuse** | `GET /api/disbursements/stats` in [`disbursement.py`](../../backend_ocr/app/routers/disbursement.py) |
 | `query_fx(period)` | **reuse** | `GET /api/fx/report`, `/api/fx/exposure`, `/api/fx/agent-briefing` in [`fx_api.py`](../../backend_ocr/app/fx_api.py) |
 | `query_runs(period)` | **new** | Fleet rollup from `agent_runs`: counts by agent/status, gate latency, tokens, `cost_usd` |
 | `query_tds_gst_exposure(period)` | **wrap** | `fact_tds_ledger` + GST recon state |
