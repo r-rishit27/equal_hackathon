@@ -1,0 +1,848 @@
+/* Recon — Vendor card → Documents → Recon. Built on the vendor card's tokens and vc__ primitives. */
+
+.rc { display: flex; flex-direction: column; gap: 14px; min-width: 0; }
+.rc__sec { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.rc__pad { padding: 8px 10px; }
+.rc__spin { animation: rc-spin 1s linear infinite; flex: none; }
+@keyframes rc-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .rc__spin { animation: none; } }
+
+.rc__drop {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 14px 16px; border: 1.5px dashed var(--line-300); border-radius: 12px;
+  background: var(--surface-1); color: var(--ink-700); cursor: pointer; font-size: 13px;
+}
+.rc__drop:hover, .rc__drop.is-over { border-color: var(--brand-400); background: var(--brand-50, var(--surface-1)); color: var(--ink-900); }
+.rc__drop:focus-visible { outline: 2px solid var(--brand-400); outline-offset: 2px; }
+
+.rc__bar { height: 3px; border-radius: 2px; background: var(--line-200); margin-top: 6px; overflow: hidden; }
+.rc__bar > span { display: block; height: 100%; background: var(--brand-500); transition: width .4s ease; }
+
+.rc__needs { align-items: flex-start; }
+.rc__why { color: var(--ink-700); margin-top: 3px; }
+.rc__cands { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-top: 6px; }
+
+/* Tables: scroll inside their own box; the item column stays put. */
+.rc__scroll { overflow-x: auto; border: 1px solid var(--line-200); border-radius: 10px; background: var(--surface-0); }
+.rc__table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+.rc__table th { text-align: left; font-weight: 600; color: var(--ink-500); font-size: 11.5px; padding: 8px 10px;
+  border-bottom: 1px solid var(--line-200); background: var(--surface-1); white-space: nowrap; position: sticky; top: 0; }
+.rc__table td { padding: 7px 10px; border-bottom: 1px solid var(--line-100, var(--line-200)); vertical-align: top; }
+.rc__table tr:last-child td { border-bottom: 0; }
+.rc__num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.rc__click { cursor: pointer; }
+.rc__click:hover td { background: var(--surface-1); }
+.rc__click:focus-visible { outline: 2px solid var(--brand-400); outline-offset: -2px; }
+.rc__click.is-open td { background: var(--surface-1); }
+.rc__click.is-reviewed td { color: var(--ink-500); }
+.rc__sticky { position: sticky; left: 0; background: var(--surface-0); z-index: 1; min-width: 220px; max-width: 340px; }
+.rc__table th.rc__sticky { z-index: 2; background: var(--surface-1); }
+.rc__click:hover .rc__sticky, .rc__click.is-open .rc__sticky { background: var(--surface-1); }
+.rc__item { display: flex; gap: 4px; align-items: flex-start; }
+.rc__item > span { white-space: normal; }
+.rc__cell-check { outline: 1.5px solid var(--warning-400, #f0b429); outline-offset: -3px; border-radius: 4px; }
+.rc__detail td { background: var(--surface-1); padding: 0; }
+
+.rc__docs { white-space: nowrap; }
+.rc__pip { display: inline-flex; align-items: center; gap: 2px; margin-right: 4px; padding: 1px 6px; border-radius: 999px;
+  font-size: 11px; border: 1px solid var(--line-200); color: var(--ink-400, var(--ink-500)); }
+.rc__pip.is-on { color: var(--success-700, var(--success-600)); border-color: var(--success-200, var(--line-200)); background: var(--success-50, transparent); }
+.rc__flags { display: inline-flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+
+/* Case view */
+.rc__casebar { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rc__casebar-meta { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: 2px; }
+.rc__totals { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.rc__total { border: 1px solid var(--line-200); border-radius: 10px; padding: 8px 10px; background: var(--surface-0); min-width: 0; }
+.rc__total-v { font-weight: 600; font-variant-numeric: tabular-nums; font-size: 15px; margin-top: 2px; }
+.rc__checks { display: flex; flex-direction: column; }
+.rc__check { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; padding: 7px 10px; border-bottom: 1px solid var(--line-100, var(--line-200)); }
+.rc__check:last-child { border-bottom: 0; }
+.rc__check--ok { color: var(--ink-600, var(--ink-500)); align-items: center; }
+.rc__lineshead { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rc__filters { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.rc__ld { padding: 10px 14px 12px 30px; display: flex; flex-direction: column; gap: 6px; }
+.rc__words { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.rc__word { min-width: 0; }
+.rc__ld-row { display: flex; gap: 6px; align-items: baseline; flex-wrap: wrap; }
+.rc__ld-acts { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; margin-top: 2px; }
+.rc__review { display: inline-flex; gap: 6px; align-items: center; }
+.rc__review .vc__field { width: 200px; }
+.rc__crop { max-width: 100%; max-height: 180px; border: 1px solid var(--line-200); border-radius: 6px; background: #fff; align-self: flex-start; }
+.rc__events { margin: 0; padding-left: 16px; display: flex; flex-direction: column; gap: 2px; }
+
+/* Dialogs (match, correct, acknowledge, detach). Above the reconciliation card and the viewer. */
+.rc__dlg { position: fixed; inset: 0; background: rgb(15 23 42 / 35%); display: grid; place-items: center;
+  z-index: calc(var(--z-modal) + 80); padding: 16px; }
+.rc__modal { width: min(560px, 100%); max-height: calc(100vh - 32px); overflow: auto; background: var(--surface-0);
+  border-radius: 14px; box-shadow: var(--e-4); padding: 14px; display: flex; flex-direction: column; gap: 10px; }
+.rc__modal-h, .rc__modal-f { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.rc__picklist { display: flex; flex-direction: column; max-height: 320px; overflow: auto; border: 1px solid var(--line-200); border-radius: 8px; }
+.rc__pick { display: flex; gap: 8px; align-items: center; text-align: left; padding: 7px 10px; border: 0; border-bottom: 1px solid var(--line-100, var(--line-200));
+  background: none; cursor: pointer; font-size: 12.5px; color: var(--ink-800); }
+.rc__pick:hover, .rc__pick:focus-visible { background: var(--surface-1); }
+.rc__lbl { display: flex; flex-direction: column; gap: 4px; }
+.rc__note { min-height: 70px; resize: vertical; }
+
+@media (max-width: 768px) {
+  .rc__totals { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .rc__words { grid-template-columns: 1fr; }
+  .rc__sticky { min-width: 160px; }
+  .rc__review .vc__field { width: 140px; }
+}
+
+.rc__file { align-items: flex-start; }
+.rc__part { display: flex; align-items: center; gap: 6px; margin-top: 4px; min-width: 0; }
+.rc__state { white-space: nowrap; }
+.rc__state--ok { color: var(--success-600); }
+.rc__state--warn { color: var(--warning-700, #b45309); }
+.rc__state--bad { color: var(--danger-600); }
+.rc__state--info { color: var(--brand-600); }
+.rc__state--plain { color: var(--ink-500); }
+
+/* Case step 1 — documents read */
+.rc__steps { align-self: flex-start; }
+.rc__doccards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.rc__doccard { display: flex; flex-direction: column; gap: 4px; min-width: 0; text-align: left; font: inherit; color: inherit;
+  padding: 12px; border: 1px solid var(--line-200); border-radius: 12px; background: var(--surface-0); cursor: pointer;
+  transition: border-color .15s, box-shadow .15s; }
+.rc__doccard:hover { border-color: var(--brand-300, var(--line-300)); box-shadow: var(--e-1); }
+.rc__doccard:focus-visible { outline: 2px solid var(--brand-400); outline-offset: 2px; }
+.rc__doccard-h { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; margin-bottom: 2px; }
+.rc__doccard-f { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; margin: 6px 0 0; }
+.rc__doccard-f dd { margin: 1px 0 0; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rc__doccard-open { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; color: var(--brand-600); font-weight: 500; }
+.rc__doc-next { display: flex; align-items: center; justify-content: flex-end; gap: 10px; flex-wrap: wrap; }
+.rc__tnum { font-variant-numeric: tabular-nums; }
+
+/* The viewer: the contract preview's shape (doc-preview-* / dpm__*), parsed values left, original right. */
+.rc__scrim { position: fixed; inset: 0; z-index: calc(var(--z-modal) + 60); display: flex; align-items: center; justify-content: center;
+  background: rgb(11 28 48 / 46%); backdrop-filter: blur(4px) saturate(120%); animation: rk-fade .25s ease; }
+.rc__viewer { display: flex; flex-direction: column; width: 96vw; max-width: 1560px; height: 92vh; border-radius: 16px;
+  background: var(--surface-0); box-shadow: var(--e-4); overflow: hidden; outline: none; animation: rk-rise .3s cubic-bezier(.2, .8, .2, 1); }
+.rc__viewer-h { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 1px solid var(--line-200);
+  background: var(--surface-1); flex-shrink: 0; }
+.rc__viewer-icon { color: var(--brand-600); flex: none; }
+.rc__viewer-nav { display: inline-flex; align-items: center; gap: 4px; }
+.rc__viewer-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+.rc__viewer-parsed { flex: 1 1 52%; min-width: 0; display: flex; flex-direction: column; overflow: hidden;
+  border-right: 1px solid var(--line-200); background: var(--canvas, var(--surface-0)); }
+.rc__viewer-ph { padding: 10px 16px; font-weight: 600; font-size: 13px; color: var(--ink-700);
+  border-bottom: 1px solid var(--line-200); background: var(--surface-1); }
+.rc__viewer-scroll { flex: 1; overflow: auto; padding: 12px 16px 16px; display: flex; flex-direction: column; gap: 14px; }
+.rc__viewer-doc { flex: 1 1 48%; min-width: 0; display: flex; flex-direction: column; overflow: hidden; background: #e5e7eb; position: relative; }
+.rc__viewer-bar { display: flex; align-items: center; gap: 4px; padding: 8px 12px; background: var(--surface-0);
+  border-bottom: 1px solid var(--line-200); flex-shrink: 0; }
+.rc__viewer-page { flex: 1; min-height: 0; overflow: auto; display: flex; align-items: flex-start; justify-content: center; }
+.rc__viewer-page.is-zoomed { justify-content: flex-start; }
+.rc__viewer-img { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: center; padding: 8px; }
+.rc__viewer-img img { max-width: 100%; max-height: 100%; object-fit: contain; background: #fff; }
+.rc__viewer-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 24px; text-align: center; }
+
+.rc__doc-warn { display: flex; flex-direction: column; gap: 3px; padding: 8px 10px; border-radius: 8px;
+  background: var(--warning-50, #fffbeb); color: var(--ink-800); }
+.rc__doc-warn svg { vertical-align: -2px; }
+.rc__fields { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 8px 16px; margin: 0; }
+.rc__field { min-width: 0; }
+.rc__field dd { margin: 2px 0 0; font-size: 13px; color: var(--ink-900); overflow-wrap: anywhere; }
+.rc__row-flag td, .rc__row-flag .rc__sticky { background: var(--warning-50, #fffbeb); }
+
+/* Phones: full screen, stacked — values above, the page below. */
+@media (width <= 760px) {
+  .rc__viewer { width: 100vw; height: 100%; max-width: none; border-radius: 0; }
+  .rc__viewer-h { flex-wrap: wrap; }
+  .rc__viewer-body { flex-direction: column; overflow-y: auto; }
+  .rc__viewer-parsed { flex: none; max-height: 55vh; border-right: 0; border-bottom: 1px solid var(--line-200); }
+  .rc__viewer-doc { flex: 1 0 60vh; }
+}
+
+/* Recon list: one row per uploaded file */
+.rc__files td { vertical-align: middle; }
+.rc__file-name { min-width: 220px; max-width: 360px; }
+.rc__file-name .vc__strong { overflow-wrap: anywhere; }
+.rc__kinds { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; }
+.rc__reading { display: flex; flex-direction: column; min-width: 160px; }
+.rc__ways { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
+  color: var(--brand-700, var(--brand-600)); background: var(--brand-50, var(--surface-1)); white-space: nowrap; }
+.rc__ways--sm { padding: 1px 6px; font-size: 11px; }
+
+/* Viewer: part tabs, the case strip, and the compared columns beside what was read */
+.rc__viewer-tabs { display: flex; gap: 6px; flex-wrap: wrap; padding: 10px 16px; border-bottom: 1px solid var(--line-200); background: var(--surface-1); }
+.rc__tab-off { opacity: .6; }
+.rc__tab-n { display: inline-grid; place-items: center; min-width: 18px; height: 18px; padding: 0 5px; margin-left: 4px; border-radius: 999px;
+  font-size: 11px; font-weight: 600; background: var(--warning-100, #fef3c7); color: var(--warning-800, #92400e); }
+.rc__h { font-size: 12px; font-weight: 600; color: var(--ink-600, var(--ink-500)); text-transform: uppercase; letter-spacing: .04em; }
+.rc__notice { padding: 10px 12px; border-radius: 10px; background: var(--surface-1); border: 1px solid var(--line-200); font-size: 12.5px; color: var(--ink-700); }
+.rc__strip { display: flex; flex-direction: column; gap: 10px; padding: 12px; border-radius: 12px; border: 1px solid var(--line-200); background: var(--surface-0); }
+.rc__strip-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rc__strip-row .vc__lnk { display: inline-flex; align-items: center; gap: 4px; }
+.rc__cover { display: inline-flex; gap: 4px; flex-wrap: wrap; }
+.rc__cover .rc__pip { margin-right: 0; }
+.rc__strip-nums { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; }
+.rc__num-cell { min-width: 0; }
+.rc__num-cell .vc__strong { font-size: 13.5px; }
+.rc__checks--flat { border: 1px solid var(--line-200); border-radius: 10px; background: var(--surface-0); }
+.rc__table .rc__group th { font-size: 10.5px; text-transform: uppercase; letter-spacing: .05em; padding: 5px 10px; position: static; }
+.rc__table .rc__group-cmp { background: var(--brand-50, var(--surface-2)); color: var(--brand-700, var(--ink-700)); border-left: 2px solid var(--brand-200, var(--line-300)); }
+.rc__table th.rc__cmp { background: var(--brand-50, var(--surface-2)); }
+.rc__table td.rc__cmp { background: color-mix(in srgb, var(--brand-50, #eef2ff) 55%, transparent); }
+.rc__table .rc__cmp-first { border-left: 2px solid var(--brand-200, var(--line-300)); }
+.rc__table td.rc__diff { color: var(--warning-800, #92400e); font-weight: 600; background: var(--warning-50, #fffbeb); }
+@media (width <= 760px) {
+  .rc__strip-nums { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* ── The reconciliation card: opened by ?open=recon:<id> over any page, sized and moving like the bill card ── */
+.rk__overlay { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; padding: var(--sp-4, 16px);
+  background: rgb(11 28 48 / 46%); backdrop-filter: blur(3px) saturate(120%); animation: rk-fade .3s ease; }
+/* No transform once open: a transformed box would trap the viewer and dialogs (position: fixed) inside it. */
+.rk__frame { display: flex; width: 100%; max-width: 1680px; height: 100%; border-radius: 16px; overflow: hidden; outline: none;
+  background: var(--surface-0); box-shadow: var(--e-4); animation: rk-open .55s cubic-bezier(.34, 1.06, .64, 1); }
+@keyframes rk-open { from { opacity: 0; transform: translate(var(--rk-dx, 0px), var(--rk-dy, 0px)) scale(.15); } to { opacity: 1; transform: none; } }
+@keyframes rk-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes rk-rise { from { opacity: 0; transform: translateY(12px) scale(.985); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .rk__frame, .rc__viewer { animation-name: rk-fade; } }
+
+.rk__card.rc { flex: 1; min-width: 0; gap: 0; }
+.rk__hdr { display: flex; align-items: flex-start; gap: 12px; flex-shrink: 0; padding: 20px 24px 16px; border-bottom: 1px solid var(--line-100, var(--line-200)); }
+.rk__chips { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+.rk__title { font-size: var(--fs-lg, 18px); font-weight: var(--fw-semibold, 600); line-height: 1.25; letter-spacing: -0.011em; color: var(--ink-900); }
+.rk__sub { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; margin-top: 6px; font-size: 12.5px; color: var(--ink-500); }
+.rk__id { display: inline-flex; align-items: center; gap: 5px; padding: 2px 8px; border: 1px solid var(--line-200); border-radius: 6px;
+  background: var(--surface-1); color: var(--ink-700); font-family: var(--font-mono, ui-monospace, monospace); font-size: 12px; cursor: pointer; }
+.rk__id:hover { border-color: var(--brand-300, var(--line-300)); color: var(--brand-700, var(--ink-900)); }
+.rk__id:focus-visible { outline: 2px solid var(--brand-400); outline-offset: 2px; }
+.rk__vendor { font-weight: 600; color: var(--ink-800); text-decoration: none; }
+.rk__vendor:hover { color: var(--brand-700, var(--ink-900)); text-decoration: underline; text-underline-offset: 3px; }
+.rk__acts { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.rk__close { display: flex; flex-shrink: 0; padding: 4px; border: none; border-radius: var(--r-sm, 6px); background: none; color: var(--ink-500); cursor: pointer; }
+.rk__close:hover { background: var(--surface-2); color: var(--ink-800); }
+.rk__body { flex: 1; min-height: 0; overflow: auto; display: flex; flex-direction: column; gap: 14px; padding: 16px 24px 28px; }
+
+.rc__caselink { display: inline-flex; align-items: baseline; gap: 6px; color: var(--brand-700, var(--ink-900)); text-decoration: none; font-size: 12.5px; }
+.rc__caselink:hover .vc__strong { text-decoration: underline; text-underline-offset: 3px; }
+.rc__ref { font-family: var(--font-mono, ui-monospace, monospace); font-size: 11px; color: var(--ink-500); }
+
+@media (width <= 760px) {
+  .rk__overlay { padding: 0; }
+  .rk__frame { border-radius: 0; }
+  .rk__hdr { flex-wrap: wrap; padding: 14px 16px 12px; }
+  .rk__acts { width: 100%; }
+  .rk__acts .rk__close { margin-left: auto; }
+  .rk__btn-text { display: none; }
+  .rk__body { padding: 12px 16px 24px; }
+}
+
+/* ── One colour per source, everywhere: PO blue · invoice violet · site audit teal · delivery proof amber · result slate ── */
+:root {
+  --rc-po: #1d4ed8;       --rc-po-bg: #eff6ff;       --rc-po-head: #dbeafe;
+  --rc-invoice: #6d28d9;  --rc-invoice-bg: #f5f3ff;  --rc-invoice-head: #ede9fe;
+  --rc-evidence: #0f766e; --rc-evidence-bg: #f0fdfa; --rc-evidence-head: #ccfbf1;
+  --rc-pod: #b45309;      --rc-pod-bg: #fffbeb;      --rc-pod-head: #fef3c7;
+  --rc-result: #334155;   --rc-result-bg: #f8fafc;   --rc-result-head: #e2e8f0;
+}
+.rc__srctable td.rc__src--po, .rc__srctable th.rc__src--po { background: var(--rc-po-bg); }
+.rc__srctable td.rc__src--invoice, .rc__srctable th.rc__src--invoice { background: var(--rc-invoice-bg); }
+.rc__srctable td.rc__src--evidence, .rc__srctable th.rc__src--evidence { background: var(--rc-evidence-bg); }
+.rc__srctable td.rc__src--pod, .rc__srctable th.rc__src--pod { background: var(--rc-pod-bg); }
+.rc__srctable td.rc__src--result, .rc__srctable th.rc__src--result { background: var(--rc-result-bg); }
+.rc__srctable th.rc__src--po { color: var(--rc-po); }
+.rc__srctable th.rc__src--invoice { color: var(--rc-invoice); }
+.rc__srctable th.rc__src--evidence { color: var(--rc-evidence); }
+.rc__srctable th.rc__src--pod { color: var(--rc-pod); }
+.rc__srctable th.rc__src--result { color: var(--rc-result); }
+.rc__srctable .rc__group th { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .05em; padding: 6px 10px; position: static; white-space: nowrap; }
+.rc__srctable .rc__group th.rc__src--po { background: var(--rc-po-head); }
+.rc__srctable .rc__group th.rc__src--invoice { background: var(--rc-invoice-head); }
+.rc__srctable .rc__group th.rc__src--evidence { background: var(--rc-evidence-head); }
+.rc__srctable .rc__group th.rc__src--pod { background: var(--rc-pod-head); }
+.rc__srctable .rc__group th.rc__src--result { background: var(--rc-result-head); }
+.rc__srctable .rc__group-item { vertical-align: bottom; background: var(--surface-1); }
+.rc__srctable .rc__src-start { border-left: 2px solid var(--surface-0); box-shadow: inset 2px 0 0 currentColor; }
+.rc__srctable td.rc__src-start.rc__src--po { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--rc-po) 35%, transparent); }
+.rc__srctable td.rc__src-start.rc__src--invoice { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--rc-invoice) 35%, transparent); }
+.rc__srctable td.rc__src-start.rc__src--evidence { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--rc-evidence) 35%, transparent); }
+.rc__srctable td.rc__src-start.rc__src--pod { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--rc-pod) 35%, transparent); }
+.rc__srctable td.rc__src-start.rc__src--result { box-shadow: inset 2px 0 0 color-mix(in srgb, var(--rc-result) 35%, transparent); }
+.rc__src-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: currentColor; margin-right: 6px; vertical-align: 1px; }
+.rc__src-own { font-weight: 500; text-transform: none; letter-spacing: 0; opacity: .75; }
+/* A cell that disagrees keeps its source colour underneath but reads as a warning. */
+.rc__srctable td.rc__diff { background: var(--warning-100, #fef3c7); color: var(--warning-800, #92400e); font-weight: 600; }
+/* Flagged rows: a warm edge on the item, so the source colours stay readable. */
+.rc__srctable .rc__row-flag td { background-image: linear-gradient(rgb(254 243 199 / 35%), rgb(254 243 199 / 35%)); }
+.rc__srctable .rc__row-flag .rc__sticky { box-shadow: inset 3px 0 0 var(--warning-400, #f0b429); background-color: var(--surface-0); }
+.rc__srctable .rc__click:hover td { filter: brightness(.98); }
+.rc__srctable .rc__click.is-open td { filter: brightness(.96); }
+
+/* Coverage pills in the same colours. */
+.rc__pip--po.is-on { color: var(--rc-po); background: var(--rc-po-bg); border-color: var(--rc-po-head); }
+.rc__pip--invoice.is-on { color: var(--rc-invoice); background: var(--rc-invoice-bg); border-color: var(--rc-invoice-head); }
+.rc__pip--evidence.is-on { color: var(--rc-evidence); background: var(--rc-evidence-bg); border-color: var(--rc-evidence-head); }
+.rc__pip--pod.is-on { color: var(--rc-pod); background: var(--rc-pod-bg); border-color: var(--rc-pod-head); }
+
+/* Row actions on the Recon list: read again, delete. */
+.rc__rowacts { white-space: nowrap; text-align: right; width: 1%; }
+.rc__rowacts .vc__iconbtn + .vc__iconbtn { margin-left: 2px; }
+
+/* ── Goods receipt extract (Dynamics export) ──────────────────────────────── */
+/* A partial load must be as visible as a clean one, so the report sits in the
+   flow rather than behind a toast that disappears. */
+.rk__grn { border: 1px solid var(--line-300, #d0d7e2); border-radius: var(--r-md, 8px); padding: 14px 16px; }
+.rk__grn-head h3 { margin: 0 0 2px; font-size: 15px; }
+.rk__grn-head p { margin: 0 0 10px; max-width: 62ch; }
+.rk__muted { color: var(--ink-500, #5d6677); font-size: 13px; }
+.rk__grn-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.rk__grn-mapping { margin-top: 10px; }
+.rk__grn-report { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line-300, #d0d7e2); }
+.rk__grn-report .rk__chips { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.rk__grn-error { color: var(--danger-700, #b03a2e); font-size: 13px; margin: 8px 0 0; }
+.rk__grn-detail { margin-top: 8px; font-size: 13px; }
+.rk__grn-detail summary { cursor: pointer; color: var(--ink-500, #5d6677); }
+.rk__grn-detail ul { margin: 6px 0 0; padding-left: 20px; }
+.rk__grn-detail li { margin: 2px 0; }
+
+/* ── Four-way: one invoice, four questions ────────────────────────────────── */
+/* Four cards in a fixed order. A reviewer answers "ordered / verified /
+   received / paid" in that sequence, so the screen is laid out that way and
+   nothing else competes for attention. */
+.fw { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px; }
+.fw__card { border: 1px solid var(--line-300, #d0d7e2); border-radius: var(--r-md, 8px); padding: 12px 14px; background: var(--surface-0, #fff); }
+.fw__head { margin-bottom: 8px; }
+.fw__title { margin: 0; font-size: 14px; }
+.fw__ask { margin: 2px 0 0; font-size: 12px; color: var(--ink-500, #5d6677); }
+.fw__absent { margin: 0; font-size: 13px; color: var(--ink-500, #5d6677); font-style: italic; }
+
+/* What the comparison proves. Quiet, under the tally, because it qualifies the
+   verdict rather than competing with it. */
+.fw__note {
+  margin: 8px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--ink-500, #5d6677);
+}
+
+/* An assumption a person still has to agree with. Above the tally and tinted,
+   because a reviewer who reads "all agree" without seeing this has been told
+   the machine was certain when it was only persuaded. */
+.fw__confirm {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 0 0 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--warn-200, #fde68a);
+  border-radius: 8px;
+  background: var(--warn-50, #fffbeb);
+  font-size: 12px;
+  line-height: 1.45;
+  color: var(--warn-800, #92400e);
+}
+
+.fw__confirm svg { flex: none; margin-top: 1px; }
+.fw__tally { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.fw__lines { list-style: none; margin: 0; padding: 0; }
+/* Only the lines that disagree are shown by default: a list where every row
+   looks equally important is a list nobody reads. */
+.fw__line { display: flex; gap: 10px; align-items: baseline; padding: 5px 0; border-top: 1px solid var(--line-200, #e8ecf2); font-size: 13px; }
+.fw__line:first-child { border-top: 0; }
+.fw__desc { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fw__checks { display: flex; gap: 4px; flex-wrap: wrap; flex: 0 0 auto; }
+.fw__vs { opacity: .85; font-variant-numeric: tabular-nums; }
+.fw__more { margin-top: 8px; font-size: 12px; }
+/* The chain of documents behind a disagreement: "says who?" answered in place. */
+.fw__line { flex-wrap: wrap; }
+.fw__trace { text-align: left; padding: 0; font: inherit; }
+.fw__chain { flex: 1 0 100%; margin: 6px 0 2px; padding: 8px 10px; font-size: 12px;
+             background: var(--canvas, #f5f7fb); border-radius: var(--r-sm, 4px); }
+.fw__chain ul { margin: 0; padding-left: 16px; }
+.fw__chain li { margin: 2px 0; }
+/* The dense per-line table, demoted behind a disclosure. */
+.rc__linessummary { cursor: pointer; }
+.rc__linesdetail[open] .rc__linessummary { margin-bottom: 6px; }
+
+/* ── The payment decision, first and in money ─────────────────────────────── */
+/* Whoever opens a case is deciding whether to pay it. That answer leads; the
+   line table is what they reach for afterwards. */
+.pv { display: flex; align-items: flex-start; gap: 12px; padding: 14px 16px; margin-bottom: 12px;
+      border: 1px solid var(--line-300, #d0d7e2); border-radius: var(--r-md, 8px); }
+.pv--ok { background: var(--success-50, #ecfdf5); border-color: var(--success-200, #a7f3d0); }
+.pv--bad { background: var(--danger-50, #fef2f2); border-color: var(--danger-200, #fecaca); }
+.pv--wait { background: var(--canvas, #f5f7fb); }
+.pv__icon { flex: 0 0 auto; margin-top: 2px; }
+.pv--ok .pv__icon { color: var(--success-700, #15803d); }
+.pv--bad .pv__icon { color: var(--danger-700, #b03a2e); }
+.pv--wait .pv__icon { color: var(--ink-500, #5d6677); }
+.pv__text { flex: 1 1 auto; min-width: 0; }
+.pv__head { margin: 0; font-size: 16px; font-weight: 650; }
+.pv__body { margin: 2px 0 0; font-size: 13px; color: var(--ink-600, #44506a); }
+/* Under-billing is the vendor's loss, so it sits aside the decision, not in it. */
+.pv__aside { flex: 0 0 auto; text-align: right; display: grid; gap: 1px; }
+.pv__aside-k { font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--ink-500, #5d6677); }
+.pv__aside-v { font-size: 15px; font-weight: 600; font-variant-numeric: tabular-nums; }
+.pv__aside-n { font-size: 11px; color: var(--ink-500, #5d6677); }
+@media (max-width: 640px) { .pv { flex-wrap: wrap; } .pv__aside { text-align: left; } }
+/* A delivery proof answering the receipt question is worth naming: it confirms
+   a consignment and its value, never item quantities. */
+.rc__receipt-note { font-size: 11px; color: var(--ink-500, #5d6677); font-style: italic; white-space: nowrap; }
+@media (max-width: 760px) { .rc__receipt-note { display: none; } }
+/* The delivery proof's verdict, stated where the delivery proof is. */
+.rc__podverdict { font-size: 12px; font-weight: 550; }
+.rc__podverdict--ok { color: var(--success-700, #15803d); }
+.rc__podverdict--bad { color: var(--danger-700, #b03a2e); }
+.rc__podverdict .rc__receipt-note { font-weight: 400; }
+/* Why a column is empty, said once under the table rather than per row. */
+.rc__tablenote { margin: 8px 2px 0; font-size: 12px; color: var(--ink-500, #5d6677); max-width: 86ch; }
+
+/* A receipt quantity derived from a single-line consignment rather than read
+   from a GRN. Dotted, so the eye can tell inference from evidence without a
+   legend; the cell's title says which. */
+.rc__derived { text-decoration: underline dotted var(--line-300, #cbd3e1); text-underline-offset: 3px; }
+
+/* The answer to a check that asked for one, beside the question rather than
+   in a panel of its own — a reviewer should not have to go looking. */
+.rc__check-act { margin-left: auto; flex: none; }
+
+/* ── Folders inside Recon ──────────────────────────────────────────────────
+   A reviewer looks for "the POs", not for a filename in a list of forty. Each
+   shelf states what it holds, so the grouping explains itself rather than
+   needing a legend. */
+.rc__folder {
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  background: var(--surface-0);
+  overflow: hidden;
+}
+
+.rc__folder-h {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  transition: background 0.15s;
+}
+
+.rc__folder-h::-webkit-details-marker { display: none; }
+.rc__folder-h:hover { background: var(--surface-50, #f8fafc); }
+.rc__folder[open] .rc__folder-h { border-bottom: 1px solid var(--line-200); }
+
+/* The hint is the first thing to go when the row is tight: the folder's name
+   and its count carry the meaning on their own. */
+.rc__folder-d { margin-left: auto; text-align: right; }
+
+@media (max-width: 640px) {
+  .rc__folder-d { display: none; }
+}
+
+/* How confident a pairing is, beside what it concluded. Tabular so a column
+   of them can be scanned, and quieter than the figure it qualifies. */
+.rc__matchpct {
+  margin-left: 5px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.75;
+}
+
+.fw__match { flex: none; margin-right: 6px; }
+
+/* ── The queue at a glance ─────────────────────────────────────────────────
+   Light and flat: no shadows, no gradients, one hairline per panel. The only
+   saturated colour on the screen belongs to data. */
+.rd { margin-bottom: 14px; }
+
+.rd__hero {
+  padding: 14px 16px;
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  background: var(--surface-0);
+  margin-bottom: 10px;
+}
+
+.rd__hero-k { font-size: 12px; color: var(--ink-500, #5d6677); }
+
+.rd__hero-v {
+  font-size: 30px;
+  line-height: 1.15;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-900);
+  margin-top: 2px;
+}
+
+.rd__hero-v--bad { color: var(--danger-700, #991b1b); }
+.rd__hero-d { font-size: 12px; color: var(--ink-500, #5d6677); margin-top: 4px; }
+
+.rd__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 10px;
+}
+
+.rd__panel {
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  background: var(--surface-0);
+  padding: 12px 14px;
+}
+
+.rd__h {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-900);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.rd__sub { font-weight: 400; font-size: 11px; color: var(--ink-500, #5d6677); }
+.rd__none { margin: 0; font-size: 12px; color: var(--ink-500, #5d6677); }
+
+/* The split. A 2px surface gap between segments so two fills never touch. */
+.rd__split {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+  margin-bottom: 10px;
+}
+
+.rd__seg { border-radius: 3px; min-width: 4px; }
+
+.rd__legend, .rd__meters, .rd__bars { list-style: none; margin: 0; padding: 0; }
+
+.rd__pick, .rd__meter, .rd__bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 4px 6px;
+  margin: 0 0 1px;
+  border: 1px solid transparent;
+  border-radius: 7px;
+  background: none;
+  font-size: 12px;
+  color: var(--ink-700, #35425a);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rd__pick:hover:not(:disabled), .rd__meter:hover, .rd__bar:hover:not(:disabled) {
+  background: var(--surface-1, #f8fafc);
+}
+
+.rd__pick.on, .rd__meter.on, .rd__bar.on {
+  border-color: var(--brand-600, #004080);
+  background: var(--brand-50, #f2f6fd);
+}
+
+.rd__pick:disabled, .rd__bar:disabled { opacity: 0.45; cursor: default; }
+
+.rd__dot { width: 8px; height: 8px; border-radius: 2px; flex: none; }
+.rd__ic { flex: none; color: var(--ink-400, #7a8599); }
+.rd__pick-l, .rd__meter-l, .rd__bar-l { flex: 1; }
+.rd__pick-n, .rd__bar-v { font-variant-numeric: tabular-nums; font-weight: 600; }
+
+/* A meter per row: each leg has its own whole, so each gets its own track
+   rather than sharing one axis with the others. */
+.rd__meter-l { flex: 0 0 104px; }
+
+.rd__meter-t, .rd__bar-t {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--surface-2, #f1f5f9);
+  overflow: hidden;
+}
+
+.rd__meter-f {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--brand-500, #0b56a4);
+  transition: width 0.3s;
+}
+
+.rd__meter-v { font-variant-numeric: tabular-nums; font-weight: 600; min-width: 46px; text-align: right; }
+.rd__of { color: var(--ink-400, #7a8599); font-weight: 400; }
+
+.rd__bar-l { flex: 0 0 82px; }
+.rd__bar-f { display: block; height: 100%; border-radius: 4px; transition: width 0.3s; }
+.rd__bar-v { min-width: 20px; text-align: right; }
+.rd__clear { margin-top: 8px; font-size: 12px; }
+
+@media (max-width: 560px) {
+  .rd__meter-l, .rd__bar-l { flex-basis: 84px; }
+  .rd__hero-v { font-size: 25px; }
+}
+
+/* A heading excluded from the billing. Stated plainly rather than tucked away:
+   a line dropped from an invoice in silence is how an understated bill gets
+   paid. */
+.rc__rollup {
+  border-left: 2px solid var(--line-300, #cbd3e1);
+  padding-left: 9px;
+  margin-bottom: 10px;
+}
+
+/* The way in to the dashboard. A real control with a state, not a heading
+   that happens to be clickable. */
+.rc__dashbar { margin-bottom: 10px; }
+
+.rc__dashbtn {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  padding: 11px 14px;
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  background: var(--surface-0);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-900);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.rc__dashbtn:hover { border-color: var(--line-300, #cbd3e1); }
+.rc__dashbtn.on { border-color: var(--brand-600, #004080); background: var(--brand-50, #f2f6fd); }
+.rc__dashbtn:focus-visible { outline: 2px solid var(--brand-600, #004080); outline-offset: 2px; }
+.rc__chev { transition: transform 0.2s; color: var(--ink-400, #7a8599); }
+.rc__chev.on { transform: rotate(180deg); }
+
+/* The panels arrive rather than appearing, which makes the connection between
+   the button and what it opened. Nothing moves for anyone who has asked the
+   system for less motion. */
+@media (prefers-reduced-motion: no-preference) {
+  #recon-dashboard .rd__hero,
+  #recon-dashboard .rd__panel { animation: rd-in 0.28s ease-out both; }
+  #recon-dashboard .rd__panel:nth-child(2) { animation-delay: 0.04s; }
+  #recon-dashboard .rd__panel:nth-child(3) { animation-delay: 0.08s; }
+  #recon-dashboard .rd__meter-f,
+  #recon-dashboard .rd__bar-f { animation: rd-grow 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+  #recon-dashboard .rd__seg { animation: rd-grow 0.4s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+}
+
+@keyframes rd-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Grown from the baseline, so a bar reads as filling up rather than sliding
+   in from somewhere. */
+@keyframes rd-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+#recon-dashboard .rd__meter-f,
+#recon-dashboard .rd__bar-f,
+#recon-dashboard .rd__seg { transform-origin: left center; }
+
+/* ── How well a reconciliation stands up ───────────────────────────────────
+   The four comparison cards say what each document concluded; these say how
+   much those conclusions are worth. Same flat language as the queue
+   dashboard, so the two read as one system. */
+.cv {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.cv__panel {
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  background: var(--surface-0);
+  padding: 12px 14px;
+}
+
+.cv__h {
+  margin: 0 0 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-900);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cv__sub { font-weight: 400; font-size: 11px; color: var(--ink-500, #5d6677); }
+.cv__none { margin: 0; font-size: 12px; color: var(--ink-500, #5d6677); }
+
+.cv__fig {
+  font-size: 27px;
+  line-height: 1.1;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-900);
+  margin-bottom: 8px;
+}
+
+.cv__fig--warn { color: var(--warn-700, #92400e); }
+.cv__note { margin: 0; font-size: 11px; line-height: 1.45; color: var(--ink-500, #5d6677); }
+.cv__meters, .cv__bars { list-style: none; margin: 0; padding: 0; }
+
+.cv__meters li, .cv__bars li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--ink-700, #35425a);
+  padding: 3px 0;
+}
+
+.cv__meter-l { flex: 0 0 96px; }
+.cv__bar-l { flex: 0 0 62px; }
+
+.cv__meter-t, .cv__bar-t {
+  flex: 1;
+  height: 7px;
+  border-radius: 4px;
+  background: var(--surface-2, #f1f5f9);
+  overflow: hidden;
+}
+
+.cv__meter-f, .cv__bar-f {
+  display: block;
+  height: 100%;
+  border-radius: 4px;
+  background: var(--brand-500, #0b56a4);
+}
+
+.cv__meter-v, .cv__bar-v {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  min-width: 34px;
+  text-align: right;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .cv__panel { animation: rd-in 0.28s ease-out both; }
+  .cv__panel:nth-child(2) { animation-delay: 0.04s; }
+  .cv__panel:nth-child(3) { animation-delay: 0.08s; }
+  .cv__meter-f, .cv__bar-f {
+    transform-origin: left center;
+    animation: rd-grow 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) both;
+  }
+}
+
+/* How much of the bill a comparison card actually speaks for. Quiet, under
+   the question it answers, because it qualifies the verdict rather than
+   being one. */
+.fw__cover { display: flex; align-items: center; gap: 7px; margin-top: 7px; }
+
+.fw__cover-t {
+  flex: 1;
+  height: 5px;
+  border-radius: 3px;
+  background: var(--surface-2, #f1f5f9);
+  overflow: hidden;
+}
+
+.fw__cover-f {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand-400, #3b82c4);
+  transform-origin: left center;
+}
+
+.fw__cover-v {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-500, #5d6677);
+  flex: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .fw__cover-f { animation: rd-grow 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+}
+
+/* The invoice list: the rows the dashboard's counts are made of, and the way
+   in to a reconciliation. */
+.cl__link { display: inline-flex; align-items: center; gap: 6px; }
+
+/* A figure and its bar on one line — the number is the fact, the bar is for
+   scanning a column of them at speed. */
+.cl__bar { display: inline-flex; align-items: center; gap: 7px; justify-content: flex-end; }
+
+.cl__bar-t {
+  width: 48px;
+  height: 6px;
+  border-radius: 3px;
+  background: var(--surface-2, #f1f5f9);
+  overflow: hidden;
+  flex: none;
+}
+
+.cl__bar-f {
+  display: block;
+  height: 100%;
+  border-radius: 3px;
+  background: var(--brand-400, #3b82c4);
+  transform-origin: left center;
+}
+
+.cl__bar-v { font-variant-numeric: tabular-nums; min-width: 34px; text-align: right; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .cl__bar-f { animation: rd-grow 0.45s cubic-bezier(0.2, 0.8, 0.3, 1) both; }
+}
+
+/* The way through to a line-by-line reconciliation. A real button on the row,
+   so the action is readable without hovering to find out. */
+.cl__open { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+
+/* ── How the documents are linked ──────────────────────────────────────────
+   The graph the matcher actually built, in place of a log of when it ran. */
+.rg {
+  border: 1px solid var(--line-200);
+  border-radius: 12px;
+  background: var(--surface-0);
+  padding: 10px 12px;
+}
+
+.rg__svg { width: 100%; height: auto; max-height: 230px; display: block; }
+
+/* A document not on the case yet is drawn, not omitted: the gap is the point,
+   it says which document to go and find. */
+.rg__node rect {
+  fill: var(--surface-1, #f8fafc);
+  stroke: var(--line-200);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.rg__node.is-on rect { fill: var(--surface-0); stroke: var(--line-300, #cbd3e1); stroke-dasharray: none; }
+.rg__node.is-spine.is-on rect { stroke: var(--brand-600, #004080); stroke-width: 1.5; }
+.rg__t { font-size: 11.5px; font-weight: 600; fill: var(--ink-700, #35425a); }
+.rg__node.is-on .rg__t { fill: var(--ink-900); }
+.rg__d { font-size: 10px; fill: var(--ink-500, #5d6677); }
+.rg__elabel { font-size: 9.5px; fill: var(--ink-500, #5d6677); }
+
+.rg__edge { fill: none; stroke: var(--line-200); stroke-dasharray: 4 4; }
+.rg__edge.is-on { stroke: var(--brand-400, #3b82c4); stroke-dasharray: none; stroke-linecap: round; }
+
+.rg__legend { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 4px 18px; }
+.rg__legend li { display: flex; align-items: baseline; gap: 7px; font-size: 12px; }
+.rg__k { font-weight: 600; color: var(--ink-700, #35425a); }
+
+/* The links draw themselves in, which shows the direction the reconciliation
+   runs: everything meets at the invoice. */
+@media (prefers-reduced-motion: no-preference) {
+  .rg__edge.is-on {
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: rg-draw 0.7s ease-out forwards;
+  }
+}
+
+@keyframes rg-draw { to { stroke-dashoffset: 0; } }

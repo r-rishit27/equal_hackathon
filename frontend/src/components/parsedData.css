@@ -1,0 +1,184 @@
+/* Parsed info / raw spreadsheet, inside the full-screen viewer's panel
+   (billPdfFullscreen.css). The table keeps the spreadsheet preview's look:
+   navy header row, numbered rows, zebra stripes. */
+
+.pdv__panel { width: min(1320px, 100%); }
+
+.pdv__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 42vw;
+  font-size: 14px;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.pdv__title svg { flex-shrink: 0; color: #4f46e5; }
+
+.pdv__badge {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #1d4ed8;
+  background: #eff6ff;
+}
+
+/* Parsed info | Raw file */
+.pdv__seg {
+  display: inline-flex;
+  margin-left: 12px;
+  padding: 3px;
+  border-radius: 9px;
+  background: #f3f4f6;
+}
+.pdv__seg button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #4b5563;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+.pdv__seg button:hover:not(:disabled):not(.is-on) { color: #111827; }
+.pdv__seg button.is-on { background: #fff; color: #1e3a5f; box-shadow: 0 1px 3px rgba(15, 23, 42, 0.12); }
+.pdv__seg button:disabled { opacity: 0.45; cursor: not-allowed; }
+.pdv__seg button:focus-visible { outline: 2px solid #2563eb; outline-offset: 1px; }
+
+.pdv__view {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  animation: pdv-in 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+@keyframes pdv-in { from { opacity: 0; transform: translateY(6px); } }
+
+.pdv__tabs {
+  display: flex;
+  gap: 2px;
+  padding: 8px 14px 0;
+  background: #f9fafb;
+  border-bottom: 1px solid #e5e7eb;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+.pdv__tab {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  margin-bottom: -1px;
+  padding: 6px 14px;
+  border: 1px solid #e5e7eb;
+  border-radius: 7px 7px 0 0;
+  background: #f3f4f6;
+  color: #6b7280;
+  font: inherit;
+  font-size: 12.5px;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.pdv__tab.is-on { background: #fff; border-bottom-color: #fff; color: #1e40af; font-weight: 600; }
+.pdv__tab-n { color: #9ca3af; font-weight: 400; font-size: 11px; }
+
+.pdv__note {
+  flex-shrink: 0;
+  padding: 7px 16px;
+  font-size: 11.5px;
+  color: #6b7280;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.pdv__scroll { flex: 1; min-height: 0; overflow: auto; background: #fff; }
+
+.pdv__table { border-collapse: separate; border-spacing: 0; min-width: 100%; font-size: 12.5px; }
+.pdv__table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 12px;
+  background: #1e3a5f;
+  border-right: 1px solid #2d4a6f;
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  white-space: nowrap;
+  min-width: 80px;
+}
+.pdv__table td {
+  padding: 6px 12px;
+  border-right: 1px solid #e5e7eb;
+  border-bottom: 1px solid #e5e7eb;
+  color: #374151;
+  white-space: nowrap;
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.pdv__table tbody tr:nth-child(even) td { background: #f8fafc; }
+.pdv__table tbody tr:hover td { background: #eef4ff; }
+.pdv__table td.is-num { text-align: right; }
+
+/* Row numbers stay in view while scrolling sideways. */
+.pdv__table .pdv__rn {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  min-width: 44px;
+  padding: 6px 8px;
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+  background: #f3f4f6;
+  border-right: 1px solid #e5e7eb;
+}
+.pdv__table th.pdv__rn { z-index: 2; color: #6b7280; font-weight: 600; }
+.pdv__table tbody tr:nth-child(even) td.pdv__rn,
+.pdv__table tbody tr:hover td.pdv__rn { background: #f3f4f6; }
+.pdv__none { padding: 28px; text-align: center; color: #9ca3af; }
+
+.pdv__center {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #6b7280;
+  background: #f9fafb;
+}
+.pdv__retry { border: 1px solid #e5e7eb; }
+.pdv__spin { animation: pdv-spin 0.8s linear infinite; }
+@keyframes pdv-spin { to { transform: rotate(360deg); } }
+
+@media (prefers-reduced-motion: reduce) {
+  .pdv__view, .pdv__spin { animation: none; }
+}
+
+@media (max-width: 640px) {
+  .pdv__title { display: none; }
+  .pdv__seg { margin-left: 0; }
+}
+
+/* The Excel letter beside a column's real name, so a value can still be
+   traced to its cell (Rate in column D, row 7) now that the header row
+   supplies the names. */
+.pdv__colhint {
+  margin-left: 5px;
+  font-size: 9px;
+  font-weight: 600;
+  opacity: 0.45;
+}
