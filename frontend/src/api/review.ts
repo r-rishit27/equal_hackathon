@@ -312,6 +312,26 @@ export function buildQuery(q: FindingQuery): string {
   return p.toString()
 }
 
+/**
+ * The brand picked in the top bar (AuthContext keeps it in sessionStorage), so
+ * the queue, its counts and a card's lines are scoped the way Bills and Vendors
+ * are. Nothing picked means every brand.
+ */
+function activeBrandId(): string | null {
+  try {
+    const raw = sessionStorage.getItem('onsum_active_brand')
+    return raw ? (JSON.parse(raw)?.id ?? null) : null
+  } catch {
+    return null
+  }
+}
+
+function withBrand(url: string): string {
+  const brand = activeBrandId()
+  if (!brand) return url
+  return `${url}${url.includes('?') ? '&' : '?'}brand_id=${encodeURIComponent(brand)}`
+}
+
 export function fetchFindings(q: FindingQuery) {
   return call<{
     items: Finding[]
@@ -322,11 +342,11 @@ export function fetchFindings(q: FindingQuery) {
      *  where there is no page to be 4 of. */
     total: number | null
     offset: number | null
-  }>(`${BASE}/findings?${buildQuery(q)}`)
+  }>(withBrand(`${BASE}/findings?${buildQuery(q)}`))
 }
 
 export function fetchCounts() {
-  return call<ReviewCounts>(`${BASE}/counts`)
+  return call<ReviewCounts>(withBrand(`${BASE}/counts`))
 }
 
 export function fetchFinding(id: string) {
@@ -339,7 +359,7 @@ export function fetchRollup(id: string, opts: { status?: 'open' | 'snoozed'; sco
   if (opts.status) p.set('status', opts.status)
   if (opts.scope) p.set('scope', opts.scope)
   const qs = p.toString()
-  return call<{ items: Finding[] }>(`${BASE}/findings/${encodeURIComponent(id)}/rollup${qs ? `?${qs}` : ''}`)
+  return call<{ items: Finding[] }>(withBrand(`${BASE}/findings/${encodeURIComponent(id)}/rollup${qs ? `?${qs}` : ''}`))
 }
 
 /**

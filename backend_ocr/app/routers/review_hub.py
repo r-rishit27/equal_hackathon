@@ -282,6 +282,38 @@ def _entitlement_clause(tenant: str) -> tuple[str, dict]:
     return "f.source_service = ANY(%(ent_services)s)", {"ent_services": services}
 
 
+# ── Brand scope ───────────────────────────────────────────────────────────────
+# A finding has no brand of its own; it takes the brand of what it is about.
+# The bill's brand wins (fact_invoices.brand_id), else the vendor's
+# (dim_suppliers.brand_id). A finding about neither — FX, settings, a vendor
+# tagged to no brand — is tenant-wide and shows under every brand, the same
+# rule the vendors list applies to untagged suppliers (routers/vendors.py).
+FINDING_BRAND_SQL = """COALESCE(
+    (SELECT bfi.brand_id FROM rh_finding_entities be
+       JOIN fact_invoices bfi ON bfi.invoice_id = be.entity_id AND bfi.tenant_id = f.tenant_id
+      WHERE be.finding_id = f.finding_id AND be.entity_type = 'bill'
+        AND bfi.brand_id IS NOT NULL
+      LIMIT 1),
+    (SELECT bs.brand_id FROM rh_finding_entities be
+       JOIN dim_suppliers bs ON bs.supplier_id = be.entity_id AND bs.tenant_id = f.tenant_id
+      WHERE be.finding_id = f.finding_id AND be.entity_type = 'vendor'
+        AND bs.brand_id IS NOT NULL
+      LIMIT 1))"""
+
+
+def _brand_clause(brand_id: str | None) -> tuple[str, dict]:
+    """Scope to the brand picked in the top bar; no brand means all of them."""
+    if not brand_id:
+        return "TRUE", {}
+    try:
+        _uuid.UUID(brand_id)
+    except ValueError:
+        raise HTTPException(400, "brand_id must be a UUID")
+    # Brand-less findings compare equal to the requested brand, so they stay.
+    return (f"COALESCE({FINDING_BRAND_SQL}, %(brand_id)s::uuid) = %(brand_id)s::uuid",
+            {"brand_id": brand_id})
+
+
 # ── GET /api/review/findings ──────────────────────────────────────────────────
 
 # Sortable columns, as a whitelist mapping to SQL. A whitelist rather than a
@@ -357,10 +389,12 @@ def list_findings(
     offset: int = Query(default=0, ge=0),
     sort: str = Query(default="rank", pattern="^(rank|type|vendor|money|priority|status|age)$"),
     direction: str = Query(default="desc", pattern="^(asc|desc)$"),
+    brand_id: str | None = Query(default=None),
 ):
     my_caps = capabilities_for()
-    where = ["f.tenant_id = %(tenant)s"]
-    params: dict = {"tenant": tenant, "limit": limit + 1}
+    brand, brand_params = _brand_clause(brand_id)
+    where = ["f.tenant_id = %(tenant)s", brand]
+    params: dict = {"tenant": tenant, "limit": limit + 1, **brand_params}
 
     if status == "open":
         where += ["f.resolved_at IS NULL",
@@ -559,7 +593,7 @@ def list_findings(
 # ── GET /api/review/counts ────────────────────────────────────────────────────
 
 @router.get("/counts")
-def counts(tenant: Tenant):
+def counts(tenant: Tenant, brand_id: str | None = Query(default=None)):
     """Every number the UI promises is complete, in one call.
 
     The hub's whole information-architecture claim is "the census is complete,
@@ -570,9 +604,11 @@ def counts(tenant: Tenant):
     vis, vis_params = visibility_sql("f")
     act, act_params = actionable_sql("f", my_caps)
     ent, ent_params = _entitlement_clause(tenant)
-    ent = f"({ent}) AND {NOT_ORPHAN_VENDOR_SQL} AND {NOT_STALE_BANK_SQL} AND {NOT_DEAD_ANOMALY_BILL_SQL}"
+    brand, brand_params = _brand_clause(brand_id)
+    ent = (f"({ent}) AND {NOT_ORPHAN_VENDOR_SQL} AND {NOT_STALE_BANK_SQL} "
+           f"AND {NOT_DEAD_ANOMALY_BILL_SQL} AND {brand}")
 
-    params = {"tenant": tenant, **vis_params, **act_params, **ent_params}
+    params = {"tenant": tenant, **vis_params, **act_params, **ent_params, **brand_params}
 
     # Counted per rollup, the way the queue shows them: a vendor's six failed
     # payments are one item to do until the last of them is dealt with.
@@ -785,16 +821,20 @@ def rollup_members(
     tenant: Tenant,
     status: str = Query(default="open", pattern="^(open|snoozed)$"),
     scope: str = Query(default="actionable", pattern="^(actionable|visible)$"),
+    brand_id: str | None = Query(default=None),
 ):
     """Every line of the card this finding is shown in, best-ranked first.
 
-    Same visibility and licensing as the queue, so a line the user could not
-    see as a row of its own never appears inside a card either.
+    Same visibility, licensing and brand as the queue, so a line the user could
+    not see as a row of its own never appears inside a card either.
     """
     my_caps = capabilities_for()
     vis, vis_params = visibility_sql("f")
     ent, ent_params = _entitlement_clause(tenant)
-    ent = f"({ent}) AND {NOT_ORPHAN_VENDOR_SQL} AND {NOT_STALE_BANK_SQL} AND {NOT_DEAD_ANOMALY_BILL_SQL}"
+    brand, brand_params = _brand_clause(brand_id)
+    ent = (f"({ent}) AND {NOT_ORPHAN_VENDOR_SQL} AND {NOT_STALE_BANK_SQL} "
+           f"AND {NOT_DEAD_ANOMALY_BILL_SQL} AND {brand}")
+    ent_params = {**ent_params, **brand_params}
     live = ("(f.snoozed_until IS NULL OR f.snoozed_until <= now())" if status == "open"
             else "f.snoozed_until > now()")
     # The same scope the queue row was counted under, so a card never holds
