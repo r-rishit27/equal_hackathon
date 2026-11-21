@@ -59,7 +59,7 @@ The **top 10 to fix first** are at the end. Four findings come from this session
 
 ### Low
 - **S-L1 · Long names or emails may crush the header** *(guess)*. `vendorCard.css:518, 568`. `.vc__hero-acts` won't shrink and only wraps at 640px and below. `.vc__hero-sub` has no `overflow-wrap`.
-- **S-L2 · Raw backend status in the header.** `VendorsPage.tsx:2392, 2409`. "PENDING" and "FAILED" are shown as-is. "Since" is when the vendor was added to Onsumm, not when the relationship started.
+- **S-L2 · Raw backend status in the header.** `VendorsPage.tsx:2392, 2409`. "PENDING" and "FAILED" are shown as-is. "Since" is when the vendor was added to Reckon.ai, not when the relationship started.
 - **S-L3 · Deep link to a vendor that isn't loaded shows nothing.** `VendorsPage.tsx:2994-2996, 3136`. There is no loading or "not found" state.
 - **S-L4 · Duplicate actions.**
   - "Pay vendor" appears in up to three places.

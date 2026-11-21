@@ -1,4 +1,4 @@
-# Onsumm Context Graph
+# Reckon.ai Context Graph
 
 **Stage:** 02 · Memory
 **Role:** The brain's shared memory — every entity and derived fact, as a graph

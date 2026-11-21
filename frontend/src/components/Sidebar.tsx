@@ -142,7 +142,7 @@ function rememberedLedger(): Ledger {
 }
 
 const PIN_KEY = 'onsum_sidebar_pinned'
-const SUPPORT_URL = 'mailto:support@onsumm.ai?subject=Onsumm%20support%20request'
+const SUPPORT_URL = 'mailto:support@onsumm.ai?subject=Reckon.ai%20support%20request'
 
 export interface SidebarProps {
   /** Count shown against Bills — how many need this user's action. */
@@ -223,10 +223,10 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
     >
       <div className="sb__logo">
         <span className="sb__logo-mark" aria-hidden="true">
-          <img src="/brand/onsumm-mark.svg" alt="" />
+          <img src="/brand/reckon-mark.svg" alt="" />
         </span>
         <span className="sb__logo-word">
-          <img src="/brand/onsumm-wordmark-dark.svg" alt="Onsumm" />
+          <img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" />
         </span>
       </div>
 

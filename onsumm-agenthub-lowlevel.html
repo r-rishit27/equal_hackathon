@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Onsumm · Agent Hub & Knowledge Graph — Low-Level Architecture</title>
+<title>Reckon.ai · Agent Hub & Knowledge Graph — Low-Level Architecture</title>
 <style>
   :root{
     --bg:#060A14; --bg2:#0A1120; --panel:#0E1728; --panel2:#132038; --panelhi:#16263F;
@@ -163,7 +163,7 @@
 <div class="wrap">
 
   <div class="brandline">
-    <span class="logo"></span><span class="brandtxt">Onsumm</span>
+    <span class="logo"></span><span class="brandtxt">Reckon.ai</span>
     <span class="brandtag">Agent Hub · Knowledge Graph</span>
     <span class="schemapill">PostgreSQL · AWS RDS · pgvector</span>
   </div>
@@ -201,7 +201,7 @@
     <div class="stage">
       <div class="shead"><span class="snum">02</span><span class="stitle">Knowledge graph — the brain's memory</span><span class="shint">every entity + fact becomes a node</span></div>
       <div class="lane l1">
-        <button class="card v-purple" data-k="graph"><div class="top"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="17" r="2.4"/><path d="M8 7l8 .5M7.4 8l4 7M16 9l-3 6"/></svg></span><div><div class="nt">Onsumm Context Graph</div><div class="ns">Nodes carry pgvector embeddings (HNSW); edges are weighted subject–relation–object triples. Agents reason over this, never raw tables.</div></div></div><div class="tbls"><span class="tbl">fact_graph_nodes</span><span class="tbl">fact_graph_edges</span><span class="tbl">+ vector(embedding)</span></div><span class="edge"></span></button>
+        <button class="card v-purple" data-k="graph"><div class="top"><span class="ico"><svg viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.4"/><circle cx="18" cy="7" r="2.4"/><circle cx="12" cy="17" r="2.4"/><path d="M8 7l8 .5M7.4 8l4 7M16 9l-3 6"/></svg></span><div><div class="nt">Reckon.ai Context Graph</div><div class="ns">Nodes carry pgvector embeddings (HNSW); edges are weighted subject–relation–object triples. Agents reason over this, never raw tables.</div></div></div><div class="tbls"><span class="tbl">fact_graph_nodes</span><span class="tbl">fact_graph_edges</span><span class="tbl">+ vector(embedding)</span></div><span class="edge"></span></button>
       </div>
     </div>
 
@@ -346,7 +346,7 @@
     email:{t:"Email agent",r:"01 · ingest",d:"Watches a connected Gmail inbox and drafts a bill straight from a vendor's email + attachment. It is <b>thread-aware</b>: a follow-up correcting an amount updates the same draft (matched on <code>thread_id</code>) instead of creating a duplicate. Every action is logged idempotently by <code>message_gmail_id</code>.",
       cap:["OCR payload attached to each draft","thread_id keys the correction-vs-duplicate logic","Toggle per tenant via agent_settings"],
       tables:[["agent_draft_bills","thread_id, ocr_payload, analysis, suggestion, related_invoice"],["agent_email_events","action, draft_id, unique(message_gmail_id)"],["user_email_connections","access/refresh token, agent_last_scan_at"]]},
-    graph:{t:"Onsumm Context Graph",r:"02 · memory",d:"The heart of the brain. Every entity (invoice, bill, supplier, payment) and every derived fact becomes a <b>node</b> in <code>fact_graph_nodes</code>, carrying a <code>ref_id</code> back to its source row, a <code>jsonb</code> property bag, and a <b>pgvector embedding</b> indexed with HNSW for semantic search. Relationships are weighted <b>subject–relation–object triples</b> in <code>fact_graph_edges</code>, uniquely keyed so the same fact is never stored twice. Agents reason over this graph — grounded in verified nodes — rather than querying raw tables directly.",
+    graph:{t:"Reckon.ai Context Graph",r:"02 · memory",d:"The heart of the brain. Every entity (invoice, bill, supplier, payment) and every derived fact becomes a <b>node</b> in <code>fact_graph_nodes</code>, carrying a <code>ref_id</code> back to its source row, a <code>jsonb</code> property bag, and a <b>pgvector embedding</b> indexed with HNSW for semantic search. Relationships are weighted <b>subject–relation–object triples</b> in <code>fact_graph_edges</code>, uniquely keyed so the same fact is never stored twice. Agents reason over this graph — grounded in verified nodes — rather than querying raw tables directly.",
       cap:["Entity nodes dedupe on (tenant, node_type, ref_id)","Fact nodes dedupe on content_hash","HNSW cosine index for similarity recall","Edges carry weight + jsonb evidence"],
       tables:[["fact_graph_nodes","node_type, ref_id, label, embedding vector, content_hash"],["fact_graph_edges","src → dst, relation, weight, unique triple"]]},
     recon:{t:"Reconcile agent",r:"03 · judgment",d:"For usage-based vendors (e.g. Nova), it pulls the vendor's <b>own usage snapshot</b> and matches the invoice line-by-line: quantity, rate and cost against real billable operations. A run is created per (tenant, vendor, month) and produces a variance amount — the raw material for a dispute.",
@@ -372,7 +372,7 @@
       tables:[["fact_disbursements","beneficiary_*, remitter_account_number, bank_rrn, status"],["remitter_accounts","account, ifsc, balance, provider"]]},
     post:{t:"ERP write-back",r:"05 · sync",d:"Validated results post back to the ERP the tenant already runs — Tally, Zoho, QBO, Xero, SAP and more — through a connector layer with field mappings and a full sync log. Conflicts are resolved by policy (outbound-write / skip / log), so the books stay the source of truth.",
       cap:["<code>data_source</code>: TALLY · ZOHO · SAP · …","<code>conflict_resolution</code>: OUTBOUND_WRITE/SKIP/LOG","<code>sync_job_status</code> tracked per run"],
-      tables:[["int_connections","status, provider, credentials ref"],["int_sync_log","job status, direction"],["int_field_mappings","source ↔ Onsumm field map"],["int_conflict_log","conflicts + resolution"]]},
+      tables:[["int_connections","status, provider, credentials ref"],["int_sync_log","job status, direction"],["int_field_mappings","source ↔ Reckon.ai field map"],["int_conflict_log","conflicts + resolution"]]},
     learn:{t:"Learn loop",r:"05 · continuous learning",d:"Every settled outcome — a confirmed overcharge, a verified payment, a resolved discrepancy — is <b>re-embedded back into the graph</b> as new nodes and edges. Vendor risk profiles update and future reconciliations start smarter. Accuracy compounds cycle over cycle.",
       cap:["Resolved exceptions become fact nodes","Payment outcomes update the graph","Recovery + accuracy compound"],
       tables:[["fact_graph_nodes","new fact nodes + fresh embeddings"],["fact_payments","confirmed payment facts"]]},

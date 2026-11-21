@@ -68,7 +68,7 @@ export default function PaymentPage({ supplierId, initialInvoiceId, initialAmoun
   const stepRef = useRef<HTMLDivElement>(null)
   const paidAtRef = useRef<Date | null>(null)
 
-  useDocumentTitle(flow.profile ? `Pay ${flow.profile.vendor_name} · Onsumm` : 'Pay vendor · Onsumm')
+  useDocumentTitle(flow.profile ? `Pay ${flow.profile.vendor_name} · Reckon.ai` : 'Pay vendor · Reckon.ai')
   useUnsavedGuard(flow.dirty)
 
   const stepIndex = flow.steps.findIndex(s => s.key === flow.step)
@@ -195,7 +195,7 @@ export default function PaymentPage({ supplierId, initialInvoiceId, initialAmoun
       )
     }
 
-    // Between "code accepted" and "the bank has decided" — the Onsumm mark in
+    // Between "code accepted" and "the bank has decided" — the Reckon.ai mark in
     // motion, held until settled or the budget expires.
     if (flow.settling) {
       return (

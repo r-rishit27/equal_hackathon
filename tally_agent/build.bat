@@ -1,5 +1,5 @@
 @echo off
-REM Build script for Onsumm Tally Agent
+REM Build script for Reckon.ai Tally Agent
 REM Run this on a Windows machine with Python 3.11+ installed
 REM Output: dist/OnsummTallyAgent.exe  (~15-20 MB, fully self-contained)
 

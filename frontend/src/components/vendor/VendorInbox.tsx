@@ -498,7 +498,7 @@ export default function VendorInbox({
                 <div className="vc__empty vc__fadein">
                   <div>
                     <div className="vc__empty-ic">{q ? <Search size={18} /> : filter === 'done' ? <CheckCircle2 size={18} /> : <Mail size={18} />}</div>
-                    {q ? 'No conversations match.' : threads.length ? 'Nothing here.' : inbox?.error ? 'Couldn’t load conversations.' : connected ? 'No emails with this vendor yet.' : 'Nothing sent from Onsumm yet.'}
+                    {q ? 'No conversations match.' : threads.length ? 'Nothing here.' : inbox?.error ? 'Couldn’t load conversations.' : connected ? 'No emails with this vendor yet.' : 'Nothing sent from Reckon.ai yet.'}
                   </div>
                 </div>
               )

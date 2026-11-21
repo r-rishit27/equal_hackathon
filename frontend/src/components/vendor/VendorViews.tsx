@@ -307,7 +307,7 @@ export function Copilot({ nudges, storageKey, failed }: {
       <div className="vc__copilot-in" key={n.id}>
         <div className="vc__copilot-ic"><Sparkles size={18} /></div>
         <div className="vc__copilot-txt">
-          <div className="vc__copilot-k"><b>Onsumm Copilot</b><span className={`vc__tone vc__tone--${n.tone}`}>{n.label}</span><span>{n.source}</span></div>
+          <div className="vc__copilot-k"><b>Reckon.ai Copilot</b><span className={`vc__tone vc__tone--${n.tone}`}>{n.label}</span><span>{n.source}</span></div>
           <div className="vc__copilot-t">{n.title}</div>
           <div className="vc__copilot-d">{n.detail}</div>
           {skipped.length > 0 && <div className="vc__copilot-skip">Some checks skipped: {skipped.join(' and ')} couldn’t load.</div>}

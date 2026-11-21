@@ -1,6 +1,6 @@
 # Finance Desk API and data models
 
-**Status:** Proposed. Use FastAPI/Pydantic with generated OpenAPI when implemented. Keep this contract and the [LLD](LLD.md) aligned. All paths below are under `/api/finance-desk`. Use the current Onsumm authentication and permission middleware.
+**Status:** Proposed. Use FastAPI/Pydantic with generated OpenAPI when implemented. Keep this contract and the [LLD](LLD.md) aligned. All paths below are under `/api/finance-desk`. Use the current Reckon.ai authentication and permission middleware.
 
 ## API surface
 

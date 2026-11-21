@@ -40,7 +40,7 @@
 
 ## 1. Executive summary
 
-The Agent Hub turns Onsumm's existing finance-automation capabilities (OCR bill
+The Agent Hub turns Reckon.ai's existing finance-automation capabilities (OCR bill
 ingestion, ledger/category enrichment, KYB verification, Nova reconciliation,
 disbursement, FX, TDS) into a **fleet of governed, auditable AI agents**
 orchestrated by a **CFO master agent**.
@@ -179,7 +179,7 @@ human approval gates, is a step-change in value and is largely an
 | **Accountant / AP clerk** | Day-to-day processing | Run Verification/Recon on a bill; act on discrepancies; send follow-ups |
 | **Compliance / Auditor** | Assurance | Immutable WHY/WHAT/WHOM/HOW trail; filter by entity/agent/date |
 | **Vendor** (indirect) | External | Receives agent-driven communications (verification requests, payment/follow-up emails) |
-| **Platform admin** | Onsumm ops | Enable/disable agents per tenant, set autonomy levels, monitor cost/errors |
+| **Platform admin** | Reckon.ai ops | Enable/disable agents per tenant, set autonomy levels, monitor cost/errors |
 
 ---
 

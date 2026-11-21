@@ -114,7 +114,7 @@ These require **your** action; the app reads all values from env (§11).
 ### Google (Gmail API) — Phase 1
 1. Google Cloud Console → new/existing project → **enable Gmail API**.
 2. **OAuth consent screen**: choose **Internal** if every user is on the
-   `onsumm.ai` Workspace (no Google verification review needed). Otherwise
+   `Reckon.ai` Workspace (no Google verification review needed). Otherwise
    External + verification for the restricted `gmail.send` scope.
 3. Create **OAuth Client ID** (type: Web application).
 4. Authorized redirect URI: `https://<API_HOST>/api/oauth/email/callback`.
@@ -334,7 +334,7 @@ logging, just a different trigger (agent vs user) and an approval gate.
 
 ## 17. Open questions
 1. **Provider order** — confirm Gmail-first (recommended), or both together?
-2. **Consent screen type** — are all users on the `onsumm.ai` Workspace (→
+2. **Consent screen type** — are all users on the `Reckon.ai` Workspace (→
    Internal, no Google review), or external users too (→ verification needed)?
 3. **Sender identity** — must the connected mailbox match the user's
    `users.email`, or may they connect any mailbox they own?

@@ -76,4 +76,4 @@ Disallow: /settings
 Disallow: /payments
 Disallow: /admin
 
-Sitemap: https://www.onsumm.ai/sitemap.xml
+Sitemap: https://reckon.ai/sitemap.xml

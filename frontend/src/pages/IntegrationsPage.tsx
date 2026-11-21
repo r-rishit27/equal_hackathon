@@ -164,7 +164,7 @@ function TokenBox({ token, expiresAt, onClose, agent = 'Tally', host = "the cust
         Token generated — expires {fmt(expiresAt)}
       </div>
       <div style={{ fontSize: 12, color: '#374151', marginBottom: 12 }}>
-        Copy this token and paste it into the Onsumm {agent} Agent on {host}.
+        Copy this token and paste it into the Reckon.ai {agent} Agent on {host}.
       </div>
 
       {/* Token value */}
@@ -191,7 +191,7 @@ function TokenBox({ token, expiresAt, onClose, agent = 'Tally', host = "the cust
       {/* Steps */}
       <div style={{ marginTop: 14, display: 'flex', flexDirection: 'column', gap: 6 }}>
         {[
-          `Download the Onsumm ${agent} Agent .exe (button below)`,
+          `Download the Reckon.ai ${agent} Agent .exe (button below)`,
           `Double-click the .exe on the machine where ${agent} runs`,
           'Paste this token when prompted',
           'Click Connect — done',
@@ -594,7 +594,7 @@ export default function IntegrationsPage() {
           <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
               { title: 'Zero credentials',  desc: 'The agent runs on the customer\'s Windows PC and talks to Tally locally — you never need their server password.' },
-              { title: 'Outbound only',     desc: 'The agent pushes data to Onsumm via HTTPS. No inbound ports are opened, so firewalls are never an issue.' },
+              { title: 'Outbound only',     desc: 'The agent pushes data to Reckon.ai via HTTPS. No inbound ports are opened, so firewalls are never an issue.' },
               { title: 'Auto-sync',         desc: 'Once connected, the agent syncs every 15 minutes automatically. Invoices, bills and payments appear here instantly.' },
               { title: 'Self-updating',     desc: 'When you release a new agent version, customers\' agents update silently on next startup — no reinstall needed.' },
             ].map(({ title, desc }) => (
@@ -737,7 +737,7 @@ export default function IntegrationsPage() {
               display: 'flex', gap: 8, alignItems: 'flex-start',
             }}>
               <Download size={15} style={{ flexShrink: 0, marginTop: 1 }} />
-              <span>The Onsumm SAP Agent installer is provided by your account manager — email{' '}
+              <span>The Reckon.ai SAP Agent installer is provided by your account manager — email{' '}
                 <a href="mailto:support@onsumm.ai?subject=SAP%20Agent%20installer" style={{ color: '#2563eb', fontWeight: 600 }}>support@onsumm.ai</a>{' '}
                 to receive <strong>OnsummSapAgent.exe</strong>.</span>
             </div>
@@ -997,8 +997,8 @@ export default function IntegrationsPage() {
           </summary>
           <div style={{ marginTop: 12, display: 'flex', flexDirection: 'column', gap: 10 }}>
             {[
-              { title: 'Your key, your account',  desc: 'This is the API key issued directly by Nova to your account — Onsumm never issues or shares a key on your behalf.' },
-              { title: 'Encrypted at rest',        desc: "Once saved, the full key is never shown again — only a masked preview. Onsumm calls Nova's billing API with it on your behalf to pull usage and reconcile bills." },
+              { title: 'Your key, your account',  desc: 'This is the API key issued directly by Nova to your account — Reckon.ai never issues or shares a key on your behalf.' },
+              { title: 'Encrypted at rest',        desc: "Once saved, the full key is never shown again — only a masked preview. Reckon.ai calls Nova's billing API with it on your behalf to pull usage and reconcile bills." },
               { title: 'Used for reconciliation',  desc: "Powers the Ownership & Rate Certification view under Nova (see the Nova page in the sidebar) — checking each vendor bill line item against your certified rate card." },
             ].map(({ title, desc }) => (
               <div key={title} style={{ display: 'flex', gap: 10 }}>

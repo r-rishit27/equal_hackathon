@@ -272,7 +272,7 @@ function ImpersonateButton({ tenantId, tenantName }: { tenantId: string; tenantN
       <Modal open={open} onClose={() => setOpen(false)} title={`View ${tenantName} as support`} size="sm">
         <div className="adm__form">
           <p className="adm__svc-desc">
-            Opens a read-only session as Onsumm Support. Every action is recorded against
+            Opens a read-only session as Reckon.ai Support. Every action is recorded against
             you, and writes are refused for the duration.
           </p>
           <Input

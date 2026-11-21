@@ -32,7 +32,7 @@ export default function AdminLoginPage() {
     <div className="adm__login">
       <div className="adm__login-card"><Card>
         <CardHeader
-          title="Onsumm Ops"
+          title="Reckon.ai Ops"
           sub="Platform administration. This is not a customer account."
         />
         <CardBody>

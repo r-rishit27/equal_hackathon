@@ -135,7 +135,7 @@ def approve_via_link(token: str):
     ).start()
     return HTMLResponse(f"""
     <html><body style="font-family:Arial,sans-serif;max-width:500px;margin:60px auto;text-align:center;">
-      <h2 style="color:#1a56db;">Onsumm</h2>
+      <h2 style="color:#1a56db;">Reckon.ai</h2>
       <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:32px;">
         <h3 style="color:#16a34a;">✓ {action_label}</h3>
         <p><b>{bill['vendor_name']}</b> — {bill['invoice_number']}</p>
@@ -344,7 +344,7 @@ def _send_approval_email(invoice_id: str, action: str, actor_name: str,
 
     html = f"""
     <html><body style="font-family:Arial,sans-serif;color:#333;max-width:600px;margin:auto;">
-      <h2 style="color:#1a56db;">Onsumm Bill Approval</h2>
+      <h2 style="color:#1a56db;">Reckon.ai Bill Approval</h2>
       {greeting}
       <p>{body_intro}</p>
       {comment_block}
@@ -392,7 +392,7 @@ def _send_approval_email(invoice_id: str, action: str, actor_name: str,
 
       <hr style="border:none;border-top:1px solid #eee;margin-top:32px;"/>
       <p style="font-size:12px;color:#888;">You can also reply <b>approved</b> to this email to approve directly.</p>
-      <p style="font-size:12px;color:#888;">This is an automated notification from Onsumm.</p>
+      <p style="font-size:12px;color:#888;">This is an automated notification from Reckon.ai.</p>
     </body></html>
     """
 

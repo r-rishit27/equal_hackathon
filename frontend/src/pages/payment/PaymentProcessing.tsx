@@ -1,5 +1,5 @@
 /**
- * The wait while a payment settles, as the Onsumm mark in motion.
+ * The wait while a payment settles, as the Reckon.ai mark in motion.
  *
  * Geometry, gradients and the four electron glyphs are lifted from the product
  * deck's atom (onsumm-product-deck.html) so this is the logo animating, not a

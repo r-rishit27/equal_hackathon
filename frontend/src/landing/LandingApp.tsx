@@ -112,12 +112,12 @@ function Navbar({ page, onNavigate, onLogin }: { page: Page | null; onNavigate: 
           <PageLink
             page="home"
             onNavigate={onNavigate}
-            aria-label="Onsumm home"
+            aria-label="Reckon.ai home"
             style={{ display: 'block', padding: 0, flexShrink: 0, lineHeight: 0 }}
           >
             <img
-              src="/brand/onsumm-wordmark-dark.svg"
-              alt="Onsumm — AP automation for Indian SMEs"
+              src="/brand/reckon-wordmark-dark.svg"
+              alt="Reckon.ai — AP automation for Indian SMEs"
               style={{ display: 'block', width: 126, height: 27 }}
             />
           </PageLink>
@@ -248,7 +248,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page, hash?: string) => void }
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))', gap: 40, marginBottom: 48 }}>
           <div>
             <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', marginBottom: 12, fontFamily: '"Public Sans", sans-serif' }}>
-              onsumm<span style={{ color: '#5cd8da' }}>.</span>ai
+              Reckon<span style={{ color: '#5cd8da' }}>.</span>ai
             </div>
             <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.75)', lineHeight: 1.7, margin: '0 0 20px', fontFamily: '"Inter", sans-serif' }}>
               AI accounts payable automation for Indian SMEs — invoice OCR, approval workflows, GST and TDS compliance, and direct Tally Prime and Zoho Books posting.
@@ -257,8 +257,8 @@ function Footer({ onNavigate }: { onNavigate: (p: Page, hash?: string) => void }
                 handler — they looked clickable and did nothing. */}
             <div style={{ display: 'flex', gap: 10 }}>
               {[
-                { label: 'X', href: 'https://x.com/onsummai', name: 'onsumm.ai on X' },
-                { label: 'in', href: 'https://www.linkedin.com/company/onsummai', name: 'onsumm.ai on LinkedIn' },
+                { label: 'X', href: 'https://x.com/onsummai', name: 'X' },
+                { label: 'in', href: 'https://www.linkedin.com/company/onsummai', name: 'LinkedIn' },
               ].map(s => (
                 <a
                   key={s.label}
@@ -296,7 +296,7 @@ function Footer({ onNavigate }: { onNavigate: (p: Page, hash?: string) => void }
         </div>
 
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 12 }}>
-          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontFamily: '"Inter", sans-serif' }}>© {new Date().getFullYear()} onsumm.ai. AP automation for Indian SMEs.</span>
+          <span style={{ fontSize: 12, color: 'rgba(255,255,255,0.7)', fontFamily: '"Inter", sans-serif' }}>© {new Date().getFullYear()} Reckon.ai. AP automation for Indian SMEs.</span>
         </div>
       </div>
     </footer>

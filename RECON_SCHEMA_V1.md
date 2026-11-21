@@ -1,4 +1,4 @@
-# Onsumm Recon Schema v1 — what to build now
+# Reckon.ai Recon Schema v1 — what to build now
 
 **Status:** Proposed for build · 2026-11-14 (rev 2: one extraction table) · **rev 2.1, 2026-11-18: business rules confirmed by Bata — see §11**
 **Pairs with:** `RECON_VOCABULARY.md` (what every code means) and the CAPEX four-way architecture (where each component runs).
@@ -592,7 +592,7 @@ New with rev 2:
 
 ## 11. Confirmed business rules (Bata call, 16 November 2026) — and what changes in v1
 
-Source: call "Bata X Onsumm: Data Clarification", 16 Nov 2026, Harminder Singh (Bata).
+Source: call "Bata X Reckon.ai: Data Clarification", 16 Nov 2026, Harminder Singh (Bata).
 Full question-and-answer record in `QUESTIONS_FOR_BATA.md`.
 
 ### 11.1 The rules, as stated

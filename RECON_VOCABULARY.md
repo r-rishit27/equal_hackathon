@@ -1,4 +1,4 @@
-# Onsumm Recon Vocabulary (v1-draft) — SUPERSEDED
+# Reckon.ai Recon Vocabulary (v1-draft) — SUPERSEDED
 
 > ⚠ **Not the dictionary. Use [`docs/RECON_VOCABULARY.md`](docs/RECON_VOCABULARY.md).**
 >
@@ -13,7 +13,7 @@
 **This file is the single source of truth for codes.** *(Superseded — see the note above.)* The schema doc points here; nothing is defined twice.
 
 > ### Basic principle: the vocabulary is the dictionary; the schema is derived from it
-> - **The vocabulary (this file) is a dictionary.** It defines every word Onsumm understands in reconciliation: what each code means, which raw labels and phrases map to it, and how ambiguous words are resolved. It holds no data.
+> - **The vocabulary (this file) is a dictionary.** It defines every word Reckon.ai understands in reconciliation: what each code means, which raw labels and phrases map to it, and how ambiguous words are resolved. It holds no data.
 > - **The schema (`docs/RECON_SCHEMA_V1.md`) is derived from the vocabulary.** Tables have generic columns (`doc_role`, `qty_role`, `line_origin`, …) and JSON fields (`item_spec`, `verification`, `header`, …). The vocabulary decides which values those columns may hold and which keys those JSON fields may contain.
 > - **Change flows one way: vocabulary first, then schema.** A new concept is added here first. In most cases nothing else changes, because it's just a new allowed value or JSON key. A column is added to the schema only when a rule must join, filter or calculate on that value, and it is still named and defined by the vocabulary.
 > - **Nothing exists in the schema that isn't in the vocabulary.** No code, column or JSON key appears in the database without a vocabulary entry.

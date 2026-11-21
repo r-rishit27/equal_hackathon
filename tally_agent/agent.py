@@ -1,5 +1,5 @@
 """
-Onsumm Tally Connector Agent  (Windows-first)
+Reckon.ai Tally Connector Agent  (Windows-first)
 ──────────────────────────────────────────────
 Distributed as a single OnsummTallyAgent.exe built with PyInstaller.
 Customer double-clicks → setup UI → running forever in system tray.
@@ -194,7 +194,7 @@ def _body_excerpt(text: str) -> str:
 
 def _cloud_request(method: str, url: str, *, what: str, timeout: float, **kw) -> dict:
     """
-    One call to the Onsumm API. Logs the request and outcome, and turns every
+    One call to the Reckon.ai API. Logs the request and outcome, and turns every
     failure into a CloudError that names the URL, status, request_id and the
     server's own message.
     """
@@ -207,14 +207,14 @@ def _cloud_request(method: str, url: str, *, what: str, timeout: float, **kw) ->
                          f"URL: {method} {url}\nSSL error: {e!r}\n"
                          "A proxy or antivirus may be intercepting HTTPS, or the PC clock is wrong.") from e
     except requests.exceptions.Timeout as e:
-        raise CloudError(f"Onsumm server did not answer within {timeout:.0f}s while {what}.",
+        raise CloudError(f"Reckon.ai server did not answer within {timeout:.0f}s while {what}.",
                          f"URL: {method} {url}\nError: {e!r}") from e
     except requests.exceptions.ConnectionError as e:
-        raise CloudError(f"Cannot reach the Onsumm server ({CLOUD_BASE_URL}) while {what}.",
+        raise CloudError(f"Cannot reach the Reckon.ai server ({CLOUD_BASE_URL}) while {what}.",
                          f"URL: {method} {url}\nError: {e!r}\n"
                          "Check the internet connection, firewall or proxy on this PC.") from e
     except requests.exceptions.RequestException as e:
-        raise CloudError(f"Request to Onsumm failed while {what}.",
+        raise CloudError(f"Request to Reckon.ai failed while {what}.",
                          f"URL: {method} {url}\nError: {e!r}") from e
 
     elapsed_ms = (time.monotonic() - started) * 1000
@@ -233,7 +233,7 @@ def _cloud_request(method: str, url: str, *, what: str, timeout: float, **kw) ->
 
     if resp.ok:
         if not isinstance(payload, dict):
-            raise CloudError(f"Onsumm server sent an unexpected reply while {what}.",
+            raise CloudError(f"Reckon.ai server sent an unexpected reply while {what}.",
                              f"URL: {method} {url}\nHTTP {resp.status_code}, "
                              f"Content-Type: {resp.headers.get('content-type', '?')}\n"
                              f"Body:\n{_body_excerpt(body_text)}")
@@ -252,7 +252,7 @@ def _cloud_request(method: str, url: str, *, what: str, timeout: float, **kw) ->
     )
     log.error("Cloud call failed (%s):\n%s", what, details)
     raise CloudError(
-        f"Onsumm server returned HTTP {resp.status_code} while {what}"
+        f"Reckon.ai server returned HTTP {resp.status_code} while {what}"
         + (f": {server_detail}" if server_detail else "."),
         details, status=resp.status_code, server_detail=server_detail,
     )
@@ -327,8 +327,8 @@ def install_windows_service() -> None:
 
         class _AgentService(win32serviceutil.ServiceFramework):
             _svc_name_        = APP_NAME
-            _svc_display_name_ = "Onsumm Tally Connector"
-            _svc_description_  = "Syncs Tally Prime data to Onsumm AP Automation platform."
+            _svc_display_name_ = "Reckon.ai Tally Connector"
+            _svc_description_  = "Syncs Tally Prime data to Reckon.ai AP Automation platform."
 
             def __init__(self, args):
                 super().__init__(args)
@@ -540,7 +540,7 @@ def push_to_cloud(api_key: str, ledgers_xml: str, vouchers_xml: str) -> dict:
         )
     except CloudError as e:
         if e.status == 401:
-            e.headline = ("Onsumm rejected this agent's key (HTTP 401) — the connection was reset "
+            e.headline = ("Reckon.ai rejected this agent's key (HTTP 401) — the connection was reset "
                           "or re-paired elsewhere. Click Re-pair… and paste a new token.")
             e.details += f"\nConfig file: {CONFIG_PATH}"
         raise
@@ -557,16 +557,16 @@ def pair_with_token(token: str) -> dict:
     except CloudError as e:
         if e.status == 400:
             e.headline = (f"Pairing token rejected: {e.server_detail or 'invalid or expired'}. "
-                          f"Make sure the token was generated on the same Onsumm environment "
+                          f"Make sure the token was generated on the same Reckon.ai environment "
                           f"this agent connects to ({CLOUD_BASE_URL}), then generate a new one.")
         elif e.status and e.status >= 500:
-            e.headline = (f"Onsumm server error (HTTP {e.status}) while pairing"
+            e.headline = (f"Reckon.ai server error (HTTP {e.status}) while pairing"
                           + (f": {e.server_detail}" if e.server_detail else "")
                           + ". Send the details below to support@onsumm.ai.")
         e.details = f"Token: {_mask(token)} ({len(token)} chars)\n" + e.details
         raise
     if "api_key" not in data:
-        raise CloudError("Onsumm accepted the token but sent no api_key.",
+        raise CloudError("Reckon.ai accepted the token but sent no api_key.",
                          f"URL: POST {PAIR_URL}\nReply keys: {sorted(data)}")
     log.info("Paired OK: tenant=%s", data.get("tenant_name", "?"))
     return data  # { "api_key": "...", "tenant_name": "..." }
@@ -852,7 +852,7 @@ def run_sync_cycle(cfg: dict) -> dict:
             raise TallyError(f"Tally's reply could not be read as Tally data — nothing uploaded. {e.headline}",
                              e.details) from e
 
-        _step(f"Uploading {entry['ledgers_kb'] + entry['vouchers_kb']} KB to Onsumm")
+        _step(f"Uploading {entry['ledgers_kb'] + entry['vouchers_kb']} KB to Reckon.ai")
         t0 = time.monotonic()
         result = push_to_cloud(api_key, ledgers_xml, vouchers_xml)
         entry["upload_ms"] = round((time.monotonic() - t0) * 1000)
@@ -938,7 +938,7 @@ def run_setup_ui() -> dict | None:
 
     result: dict = {}
     root = tk.Tk()
-    root.title("Onsumm Tally Connector — Setup")
+    root.title("Reckon.ai Tally Connector — Setup")
     root.geometry("560x700")
     root.minsize(520, 640)
 
@@ -951,8 +951,8 @@ def run_setup_ui() -> dict | None:
     frame = tk.Frame(root, padx=28, pady=22)
     frame.pack(fill="both", expand=True)
 
-    tk.Label(frame, text="Onsumm Tally Connector", font=("Segoe UI", 15, "bold")).pack(anchor="w")
-    tk.Label(frame, text="Connect your Tally Prime to Onsumm AP Automation",
+    tk.Label(frame, text="Reckon.ai Tally Connector", font=("Segoe UI", 15, "bold")).pack(anchor="w")
+    tk.Label(frame, text="Connect your Tally Prime to Reckon.ai AP Automation",
              font=("Segoe UI", 9), fg="#555").pack(anchor="w", pady=(2, 4))
     tk.Label(frame, text=f"Server: {CLOUD_BASE_URL}   ·   Agent v{AGENT_VERSION}",
              font=("Segoe UI", 8), fg="#888").pack(anchor="w", pady=(0, 14))
@@ -960,7 +960,7 @@ def run_setup_ui() -> dict | None:
     # Pairing token
     tk.Label(frame, text="Pairing Token  *", font=("Segoe UI", 10, "bold")).pack(anchor="w")
     tk.Label(frame,
-             text="From your Onsumm dashboard → Settings → Connect Tally → Generate Token",
+             text="From your Reckon.ai dashboard → Settings → Connect Tally → Generate Token",
              font=("Segoe UI", 8), fg="#666").pack(anchor="w")
     token_var = tk.StringVar()
     token_ent = tk.Entry(frame, textvariable=token_var, width=52, font=("Consolas", 10))
@@ -1070,7 +1070,7 @@ def run_setup_ui() -> dict | None:
             result.update(cfg)
             messagebox.showinfo(
                 "Connected!",
-                f"Successfully connected to {cfg['tenant_name'] or 'Onsumm'}.\n\n"
+                f"Successfully connected to {cfg['tenant_name'] or 'Reckon.ai'}.\n\n"
                 "The dashboard opens next and runs the first sync.\n"
                 "Closing it keeps the agent syncing from the system tray (bottom-right).",
             )
@@ -1084,7 +1084,7 @@ def run_setup_ui() -> dict | None:
             show_error(f"Unexpected error while pairing: {type(ex).__name__}: {ex}", tb)
 
     connect_btn = tk.Button(
-        frame, text="Connect to Onsumm", command=on_connect,
+        frame, text="Connect to Reckon.ai", command=on_connect,
         bg="#2563eb", fg="white", font=("Segoe UI", 10, "bold"),
         padx=18, pady=7, relief="flat", cursor="hand2", bd=0,
         activebackground="#1d4ed8", activeforeground="white",
@@ -1146,7 +1146,7 @@ def start_tray(on_open, on_quit) -> bool:
         return img
 
     icon = pystray.Icon(
-        APP_NAME, _icon_image(True), f"Onsumm Tally Agent v{AGENT_VERSION}",
+        APP_NAME, _icon_image(True), f"Reckon.ai Tally Agent v{AGENT_VERSION}",
         menu=pystray.Menu(
             pystray.MenuItem("Open dashboard", lambda *_: on_open(), default=True),
             pystray.MenuItem("Sync now",       lambda *_: request_sync("tray")),
@@ -1162,7 +1162,7 @@ def start_tray(on_open, on_quit) -> bool:
         while not _stop_event.is_set():
             try:
                 # Windows caps tray tooltips at 128 chars; the full text is in the dashboard/log
-                icon.title = f"Onsumm Tally Agent\n{STATE.tray_line()}"[:127]
+                icon.title = f"Reckon.ai Tally Agent\n{STATE.tray_line()}"[:127]
                 icon.icon  = _icon_image(STATE.healthy())
             except Exception:
                 log.debug("Tray refresh failed", exc_info=True)
@@ -1178,7 +1178,7 @@ def start_tray(on_open, on_quit) -> bool:
 
 def main() -> None:
     log.info("=" * 78)
-    log.info("Onsumm Tally Agent v%s starting | args=%s", AGENT_VERSION, sys.argv[1:])
+    log.info("Reckon.ai Tally Agent v%s starting | args=%s", AGENT_VERSION, sys.argv[1:])
     log.info("Server: %s (build default %s%s)", CLOUD_BASE_URL, BUILD_SERVER_URL,
              ", overridden by ONSUMM_API_URL" if os.getenv("ONSUMM_API_URL") else "")
     log.info("OS: %s | Python %s | frozen=%s | exe=%s",

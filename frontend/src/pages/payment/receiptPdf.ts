@@ -79,7 +79,7 @@ export function buildPdf(lines: PdfLine[], title = 'Payment receipt'): Uint8Arra
     `<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`,
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
     '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
-    `<< /Title (${escapePdfText(title)}) /Producer (Onsumm) >>`,
+    `<< /Title (${escapePdfText(title)}) /Producer (Reckon.ai) >>`,
   ]
 
   let body = ''

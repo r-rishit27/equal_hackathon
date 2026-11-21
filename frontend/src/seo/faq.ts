@@ -18,43 +18,43 @@ export interface FaqEntry {
 export const FAQS: readonly FaqEntry[] = [
   {
     q: 'What is AP automation?',
-    a: 'AP automation is software that takes a vendor bill from arrival to payment without manual data entry. Onsumm reads the invoice with AI invoice OCR, routes it through an approval workflow, checks GST and TDS, and posts the approved bill to your accounting system — so accounts payable runs on exceptions rather than on typing.',
+    a: 'AP automation is software that takes a vendor bill from arrival to payment without manual data entry. Reckon.ai reads the invoice with AI invoice OCR, routes it through an approval workflow, checks GST and TDS, and posts the approved bill to your accounting system — so accounts payable runs on exceptions rather than on typing.',
   },
   {
-    q: 'Does Onsumm integrate with Tally Prime?',
-    a: 'Yes — Onsumm posts approved bills directly into Tally Prime and Tally ERP 9. The Tally connector maps each bill to your existing ledgers, voucher types and GST classifications, so automated Tally posting produces the same entries your accountant would have made by hand, with the invoice image attached.',
+    q: 'Does Reckon.ai integrate with Tally Prime?',
+    a: 'Yes — Reckon.ai posts approved bills directly into Tally Prime and Tally ERP 9. The Tally connector maps each bill to your existing ledgers, voucher types and GST classifications, so automated Tally posting produces the same entries your accountant would have made by hand, with the invoice image attached.',
   },
   {
-    q: 'Does Onsumm work with Zoho Books?',
+    q: 'Does Reckon.ai work with Zoho Books?',
     a: 'Yes. Zoho Books integration is native, and teams running Tally Prime and Zoho Books side by side can post to both from one approved bill — useful during a migration, or when the books and the statutory filing live in different systems.',
   },
   {
     q: 'How accurate is the invoice OCR?',
-    a: "Onsumm reads a PDF's embedded text layer first and falls back to vision OCR only for scans, which is why GSTINs, invoice numbers and bank details come through exactly rather than approximately. Every extracted field carries a confidence score, and anything below the bar is held for human review instead of being posted quietly.",
+    a: "Reckon.ai reads a PDF's embedded text layer first and falls back to vision OCR only for scans, which is why GSTINs, invoice numbers and bank details come through exactly rather than approximately. Every extracted field carries a confidence score, and anything below the bar is held for human review instead of being posted quietly.",
   },
   {
-    q: 'Does Onsumm handle GST and GSTIN verification?',
-    a: 'Yes. Onsumm runs GSTIN verification on every vendor and every bill, validates the GST invoice against the GSTIN it claims, and flags a mismatch before approval. ITC reconciliation compares what you booked against what your vendors actually filed, so input tax credit you are owed does not lapse unnoticed.',
+    q: 'Does Reckon.ai handle GST and GSTIN verification?',
+    a: 'Yes. Reckon.ai runs GSTIN verification on every vendor and every bill, validates the GST invoice against the GSTIN it claims, and flags a mismatch before approval. ITC reconciliation compares what you booked against what your vendors actually filed, so input tax credit you are owed does not lapse unnoticed.',
   },
   {
-    q: 'Can Onsumm calculate TDS on vendor bills?',
+    q: 'Can Reckon.ai calculate TDS on vendor bills?',
     a: 'Yes — automated TDS calculation is applied per bill, using the vendor type, PAN status and the section that applies to the expense. TDS tracking then carries the deduction through to payment and to the quarterly return, so vendor TDS does not have to be reconstructed at filing time.',
   },
   {
-    q: 'How does Onsumm catch duplicate invoices and duplicate payments?',
-    a: 'Onsumm checks each new bill against every bill already in the system — same vendor and invoice number, same amount and date, or the same document arriving by a second route. Duplicate invoice detection runs before approval and duplicate payment detection runs again before money moves, which is where a re-sent bill usually slips through.',
+    q: 'How does Reckon.ai catch duplicate invoices and duplicate payments?',
+    a: 'Reckon.ai checks each new bill against every bill already in the system — same vendor and invoice number, same amount and date, or the same document arriving by a second route. Duplicate invoice detection runs before approval and duplicate payment detection runs again before money moves, which is where a re-sent bill usually slips through.',
   },
   {
-    q: "Does Onsumm verify a vendor's bank account?",
+    q: "Does Reckon.ai verify a vendor's bank account?",
     a: 'Yes. Vendor bank account verification confirms the account belongs to the vendor before the first payment, and vendor bank change detection flags it whenever those details change afterwards — the change being the moment invoice fraud and payment fraud usually happen.',
   },
   {
-    q: 'Is Onsumm built for Indian SMEs?',
-    a: 'Onsumm is built for Indian SMEs specifically, not adapted from a US product. GST, TDS, HSN codes, e-invoicing, Tally Prime and Zoho Books are first-class, and the approval workflows follow how Indian finance teams already sign off on a vendor bill.',
+    q: 'Is Reckon.ai built for Indian SMEs?',
+    a: 'Reckon.ai is built for Indian SMEs specifically, not adapted from a US product. GST, TDS, HSN codes, e-invoicing, Tally Prime and Zoho Books are first-class, and the approval workflows follow how Indian finance teams already sign off on a vendor bill.',
   },
   {
     q: 'How long does it take to get started?',
-    a: 'Most teams are processing live invoices the same week. Setup is connecting Tally Prime or Zoho Books, importing your vendor master, and setting the approval matrix — there is no data migration, because Onsumm reads the bills as they arrive from that point on.',
+    a: 'Most teams are processing live invoices the same week. Setup is connecting Tally Prime or Zoho Books, importing your vendor master, and setting the approval matrix — there is no data migration, because Reckon.ai reads the bills as they arrive from that point on.',
   },
 ]
 
@@ -63,7 +63,7 @@ export function faqSchema(): object {
   return {
     '@context': 'https://schema.org',
     '@type': 'FAQPage',
-    '@id': 'https://www.onsumm.ai/#faq',
+    '@id': 'https://reckon.ai/#faq',
     mainEntity: FAQS.map(({ q, a }) => ({
       '@type': 'Question',
       name: q,

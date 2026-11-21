@@ -205,7 +205,7 @@ def pair_agent(body: PairRequest):
             raise HTTPException(
                 status_code=400,
                 detail="Pairing token not recognised — it was already used, replaced by a newer token, "
-                       "or generated on a different Onsumm environment. Generate a new token and paste it.",
+                       "or generated on a different Reckon.ai environment. Generate a new token and paste it.",
             )
 
         connection_id, tenant_id, expires_at, source, conn_status = row

@@ -96,7 +96,7 @@ echo "✅ Uploads directory created"
 # ── 7. Systemd service for FastAPI ───────────────────────────
 sudo tee /etc/systemd/system/onsumm-api.service > /dev/null << SERVICEEOF
 [Unit]
-Description=Onsumm FastAPI Backend
+Description=Reckon.ai FastAPI Backend
 After=network.target
 
 [Service]

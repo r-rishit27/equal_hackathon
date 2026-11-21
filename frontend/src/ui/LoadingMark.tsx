@@ -8,7 +8,7 @@ type LoadingMarkProps = {
 export function LoadingMark({ size = 16, label = 'Loading', className = '' }: LoadingMarkProps) {
   return (
     <span className={`u-loading-mark ${className}`.trim()} role="status" aria-label={label} style={{ width: size, height: size }}>
-      <img src="/brand/onsumm-mark.svg" alt="" />
+      <img src="/brand/reckon-mark.svg" alt="" />
     </span>
   )
 }

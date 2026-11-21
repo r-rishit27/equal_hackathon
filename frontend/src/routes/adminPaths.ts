@@ -10,7 +10,7 @@
 
 export const ADMIN_ROOT = '/admin'
 export const ADMIN_LOGIN_PATH = '/admin/login'
-export const ADMIN_APP_NAME = 'Onsumm Ops'
+export const ADMIN_APP_NAME = 'Reckon.ai Ops'
 
 export type AdminPage = 'tenants' | 'onboarding' | 'platform-users' | 'audit' | 'catalog'
 

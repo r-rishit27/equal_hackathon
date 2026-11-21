@@ -692,7 +692,7 @@ def impersonate(tenant_id: str, body: ImpersonateRequest, request: Request):
             # itself, so every audit trail records who was actually there.
             "sub": actor,
             "role": body.assumed_role,
-            "name": f"{actor} (Onsumm Support)",
+            "name": f"{actor} (Reckon.ai Support)",
             "email": actor,
             "company_id": tenant_id,
             "company_name": tenant["company_name"],

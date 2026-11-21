@@ -85,7 +85,7 @@ export default function LandingContact({ onLogin }: Props) {
 
             <div style={{ background: C.surface, border: `1px solid ${C.border}`, borderRadius: 8, padding: '24px' }}>
               <div style={{ fontSize: 13, fontWeight: 600, color: C.onSurface, marginBottom: 8, fontFamily: '"Public Sans", sans-serif' }}>Already have an account?</div>
-              <p style={{ fontSize: 12, color: C.onSurfaceVar, lineHeight: 1.6, margin: '0 0 14px', fontFamily: '"Inter", sans-serif' }}>Sign in to your onsumm.ai dashboard to manage invoices and approvals.</p>
+              <p style={{ fontSize: 12, color: C.onSurfaceVar, lineHeight: 1.6, margin: '0 0 14px', fontFamily: '"Inter", sans-serif' }}>Sign in to your Reckon.ai dashboard to manage invoices and approvals.</p>
               <button
                 onClick={onLogin}
                 style={{ background: C.primaryCont, color: '#fff', border: 'none', borderRadius: 4, padding: '9px 18px', fontSize: 13, fontWeight: 600, cursor: 'pointer', fontFamily: '"Inter", sans-serif', display: 'flex', alignItems: 'center', gap: 6, transition: 'background 0.15s' }}

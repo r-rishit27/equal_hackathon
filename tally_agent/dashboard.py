@@ -1,5 +1,5 @@
 """
-Onsumm Tally Agent — dashboard window.
+Reckon.ai Tally Agent — dashboard window.
 
 Shows everything the agent knows: cloud connection, Tally status, the
 current sync step, KPIs, every voucher and ledger fetched, sync history,
@@ -54,7 +54,7 @@ class Dashboard:
     def __init__(self, agent, cfg: dict, start_hidden: bool = False):
         self.a, self.cfg = agent, cfg
         self.root = tk.Tk()
-        self.root.title(f"Onsumm Tally Agent v{agent.AGENT_VERSION}")
+        self.root.title(f"Reckon.ai Tally Agent v{agent.AGENT_VERSION}")
         self.root.geometry("1180x760")
         self.root.minsize(980, 620)
         self.root.configure(bg=C_BG)
@@ -96,7 +96,7 @@ class Dashboard:
         a = self.a
         top = tk.Frame(self.root, bg=C_BRAND)
         top.pack(fill="x")
-        tk.Label(top, text="Onsumm Tally Agent", bg=C_BRAND, fg="white",
+        tk.Label(top, text="Reckon.ai Tally Agent", bg=C_BRAND, fg="white",
                  font=("Segoe UI", 14, "bold")).pack(side="left", padx=16, pady=10)
         self.pills = {}
         for key in ("sync", "tally", "cloud"):
@@ -146,7 +146,7 @@ class Dashboard:
         cols.pack(fill="both", expand=True)
         self.info = {}
         for title, keys in (
-            ("Onsumm cloud", ["Server", "Status", "Tenant", "Connection", "Cloud last sync", "Agent key",
+            ("Reckon.ai cloud", ["Server", "Status", "Tenant", "Connection", "Cloud last sync", "Agent key",
                               "Latency", "Checked", "Message"]),
             ("Tally", ["Address", "Status", "Companies", "Company used", "Latency", "Checked"]),
             ("Sync", ["State", "Last run", "Result", "Duration", "Fetched", "Parsed by server",
@@ -218,7 +218,7 @@ class Dashboard:
         self.v_note = tk.Label(tab, text="", bg=C_BG, fg=C_MUTED, font=("Segoe UI", 8), anchor="w", justify="left")
         self.v_note.pack(fill="x")
         self.v_tv = self._table(tab, [
-            ("date", "Date", 90, "w"), ("kind", "Onsumm type", 95, "w"), ("type", "Tally voucher type", 130, "w"),
+            ("date", "Date", 90, "w"), ("kind", "Reckon.ai type", 95, "w"), ("type", "Tally voucher type", 130, "w"),
             ("number", "Number", 120, "w"), ("party", "Party", 250, "w"), ("gstin", "GSTIN", 140, "w"),
             ("amount", "Amount", 110, "e"), ("tax", "Tax", 90, "e"), ("items", "Items", 50, "e"),
             ("narration", "Narration", 260, "w"),
@@ -250,7 +250,7 @@ class Dashboard:
     def _build_errors(self, nb) -> None:
         tab = tk.Frame(nb, bg=C_BG)
         nb.add(tab, text="Row errors")
-        tk.Label(tab, text="Rows the Onsumm server could not save in the last sync (first 25), as reported by the server.",
+        tk.Label(tab, text="Rows the Reckon.ai server could not save in the last sync (first 25), as reported by the server.",
                  bg=C_BG, fg=C_MUTED).pack(anchor="w", pady=(10, 6))
         self.rowerr_txt = tk.Text(tab, wrap="word", font=("Consolas", 9))
         self.rowerr_txt.pack(fill="both", expand=True)
@@ -361,7 +361,7 @@ class Dashboard:
         self.btn_sync.state(["disabled"] if sync["running"] else ["!disabled"])
 
         # cloud card
-        C = "Onsumm cloud"
+        C = "Reckon.ai cloud"
         self._set(C, "Server", a.CLOUD_BASE_URL)
         self._set(C, "Status", "Connected" if cs == "ok" else cloud.get("error", "Checking…"),
                   C_OK if cs == "ok" else C_ERR if cs == "error" else C_MUTED)
@@ -420,7 +420,7 @@ class Dashboard:
             if key in p:
                 lines.append(f"parsed {p[key]} · saved {saved.get(key, 0)}")
             if key in totals:
-                lines.append(f"{totals[key]:,} in Onsumm total")
+                lines.append(f"{totals[key]:,} in Reckon.ai total")
             sub.config(text="\n".join(lines) or "last sync")
         big, sub = self.kpis["vouchers"]
         big.config(text=str(len(vouchers)) if fetched_at else "—")
@@ -470,7 +470,7 @@ class Dashboard:
         self.v_count.config(text=f"{len(rows):,} vouchers · {_money(total)}{more}")
         fetched = self.a.STATE.fetched_at
         self.v_note.config(text=(f"Fetched from Tally at {fetched}. Sales → Invoice, Purchase → Bill, "
-                                 f"Payment/Receipt → Payment; other voucher types are not synced to Onsumm."
+                                 f"Payment/Receipt → Payment; other voucher types are not synced to Reckon.ai."
                                  if fetched else "Nothing fetched yet — click Sync now."))
 
     def _ledger_rows(self) -> list[dict]:
@@ -628,7 +628,7 @@ class Dashboard:
     def _repair(self) -> None:
         if not messagebox.askyesno(
                 "Re-pair agent",
-                "This disconnects this PC from Onsumm and asks for a new pairing token.\n\nContinue?"):
+                "This disconnects this PC from Reckon.ai and asks for a new pairing token.\n\nContinue?"):
             return
         cfg = self.a.load_config()
         cfg.pop("api_key", None)

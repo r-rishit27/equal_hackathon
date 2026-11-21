@@ -1,4 +1,4 @@
-"""Composition root for the Onsumm Invoice API.
+"""Composition root for the Reckon.ai Invoice API.
 
 This module builds the FastAPI app, installs the cross-cutting middleware and
 dependencies, and mounts every router. It holds no endpoints and no business
@@ -85,7 +85,7 @@ _bearer_scheme = HTTPBearer(
 )
 
 app = FastAPI(
-    title="Onsumm Invoice API",
+    title="Reckon.ai Invoice API",
     version="1.1.0",
     description=(
         "Every path except a short public allowlist needs a bearer token. Click "

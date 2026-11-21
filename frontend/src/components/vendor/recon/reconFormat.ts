@@ -133,7 +133,7 @@ export const ROLE_LABEL: Record<CaseDocument['role'], string> = {
   po: 'Purchase order', invoice: 'Invoice', evidence: 'Site audit', pod: 'Delivery proof', memo: 'Approval memo', other: 'Other',
 }
 export const SOURCE_LABEL: Record<CaseDocument['source'], string> = {
-  upload: '', bill: 'The bill already in Onsumm', register: 'From the PO register',
+  upload: '', bill: 'The bill already in Reckon.ai', register: 'From the PO register',
 }
 
 export function fmtValue(v: unknown, fmt: ValueFmt): string {

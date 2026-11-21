@@ -1,7 +1,7 @@
 # CAPEX Four-Way Match — Business Questions for the Bata Team
 
-**Prepared by:** Onsumm · **Issued:** 16 November 2026 · **Answered:** 16 November 2026
-**Source of answers:** call "Bata X Onsumm: Data Clarification", 16 Nov 2026, 11:00 — Harminder Singh (Bata), Vibhanshu Ahluwalia and Rishit Rastogi (Onsumm)
+**Prepared by:** Reckon.ai · **Issued:** 16 November 2026 · **Answered:** 16 November 2026
+**Source of answers:** call "Bata X Reckon.ai: Data Clarification", 16 Nov 2026, 11:00 — Harminder Singh (Bata), Vibhanshu Ahluwalia and Rishit Rastogi (Reckon.ai)
 **Status:** 5 of 6 questions closed · Q6 (Dynamics posting) and the mailbox point still open
 
 ---
@@ -133,7 +133,7 @@ be billed across several invoices? Is retention or LD applied at invoice stage?
 > against that advance and the balance is released to the vendor.
 >
 > Asked where we could read the advance ledger, Harminder's response was that **matching
-> does not require it** — the advance is a payment matter, not a matching input. Onsumm
+> does not require it** — the advance is a payment matter, not a matching input. Reckon.ai
 > confirmed on the call that the payment side is out of scope for now.
 >
 > **One PO can carry multiple invoices. One invoice cannot carry multiple POs.**
@@ -206,8 +206,8 @@ reports, delivery proofs and invoices, and the typical senders.
 | Harminder Singh (Bata) | Share Excel extracts of **GRN line items** for 2–3 samples |
 | Harminder Singh (Bata) | Share a **sample credit note** linked to its invoice |
 | Harminder Singh (Bata) | Check with the team on **AR open transactions** / receivable invoices for receipt matching |
-| Vibhanshu Ahluwalia (Onsumm) | Send the invoice showing the **additional line items**, so the matching credit note can be arranged |
-| Onsumm | Reconfigure to **GRN ↔ invoice ↔ audit report** with the PO as cap, and the ₹100 threshold |
+| Vibhanshu Ahluwalia (Reckon.ai) | Send the invoice showing the **additional line items**, so the matching credit note can be arranged |
+| Reckon.ai | Reconfigure to **GRN ↔ invoice ↔ audit report** with the PO as cap, and the ₹100 threshold |
 
 ---
 

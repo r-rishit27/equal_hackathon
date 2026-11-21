@@ -1,10 +1,10 @@
-# Onsumm Recon Vocabulary (v1)
+# Reckon.ai Recon Vocabulary (v1)
 
 **Status:** Adopted for Recon · v1 · 2026-11-16. Author: Vibhanshu (v1-draft, 2026-11-14); adopted into Recon with the corrections and additions logged in §19 and §21.
 **This file is the single source of truth for codes.** Its machine form is `backend_ocr/app/recon/vocab.py` (seeded into `vocab_codes` / `vocab_aliases`); `tests/recon/test_vocab.py` fails if the two disagree. How Recon stores and uses each code: §21.
 
 > ### Basic principle: the vocabulary is the dictionary; the schema is derived from it
-> - **The vocabulary (this file) is a dictionary.** It defines every word Onsumm understands in reconciliation: what each code means, which raw labels and phrases map to it, and how ambiguous words are resolved. It holds no data.
+> - **The vocabulary (this file) is a dictionary.** It defines every word Reckon.ai understands in reconciliation: what each code means, which raw labels and phrases map to it, and how ambiguous words are resolved. It holds no data.
 > - **The schema is derived from the vocabulary.** Recon's tables carry generated code columns (`doc_role`, `recon_leg`, `verification_status`, `line_origin`, `uom`, …) with foreign keys into `vocab_codes` (§21). The vocabulary decides which values those columns may hold.
 > - **Change flows one way: vocabulary first, then schema.** A new concept is added here first. In most cases nothing else changes, because it's just a new allowed value or JSON key. A column is added to the schema only when a rule must join, filter or calculate on that value, and it is still named and defined by the vocabulary.
 > - **Nothing exists in the schema that isn't in the vocabulary.** No code, column or JSON key appears in the database without a vocabulary entry.
@@ -207,7 +207,7 @@ Package dimension strings are `count-L x W x H` (unit implied cm/in, so the unit
 
 `value_change_kind` **N**: why a value has history (`value_history` = `[{field, was, now, kind, by?, at?}]`).
 - `HANDWRITTEN_CORRECTION`: overwritten by hand on the page (`~~18~~ 15`, `[548] 602`).
-- `REVIEWER_CORRECTION`: corrected by a reviewer in Onsumm; the machine reading is kept.
+- `REVIEWER_CORRECTION`: corrected by a reviewer in Reckon.ai; the machine reading is kept.
 
 ---
 

@@ -1,6 +1,6 @@
-# Onsumm Finance Desk
+# Reckon.ai Finance Desk
 
-Design package for extending Onsumm's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The Finance Desk is proposed. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
+Design package for extending Reckon.ai's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The Finance Desk is proposed. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
 
 ## Read in this order
 
@@ -8,7 +8,7 @@ Design package for extending Onsumm's `uat2` payables and receivables baseline w
 |---|---|
 | [PRD](PRD.md) | Target users, product thesis, scope, outcomes, and the one-day investor demo |
 | [Requirements](REQUIREMENTS.md) | Prioritized functional and operational requirements, with acceptance evidence |
-| [High-level design](HLD.md) | System boundaries, flow of data, integration with Onsumm, and design decisions |
+| [High-level design](HLD.md) | System boundaries, flow of data, integration with Reckon.ai, and design decisions |
 | [Technical design](TECHNICAL_DESIGN.md) | Earlier integrated proposal, forecasting and inventory rules, assistant tools, and fixture |
 | [Low-level design](LLD.md) | Typed contracts, finance calculations, storage, API behavior, and concurrency |
 | [Experience design](UX_DESIGN.md) | Page structure, task flow, wording, and evidence states |
@@ -23,7 +23,7 @@ The requirements document defines release scope. The LLD owns API and state-tran
 
 | Document | Use it for |
 |---|---|
-| [Inventory reference and adaptation](INVENTORY_REFERENCE.md) | Paytm code architecture, QUBO/EOQ limitations, and Onsumm's dated feasibility checks |
+| [Inventory reference and adaptation](INVENTORY_REFERENCE.md) | Paytm code architecture, QUBO/EOQ limitations, and Reckon.ai's dated feasibility checks |
 | [Assistant architecture](ASSISTANT_ARCHITECTURE.md) | Fact Graph integration, RBAC, citations, OpenAI and scale |
 | [Financial guardrails](FINANCIAL_GUARDRAILS.md) | Cross-service controls and release evidence |
 | [API and data models](API_AND_DATA_MODELS.md) | Proposed endpoints, typed payloads, storage and versioning |

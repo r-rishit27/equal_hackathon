@@ -33,7 +33,7 @@ system then:
 
 ```mermaid
 flowchart LR
-    U[Finance / Projects user] -->|upload PO, report, POD, memo, xlsx| FE[Onsumm web app<br/>Vendor card → Documents → Recon]
+    U[Finance / Projects user] -->|upload PO, report, POD, memo, xlsx| FE[Reckon.ai web app<br/>Vendor card → Documents → Recon]
     FE -->|REST, JWT| API[FastAPI backend_ocr]
     API --> PG[(Postgres<br/>vendor_documents, recon_*, purchase_orders,<br/>stg_bills, stg_bill_line_items)]
     API --> S3[(S3 onsumm-assets / -dev<br/>private)]

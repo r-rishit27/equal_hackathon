@@ -1,4 +1,4 @@
-# Scalable finance assistant on the Onsumm Fact Graph
+# Scalable finance assistant on the Reckon.ai Fact Graph
 
 ## Integration and authorization
 
@@ -16,7 +16,7 @@ Treat these as policy mappings to validate against current tenant roles. A tenan
 ```mermaid
 sequenceDiagram
     actor User
-    participant API as Onsumm API
+    participant API as Reckon.ai API
     participant Chat as Assistant orchestrator
     participant Tools as Typed resolver and tools
     participant DB as PostgreSQL and Fact Graph

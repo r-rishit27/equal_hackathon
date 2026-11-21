@@ -2,7 +2,7 @@
 
 **Status:** Proposed · **Scope:** one-day demo and pilot follow-up
 
-P0 is required for the integrated demo. P1 is an extension after the seeded path passes. Existing Onsumm permissions continue to apply to underlying source records.
+P0 is required for the integrated demo. P1 is an extension after the seeded path passes. Existing Reckon.ai permissions continue to apply to underlying source records.
 
 | ID | Priority | Requirement | Acceptance evidence |
 |---|---|---|---|

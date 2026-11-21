@@ -38,7 +38,7 @@ function AdminShell({ children }: { children: React.ReactNode }) {
     <div className="adm">
       <nav className="adm__rail" aria-label="Ops">
         <div className="adm__brand">
-          Onsumm <span className="adm__brand-tag">Ops</span>
+          Reckon.ai <span className="adm__brand-tag">Ops</span>
         </div>
         {NAV.map(({ page, label, icon: Icon }) => (
           <button

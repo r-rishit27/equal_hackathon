@@ -1,8 +1,8 @@
-# Inventory optimization reference and Onsumm adaptation
+# Inventory optimization reference and Reckon.ai adaptation
 
 ## What the Paytm code does
 
-Source inspected at commit `cc1a4133022dfdde9cd1e5928623b8eab0aec5a1`. This reference is limited to inventory optimization. The finance assistant, cash model and deployment below are Onsumm designs.
+Source inspected at commit `cc1a4133022dfdde9cd1e5928623b8eab0aec5a1`. This reference is limited to inventory optimization. The finance assistant, cash model and deployment below are Reckon.ai designs.
 
 ```mermaid
 flowchart LR
@@ -27,7 +27,7 @@ flowchart LR
 
 Squared deviations favor proximity to a budget or capacity target and do not enforce an upper bound. The decoder's rounding and minimum quantity can still leave an infeasible result. The reference also estimates capacity from quantities. These are useful prototype choices to compare against an exact feasibility check. No source code is copied.
 
-## Own the decision in Onsumm
+## Own the decision in Reckon.ai
 
 1. Read stock, observed demand, open purchase orders and verified offers at a single revision. Identify whether lateness, absent history or unavailable terms limit inference. Use current catalog and vendor links after confirming their identities. Treat stock CSV and quote data as separate source records.
 2. Calculate daily availability, shortage unit-days and earliest stockout per SKU/location. For existing receipts or reservations already represented upstream, deduplicate using source identity. Use lead-time demand plus safety stock; compute EOQ only when reliable order and holding costs are present.

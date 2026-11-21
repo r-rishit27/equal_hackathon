@@ -16,7 +16,7 @@ export function articleFor(pathname: string): Article | undefined {
   return ARTICLES.find(a => a.path === pathname)
 }
 
-const SITE = 'https://www.onsumm.ai'
+const SITE = 'https://reckon.ai'
 
 /**
  * TechArticle + FAQPage + BreadcrumbList for one article.
@@ -65,7 +65,7 @@ export function articleSchema(article: Article): object[] {
       '@type': 'BreadcrumbList',
       '@id': `${SITE}${article.path}#breadcrumb`,
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: 'Onsumm', item: `${SITE}/` },
+        { '@type': 'ListItem', position: 1, name: 'Reckon.ai', item: `${SITE}/` },
         { '@type': 'ListItem', position: 2, name: article.title, item: `${SITE}${article.path}` },
       ],
     },

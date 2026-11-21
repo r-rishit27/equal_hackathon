@@ -116,7 +116,7 @@
 /* Compatibility bridge for existing in-progress affordances while individual
    screens migrate to LoadingMark. */
 :is(svg.spin, svg.u-spin, svg.bp__spin, svg.vp__spin, svg.fg-spin, svg.rp__spin, svg.ah-spin) {
-  background: url('/brand/onsumm-mark.svg') center / contain no-repeat;
+  background: url('/brand/reckon-mark.svg') center / contain no-repeat;
   color: transparent !important;
   stroke: transparent !important;
   fill: transparent !important;

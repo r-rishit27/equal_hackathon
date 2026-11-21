@@ -1,6 +1,6 @@
 # Demo Bill Generation Prompt
 
-Use the prompt below with any AI (ChatGPT, Claude, Gemini) to generate realistic Indian tax invoice PDFs for testing the Onsumm.Ai upload flow.
+Use the prompt below with any AI (ChatGPT, Claude, Gemini) to generate realistic Indian tax invoice PDFs for testing the Reckon.ai upload flow.
 
 ---
 

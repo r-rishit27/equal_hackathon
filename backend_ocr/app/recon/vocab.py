@@ -188,7 +188,7 @@ CODES: dict[str, list[tuple[str, str, str, str | None]]] = {
         WITNESSED_SHEET | Vendor sheet with handwritten audit values, witnessed"""),          # gap, §4.4
     "value_change_kind": _codes("""
         HANDWRITTEN_CORRECTION | Value overwritten by hand on the page
-        REVIEWER_CORRECTION | Value corrected by a reviewer in Onsumm"""),                   # gap, §4.4
+        REVIEWER_CORRECTION | Value corrected by a reviewer in Reckon.ai"""),                   # gap, §4.4
     "rate_role": _codes("""
         RATE_LIST | Rate-card rate before discount
         RATE_NET | Rate after negotiated discount

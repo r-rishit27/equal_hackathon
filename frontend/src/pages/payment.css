@@ -1049,7 +1049,7 @@
 
 /* ── Settling ─────────────────────────────────────────────────────────────────
    The wait between "OTP accepted" and "the bank has decided", carried by the
-   Onsumm mark in motion (PaymentProcessing.tsx). Nothing here claims progress:
+   Reckon.ai mark in motion (PaymentProcessing.tsx). Nothing here claims progress:
    the orbits turn at a constant rate because the bank gives us no percentage,
    and a bar that crept to 90% and stopped would be a lie about an irreversible
    transfer. */

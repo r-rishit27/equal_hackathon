@@ -153,7 +153,7 @@ export default function LoginPage({ onBack }: Props) {
       {/* ── Top nav ── */}
       <nav className="lp__nav">
         <button className="lp__nav-logo" onClick={onBack}>
-          <img src="/brand/onsumm-wordmark-dark.svg" alt="Onsumm" />
+          <img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" />
         </button>
 
         <div style={{ marginLeft: 'auto' }}>
@@ -171,7 +171,7 @@ export default function LoginPage({ onBack }: Props) {
           <div className="lp__left-inner">
             {/* Brand */}
             <div className="lp__brand">
-              <div className="lp__brand-logo"><img src="/brand/onsumm-wordmark-light.svg" alt="Onsumm" /></div>
+              <div className="lp__brand-logo"><img src="/brand/reckon-wordmark-light.svg" alt="Reckon.ai" /></div>
               <div className="lp__brand-badge">AP Automation Platform</div>
             </div>
 
@@ -221,7 +221,7 @@ export default function LoginPage({ onBack }: Props) {
           <div className="lp__form-wrap">
 
             {/* Mobile-only logo */}
-            <div className="lp__mobile-logo"><img src="/brand/onsumm-wordmark-dark.svg" alt="Onsumm" /></div>
+            <div className="lp__mobile-logo"><img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" /></div>
 
             {/* Header */}
             <div className="lp__form-header">
@@ -232,7 +232,7 @@ export default function LoginPage({ onBack }: Props) {
               </div>
               <div>
                 <h1 className="lp__title">Welcome back</h1>
-                <p className="lp__subtitle">Sign in to your onsumm.ai account</p>
+                <p className="lp__subtitle">Sign in to your Reckon.ai account</p>
               </div>
             </div>
 

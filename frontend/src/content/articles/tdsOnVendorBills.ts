@@ -27,7 +27,7 @@ export const tdsOnVendorBills: Article = {
   updated: '2026-09-19',
 
   answer:
-    'Automating TDS on vendor bills means four things the software has to get right in order: picking the correct section for the vendor and the expense, calculating the deduction on the right base (GST-exclusive when GST is shown separately on the invoice), tracking the vendor’s cumulative billing across the financial year so the threshold fires on the bill that actually crosses it, and recovering the tax on earlier bills once it does. Onsumm does all four on every vendor bill it processes, and holds the section rules as data rather than code so a rate change is a configuration change rather than a release.',
+    'Automating TDS on vendor bills means four things the software has to get right in order: picking the correct section for the vendor and the expense, calculating the deduction on the right base (GST-exclusive when GST is shown separately on the invoice), tracking the vendor’s cumulative billing across the financial year so the threshold fires on the bill that actually crosses it, and recovering the tax on earlier bills once it does. Reckon.ai does all four on every vendor bill it processes, and holds the section rules as data rather than code so a rate change is a configuration change rather than a release.',
 
   sections: [
     {
@@ -45,23 +45,23 @@ export const tdsOnVendorBills: Article = {
       ],
     },
     {
-      heading: 'How does Onsumm decide which TDS section applies?',
+      heading: 'How does Reckon.ai decide which TDS section applies?',
       body: [
-        'Onsumm resolves the section in a fixed order of precedence: a per-vendor override first, then the rule mapped to the vendor’s category, and if neither exists the bill is flagged as uncategorised rather than passed with no deduction. A vendor nobody has categorised is a question for a human, not a silent zero.',
+        'Reckon.ai resolves the section in a fixed order of precedence: a per-vendor override first, then the rule mapped to the vendor’s category, and if neither exists the bill is flagged as uncategorised rather than passed with no deduction. A vendor nobody has categorised is a question for a human, not a silent zero.',
         'The sections themselves live in a table, not in code. Each row carries its return code, the legacy section label accountants still use in conversation, the default rate, the rate that applies when no PAN is available, the threshold type and amounts, whether the base is GST-exclusive, and the dates it is effective between. When the statute changes, the fix is a row with a new effective-from date — and bills dated before it keep computing the way they did at the time, which is what an assessment will ask for.',
       ],
     },
     {
       heading: 'Is TDS deducted on the invoice total or the taxable value?',
       body: [
-        'TDS is deducted on the value excluding GST whenever GST is shown as a separate line on the invoice, and on the gross amount when it is not. Onsumm reads both off the bill during extraction and applies whichever the section’s base calculation calls for, so the distinction is made from what the invoice actually says rather than from a default someone set once.',
+        'TDS is deducted on the value excluding GST whenever GST is shown as a separate line on the invoice, and on the gross amount when it is not. Reckon.ai reads both off the bill during extraction and applies whichever the section’s base calculation calls for, so the distinction is made from what the invoice actually says rather than from a default someone set once.',
         'This is the single most common source of a rupee-level mismatch between the books and the return. It is also the easiest one to get wrong silently, because deducting on the gross amount produces a number that looks entirely reasonable until the vendor disputes it.',
       ],
     },
     {
       heading: 'How is the annual threshold tracked across bills?',
       body: [
-        'Onsumm keeps a running state per vendor, per section, per financial year: total billed so far, whether the threshold has been crossed, tax deducted to date, and any catch-up still outstanding. Every new bill is added to that total before the threshold is evaluated, so the deduction fires on the bill that crosses the line rather than on the next one after it.',
+        'Reckon.ai keeps a running state per vendor, per section, per financial year: total billed so far, whether the threshold has been crossed, tax deducted to date, and any catch-up still outstanding. Every new bill is added to that total before the threshold is evaluated, so the deduction fires on the bill that crosses the line rather than on the next one after it.',
         'Four threshold shapes are supported, because the statute uses all four: no threshold at all, a per-transaction floor, an annual aggregate, and the dual form where a bill is liable if it clears the per-transaction floor on its own or if the year-to-date total clears the annual one. The financial year is derived from the invoice date and the tenant’s own year-start month, not from the date the bill was uploaded.',
         'That state is locked while a bill is being computed. Two invoices from the same vendor posted at the same instant would otherwise both read the same pre-crossing total, both decide the threshold had not been reached, and both deduct nothing — a race that produces a shortfall nobody discovers until the return is filed.',
       ],
@@ -69,14 +69,14 @@ export const tdsOnVendorBills: Article = {
     {
       heading: 'What happens when a vendor crosses the threshold mid-year?',
       body: [
-        'When the annual aggregate is crossed, the tax on the earlier bills becomes payable too, and Onsumm carries that forward as a catch-up balance against the vendor rather than writing it off. The crossing bill is marked as the crossing bill, the arrears are recorded, and the recovery is tracked until the balance is zero.',
+        'When the annual aggregate is crossed, the tax on the earlier bills becomes payable too, and Reckon.ai carries that forward as a catch-up balance against the vendor rather than writing it off. The crossing bill is marked as the crossing bill, the arrears are recorded, and the recovery is tracked until the balance is zero.',
         'This is the step that is almost universally missing. A tool that starts deducting from the crossing bill onward is under-deducting by exactly the tax on everything before it, and the shortfall surfaces at filing time as a reconciliation nobody can explain without going back through the year bill by bill.',
       ],
     },
     {
       heading: 'What happens when a vendor has no PAN?',
       body: [
-        'Section 206AA requires a higher rate when the deductee has not furnished a PAN, and Onsumm applies the section’s no-PAN rate when none is on file. Before it does, it tries to recover the PAN from the vendor’s GSTIN — characters three to twelve of a GSTIN are the PAN — so a vendor whose PAN was simply never typed into the master is not penalised at twenty percent for a data-entry gap.',
+        'Section 206AA requires a higher rate when the deductee has not furnished a PAN, and Reckon.ai applies the section’s no-PAN rate when none is on file. Before it does, it tries to recover the PAN from the vendor’s GSTIN — characters three to twelve of a GSTIN are the PAN — so a vendor whose PAN was simply never typed into the master is not penalised at twenty percent for a data-entry gap.',
         'A lower-deduction certificate works the other way: the certificate number and its rate are held against the vendor, and the override is applied in place of the section default with the certificate recorded alongside the deduction, so the reason for the lower rate travels with the entry.',
       ],
     },
@@ -91,11 +91,11 @@ export const tdsOnVendorBills: Article = {
       heading: 'How does this compare with doing TDS in Tally alone?',
       body: [
         'Tally computes TDS correctly once the entry is in front of it. What it cannot do is read the vendor bill, decide the section from the vendor and the expense, or tell you in September that a vendor you have been paying since April is about to cross an annual threshold. Those are accounts-payable problems that happen before the voucher exists.',
-        'The division of labour that works is the one where the bill is read, classified, checked and approved upstream, and Tally receives a finished entry. Onsumm is built for that half; it posts into Tally Prime rather than replacing it.',
+        'The division of labour that works is the one where the bill is read, classified, checked and approved upstream, and Tally receives a finished entry. Reckon.ai is built for that half; it posts into Tally Prime rather than replacing it.',
       ],
       table: {
         caption: 'Where each step happens',
-        head: ['Step', 'In Tally alone', 'With Onsumm upstream'],
+        head: ['Step', 'In Tally alone', 'With Reckon.ai upstream'],
         rows: [
           ['Reading the bill', 'Manual data entry', 'OCR, with the text layer read before vision'],
           ['Choosing the section', 'The person entering it decides', 'Vendor category rule, or a per-vendor override'],
@@ -111,23 +111,23 @@ export const tdsOnVendorBills: Article = {
   faqs: [
     {
       q: 'Can software deduct TDS on vendor bills automatically?',
-      a: 'Yes. Onsumm calculates TDS on every vendor bill automatically — it maps the vendor to a section, computes the deduction on the GST-exclusive value where the invoice shows GST separately, tracks the vendor’s cumulative billing for the financial year so the threshold fires on the right bill, and raises the arrears on earlier bills when an annual threshold is crossed mid-year.',
+      a: 'Yes. Reckon.ai calculates TDS on every vendor bill automatically — it maps the vendor to a section, computes the deduction on the GST-exclusive value where the invoice shows GST separately, tracks the vendor’s cumulative billing for the financial year so the threshold fires on the right bill, and raises the arrears on earlier bills when an annual threshold is crossed mid-year.',
     },
     {
-      q: 'How does Onsumm handle a TDS threshold crossed in the middle of the year?',
-      a: 'Onsumm raises a catch-up balance against the vendor for the tax due on the bills already processed that year, marks the bill that crossed the threshold, and tracks the recovery until it is cleared. Deducting only from the crossing bill onward leaves a shortfall equal to the tax on everything before it, which is the discrepancy most teams find at filing time.',
+      q: 'How does Reckon.ai handle a TDS threshold crossed in the middle of the year?',
+      a: 'Reckon.ai raises a catch-up balance against the vendor for the tax due on the bills already processed that year, marks the bill that crossed the threshold, and tracks the recovery until it is cleared. Deducting only from the crossing bill onward leaves a shortfall equal to the tax on everything before it, which is the discrepancy most teams find at filing time.',
     },
     {
-      q: 'Does Onsumm apply Section 206AA when a vendor has no PAN?',
-      a: 'Yes, but it checks first. Onsumm derives the PAN from characters three to twelve of the vendor’s GSTIN before falling back to the higher no-PAN rate, so a vendor whose PAN was never entered in the master is not charged the Section 206AA penalty rate over a missing field.',
+      q: 'Does Reckon.ai apply Section 206AA when a vendor has no PAN?',
+      a: 'Yes, but it checks first. Reckon.ai derives the PAN from characters three to twelve of the vendor’s GSTIN before falling back to the higher no-PAN rate, so a vendor whose PAN was never entered in the master is not charged the Section 206AA penalty rate over a missing field.',
     },
     {
       q: 'Is TDS calculated on the invoice total or on the value before GST?',
-      a: 'On the value before GST when the invoice shows GST as a separate line, and on the gross amount when it does not. Onsumm takes both figures from the bill during extraction and applies whichever the section calls for, rather than assuming one.',
+      a: 'On the value before GST when the invoice shows GST as a separate line, and on the gross amount when it does not. Reckon.ai takes both figures from the bill during extraction and applies whichever the section calls for, rather than assuming one.',
     },
     {
       q: 'Do TDS rates have to be updated in the software when the law changes?',
-      a: 'The sections, rates and thresholds are configuration in Onsumm, not code, and each carries the dates it is effective between. A change is a new row with a new effective-from date; bills dated earlier continue to compute the way they did at the time, which is what an assessment expects to see.',
+      a: 'The sections, rates and thresholds are configuration in Reckon.ai, not code, and each carries the dates it is effective between. A change is a new row with a new effective-from date; bills dated earlier continue to compute the way they did at the time, which is what an assessment expects to see.',
     },
     {
       q: 'Does the TDS entry post into Tally Prime?',

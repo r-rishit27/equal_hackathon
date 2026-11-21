@@ -15,7 +15,7 @@ import type { KeywordCluster } from './keywords'
  * owns for every route in the app, marketing pages included.
  */
 
-export const SITE_URL = 'https://www.onsumm.ai'
+export const SITE_URL = 'https://reckon.ai'
 
 /**
  * The ceiling Google renders before it truncates a description with an ellipsis.
@@ -74,10 +74,10 @@ export const PAGE_SEO: Record<string, PageSeo> = {
         '@context': 'https://schema.org',
         '@type': 'Product',
         '@id': `${SITE_URL}/pricing#product`,
-        name: 'Onsumm AP automation',
+        name: 'Reckon.ai AP automation',
         description:
           'Accounts payable automation software for Indian SMEs, with invoice OCR, approval workflows, GST and TDS compliance, and Tally Prime and Zoho Books integration.',
-        brand: { '@type': 'Brand', name: 'Onsumm' },
+        brand: { '@type': 'Brand', name: 'Reckon.ai' },
         offers: [
           {
             '@type': 'Offer',
@@ -109,15 +109,15 @@ export const PAGE_SEO: Record<string, PageSeo> = {
   },
   '/contact': {
     description:
-      'Book a demo of Onsumm — AP automation for Indian SMEs. Ask about Tally Prime and Zoho Books integration, GST and TDS compliance, or pricing.',
+      'Book a demo of Reckon.ai — AP automation for Indian SMEs. Ask about Tally Prime and Zoho Books integration, GST and TDS compliance, or pricing.',
     clusters: ['apFinance', 'india', 'tally', 'zoho'],
     schema: () => [
       {
         '@context': 'https://schema.org',
         '@type': 'ContactPage',
         '@id': `${SITE_URL}/contact#contactpage`,
-        name: 'Contact Onsumm',
-        description: 'Contact the Onsumm team about AP automation, invoice automation, Tally Prime and Zoho Books integration.',
+        name: 'Contact Reckon.ai',
+        description: 'Contact the Reckon.ai team about AP automation, invoice automation, Tally Prime and Zoho Books integration.',
         mainEntity: { '@id': `${SITE_URL}/#organization` },
       },
     ],

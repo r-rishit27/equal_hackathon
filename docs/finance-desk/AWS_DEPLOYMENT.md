@@ -15,7 +15,7 @@ flowchart LR
     Users["Finance team"] --> Web["Amplify Hosting · CloudFront"]
     Users --> Edge["Public ALB · ACM · AWS WAF"]
     Web --> Edge
-    Edge --> Core["Private ECS · existing Onsumm API"]
+    Edge --> Core["Private ECS · existing Reckon.ai API"]
     Core --> Forecast["Private forecast service"]
     Core --> Inventory["Private inventory evaluator"]
     Core --> Assistant["Private assistant service"]

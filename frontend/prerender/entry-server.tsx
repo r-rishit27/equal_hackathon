@@ -3,7 +3,7 @@
  *
  * The app is a client-rendered SPA, which is fine for the authenticated half —
  * nobody indexes /bills. It is fatal for the marketing half. The answer-engine
- * crawlers that decide whether Onsumm gets named in "best AP automation for
+ * crawlers that decide whether Reckon.ai gets named in "best AP automation for
  * Indian SMEs" answers (GPTBot, OAI-SearchBot, ClaudeBot, Claude-SearchBot,
  * PerplexityBot) read raw HTML and do not run JavaScript. Before this file,
  * every marketing route returned the same 9 KB shell, so to those crawlers the

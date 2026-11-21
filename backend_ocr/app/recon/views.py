@@ -260,7 +260,7 @@ class DocumentsView:
                                  + (f" (page {c.page})" if c.page else ""))
         if bill and seg:
             if bill.get("total_amount") is not None and inv.total is not None and abs(Decimal(bill["total_amount"]) - inv.total) > 1:
-                d["warnings"].append(f"The bill in Onsumm says total {bill['total_amount']}; this reading says {inv.total}")
+                d["warnings"].append(f"The bill in Reckon.ai says total {bill['total_amount']}; this reading says {inv.total}")
         d["tables"] = [{
             "title": "Invoice annexure lines" if is_annex else "Invoice lines",
             "columns": [_c("sno", "#", "qty"), _c("description", "Item"), _c("hsn", "HSN"), _c("unit", "Unit"),

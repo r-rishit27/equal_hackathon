@@ -1,4 +1,4 @@
-# ONSUMM.AI — Pipeline Test Report
+# Reckon.ai — Pipeline Test Report
 
 **Environment:** Neon PostgreSQL (serverless) · Tally Prime (localhost:9000)
 **Last run:** 2026-05-09
@@ -216,4 +216,4 @@ All 11 modules import without errors.
 
 ---
 
-*ONSUMM.AI — 76 tests passed across pipeline integration, dedup unit, and dedup integration suites.*
+*Reckon.ai — 76 tests passed across pipeline integration, dedup unit, and dedup integration suites.*

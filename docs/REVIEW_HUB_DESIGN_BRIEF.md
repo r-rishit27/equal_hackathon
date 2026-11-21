@@ -6,7 +6,7 @@
 
 ## 1. What you are designing
 
-**Onsumm** is an accounts-payable platform used by Indian finance teams. It ingests vendor bills
+**Reckon.ai** is an accounts-payable platform used by Indian finance teams. It ingests vendor bills
 (OCR from PDFs and email), runs them through a configurable approval chain, verifies vendors against
 the GST portal and their bank, reconciles line items against usage data, handles TDS and foreign
 exchange, and finally disburses payment.

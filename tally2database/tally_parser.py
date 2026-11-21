@@ -1,5 +1,5 @@
 """
-tally_parser.py — Tally XML → Python dicts matching Onsum schema
+tally_parser.py — Tally XML → Python dicts matching Reckon.ai schema
 """
 import re
 import logging

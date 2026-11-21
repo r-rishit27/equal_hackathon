@@ -95,7 +95,7 @@ def generate_tally_pairing_token():
         "token":      token,
         "expires_at": expires.isoformat(),
         "instructions": (
-            "Download the Onsumm Tally Agent, run it, and paste this token when prompted. "
+            "Download the Reckon.ai Tally Agent, run it, and paste this token when prompted. "
             "Token expires in 30 minutes."
         ),
     }

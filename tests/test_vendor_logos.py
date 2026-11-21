@@ -239,9 +239,9 @@ class TestPickLogo:
 
     def test_picks_the_named_image(self, monkeypatch):
         calls = self._fake(monkeypatch, '{"logo": 2}')
-        assert vl.pick_logo("Acme", ["Onsumm"], [_logo(), _logo()], "ACME TRADERS") == 1
+        assert vl.pick_logo("Acme", ["Reckon.ai"], [_logo(), _logo()], "ACME TRADERS") == 1
         text = calls[0]["messages"][0]["content"][0]["text"]
-        assert '"Acme"' in text and "Onsumm" in text and "ACME TRADERS" in text
+        assert '"Acme"' in text and "Reckon.ai" in text and "ACME TRADERS" in text
 
     @pytest.mark.parametrize("reply", ['{"logo": null}', '{"logo": 5}', '{"logo": "1"}', "{}"])
     def test_none_or_nonsense_is_no_logo(self, monkeypatch, reply):

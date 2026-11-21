@@ -1,4 +1,4 @@
-# Sandbox GST & Compliance Integration — ONSUMM.AI
+# Sandbox GST & Compliance Integration — Reckon.ai
 
 **Source:** [Sandbox Developer Portal](https://developer.sandbox.co.in/api-reference/gst/overview)  
 **MCP Server:** `sandbox` (`.mcp.json` + `.claude/settings.json`)  
@@ -107,14 +107,14 @@ Body: { "gstin": "29AFSPB9500E1ZY" }
 ```
 
 **Key response fields:**
-| Field | Meaning | Maps to ONSUMM |
+| Field | Meaning | Maps to Reckon.ai |
 |---|---|---|
 | `sts` | `Active` / `Cancelled` / `Provisional` | `dim_suppliers.gstin_status` (new col) |
 | `lgnm` | Legal name from GSTN | Overwrite `dim_suppliers.name` if differs |
 | `einvoiceStatus` | `Yes` / `No` | `dim_suppliers.einvoice_eligible` (new col) |
 | `ctb` | Constitution type (Pvt Ltd, LLP, etc.) | `dim_suppliers.gstn` cross-check |
 
-**Trigger points in ONSUMM schema:**
+**Trigger points in Reckon.ai schema:**
 - `UploadOcrWorker` → after writing to `stg_bills` → read `stg_bills.gstin_seller` → call API → update `dim_suppliers`
 - `ApiSyncWorker` → after writing `stg_invoices` → read `stg_invoices.gstin_buyer` → verify `dim_end_customers.gstin`
 - `StagingPromotionWorker` → block promotion if `dim_suppliers.gstin_status = 'Cancelled'` + write `ai_anomaly`
@@ -140,7 +140,7 @@ Body: { "gstin": "<dim_suppliers.gstn>" }
 }
 ```
 
-**ONSUMM use:**
+**Reckon.ai use:**
 - For each `stg_bill`, derive `ret_prd` from `stg_bills.bill_date` (fiscal month → MMYYYY)
 - If supplier's GSTR-1 for that period `status ≠ Filed` → write to `ai_anomalies`:
   ```
@@ -159,7 +159,7 @@ POST /gst/compliance/public/pan/search?state_code=29
 Body: { "pan": "<dim_end_customers.pan>" }
 ```
 
-**ONSUMM use:** Vendor onboarding — `dim_end_customers.pan` already exists. Feed PAN → discover all GSTINs → populate `dim_end_customers.gstin`.
+**Reckon.ai use:** Vendor onboarding — `dim_end_customers.pan` already exists. Feed PAN → discover all GSTINs → populate `dim_end_customers.gstin`.
 
 **Rate limit:** 120 req/window. Use `x-accept-cache: true`.
 
@@ -235,7 +235,7 @@ CREATE TABLE fact_gst_reconciliation (
   tenant_id         UUID NOT NULL REFERENCES dim_tenants(tenant_id),
   gstin             TEXT NOT NULL,                    -- dim_tenants.gstn
   fiscal_year       INTEGER NOT NULL,
-  fiscal_month      INTEGER NOT NULL,                 -- 1=April (ONSUMM convention)
+  fiscal_month      INTEGER NOT NULL,                 -- 1=April (Reckon.ai convention)
   sandbox_job_id    UUID NOT NULL,
   recon_type        TEXT NOT NULL,                    -- 'GSTR2A' | 'GSTR2B'
   criteria          TEXT NOT NULL,                    -- strict|moderate|flexible
@@ -254,7 +254,7 @@ CREATE TABLE fact_gst_reconciliation (
 
 ## 5. Taxpayer APIs — GSTR Filing & ITC Ledger
 
-Requires per-tenant GST portal OTP session (section 2.2). Relevant for tenants who want ONSUMM to act as their filing interface.
+Requires per-tenant GST portal OTP session (section 2.2). Relevant for tenants who want Reckon.ai to act as their filing interface.
 
 | Return | Operations |
 |---|---|
@@ -284,7 +284,7 @@ Mandatory for businesses with turnover > ₹5 Cr. `dim_tenants.gstn` tells us th
 POST /gst/compliance/e-invoice/generate
 Headers: authorization, x-api-key, gst-session-token
 
-Body (key fields mapped to ONSUMM columns):
+Body (key fields mapped to Reckon.ai columns):
 {
   "DocDtls": {
     "No":  <stg_invoices.invoice_number>,
@@ -333,7 +333,7 @@ EwbNo        → stg_invoices.ewb_no        (new col, if EWB generated)
 
 ## 7. E-Way Bill
 
-Mandatory for goods movement > ₹50,000. Service invoices (most ONSUMM tenants) don't require EWBs.
+Mandatory for goods movement > ₹50,000. Service invoices (most Reckon.ai tenants) don't require EWBs.
 
 | Operation | Endpoint |
 |---|---|
@@ -342,7 +342,7 @@ Mandatory for goods movement > ₹50,000. Service invoices (most ONSUMM tenants)
 | Extend validity | `POST /gst/compliance/ewb/extend` |
 | HSN lookup | `GET /gst/compliance/ewb/hsn` |
 
-**When relevant for ONSUMM:** Only for tenants dealing in goods. Check `stg_bill_line_items.hsn_code` — HSN codes starting with chapters 1–97 are goods; SAC codes (99xxxx) are services. Can use the HSN endpoint to classify.
+**When relevant for Reckon.ai:** Only for tenants dealing in goods. Check `stg_bill_line_items.hsn_code` — HSN codes starting with chapters 1–97 are goods; SAC codes (99xxxx) are services. Can use the HSN endpoint to classify.
 
 ---
 
@@ -489,7 +489,7 @@ These are decisions that block implementation. Other questions (pricing, webhook
 
 The schema enforces `UNIQUE (gstn)` on `dim_tenants`. Multi-state companies have multiple GSTINs (e.g., 29XXXX for Karnataka, 27XXXX for Maharashtra). Taxpayer APIs and reconciliation jobs run per-GSTIN. If a tenant has 3 GSTINs, we need 3 OTP sessions and 3 reconciliation jobs, but the current schema supports only one GSTIN per tenant.
 
-**Decision needed:** Do we extend `dim_tenants` with a `gstin_jsonb TEXT[]`, add a new `dim_tenant_gstins` table, or restrict ONSUMM to single-GSTIN tenants for this release?
+**Decision needed:** Do we extend `dim_tenants` with a `gstin_jsonb TEXT[]`, add a new `dim_tenant_gstins` table, or restrict Reckon.ai to single-GSTIN tenants for this release?
 
 ---
 

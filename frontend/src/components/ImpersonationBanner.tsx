@@ -41,7 +41,7 @@ export default function ImpersonationBanner() {
     <div className="adm-imp" role="status">
       <span>
         <Eye size={14} aria-hidden="true" />{' '}
-        Viewing <strong>{meta.tenant_name}</strong> as Onsumm Support
+        Viewing <strong>{meta.tenant_name}</strong> as Reckon.ai Support
         {meta.read_only && ' · read-only'} · ends in {left}
       </span>
       <Button size="sm" variant="secondary" onClick={exitImpersonation}>

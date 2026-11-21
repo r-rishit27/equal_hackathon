@@ -1,4 +1,4 @@
-# Onsumm.ai — UI/UX Audit & Enterprise Revamp Plan
+# Reckon.ai — UI/UX Audit & Enterprise Revamp Plan
 
 **Auditor role:** Senior UI/UX Manager (adversarial / devil's-advocate review)
 **Date:** 2026-08-01
@@ -185,7 +185,7 @@ Hard counts across all `.tsx`/`.ts`/`.css`:
   - Browser Back exits the app or does nothing.
   - Refresh (F5) resets to the role default page (`App.tsx:29-33`) and drops all filters, the open bill, the review queue, and the upload queue.
   - Sessions live in `sessionStorage` (`AuthContext.tsx:54`) — closing the tab logs the user out with no warning and no "resume where you left off".
-  - Browser tab title is permanently `Onsumm — Invoice Processing` (`index.html:6`), so a user with 6 tabs open cannot tell them apart.
+  - Browser tab title is permanently `Reckon.ai — Invoice Processing` (`index.html:6`), so a user with 6 tabs open cannot tell them apart.
   - No analytics or support triage is possible ("what page were you on?" has no answer).
 
 **In an approval workflow product this is close to disqualifying.** The core enterprise motion is: approver receives an email → clicks a link → lands on the bill. That flow cannot exist without routing.

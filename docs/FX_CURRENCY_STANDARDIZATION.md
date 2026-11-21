@@ -1,6 +1,6 @@
 # Multi-Currency Handling — Complete Specification
 
-> **ONSUMM.AI** | Finalized June 2026
+> **Reckon.ai** | Finalized June 2026
 > **Reporting currency**: Indian Rupee (INR) — always.
 > **Foreign currencies**: USD, EUR, GBP, JPY (RBI/FBIL published reference rates only)
 
@@ -34,7 +34,7 @@
 
 ## 1. Why This Feature Exists
 
-ONSUMM.AI serves Indian SMEs whose AP and AR transactions are not always in INR.
+Reckon.ai serves Indian SMEs whose AP and AR transactions are not always in INR.
 
 | Scenario | Example |
 |---|---|
@@ -1363,7 +1363,7 @@ python scripts/test_fx_live.py
 
 ---
 
-*ONSUMM.AI — Multi-Currency Handling Specification*
+*Reckon.ai — Multi-Currency Handling Specification*
 *Currencies: USD, EUR, GBP, JPY (RBI/FBIL reference rates)*
 *Reviewed: 2026-06-15 via /plan-eng-review (12 issues, 0 unresolved)*
 *Last updated: June 2026*

@@ -7,7 +7,7 @@ The desk extends the existing React and FastAPI application. A snapshot adapter 
 ```mermaid
 flowchart LR
     UI["React Finance Desk"] --> API["FastAPI · tenant and role checks"]
-    AP["Onsumm AP and AR"] --> Snap["Snapshot adapter"]
+    AP["Reckon.ai AP and AR"] --> Snap["Snapshot adapter"]
     Bank["Bank balance and actuals"] --> Snap
     Stock["Stock and supplier terms"] --> Snap
     Snap --> Forecast["Cash projection"]
@@ -18,7 +18,7 @@ flowchart LR
     API --> Ask["Assistant orchestration"]
     Ask -->|Authorized read tools| Forecast
     Ask --> Inv
-    Ask --> Graph["Onsumm Fact Graph"]
+    Ask --> Graph["Reckon.ai Fact Graph"]
     API --> Ledger[("Scenario and decisions")]
     Graph --> AP
 
@@ -43,7 +43,7 @@ flowchart LR
 
 | Decision | Rationale | Revisit when |
 |---|---|---|
-| Use current Onsumm application and PostgreSQL read adapters. | Existing bills, receivables and authorization are the product foundation. | Dedicated deployment is needed for a significant scaling or operational boundary. |
+| Use current Reckon.ai application and PostgreSQL read adapters. | Existing bills, receivables and authorization are the product foundation. | Dedicated deployment is needed for a significant scaling or operational boundary. |
 | Use the existing Fact Graph, with exact-reference fallback. | Evidence discovery can reuse entity relationships. Exact IDs and SQL remain sufficient for the demo. | Pilot measurements show graph coverage or traversal quality limits answers. |
 | Enumerate a small number of offers and enforce hard cash constraints. | Demonstrates transparent vendor trade-offs in one day. | Multi-SKU coupling and order volumes make enumeration impractical. |
 | Use an isolated fixture and durable local plan store for the demo. | Prior environment checks could not connect to configured PostgreSQL. | A dedicated development database and representative inventory source are reachable. |

@@ -219,7 +219,7 @@ export const LOGIN_PATH = '/login'
 
 /**
  * Browser tab titles. Distinct per page so a user with six tabs open can tell
- * them apart — previously every tab read "Onsum — Invoice Processing".
+ * them apart — previously every tab read "Reckon.ai — Invoice Processing".
  */
 const TITLES: Record<string, string> = {
   [PATHS.upload]:            'Upload Invoices',
@@ -246,7 +246,7 @@ const TITLES: Record<string, string> = {
   // The four public marketing routes carry the terms we want to rank for, not
   // just a section name: these titles are the headline of the search result and
   // the first line an answer engine reads. Kept under ~60 characters including
-  // the ` · Onsumm` suffix so Google shows them whole.
+  // the ` · Reckon.ai` suffix so Google shows them whole.
   '/':                       'AP Automation for Indian SMEs — Tally & Zoho Books',
   '/product':                'Invoice OCR, Approval Workflows, GST & TDS',
   '/pricing':                'AP Automation Pricing for Indian SMEs',
@@ -256,7 +256,7 @@ const TITLES: Record<string, string> = {
   ...Object.fromEntries(ARTICLES.map(a => [a.path, a.title])),
 }
 
-export const APP_NAME = 'Onsumm'
+export const APP_NAME = 'Reckon.ai'
 
 /** Tab title for a path, longest-prefix matched so nested routes inherit. */
 export function titleForPath(pathname: string): string {

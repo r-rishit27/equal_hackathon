@@ -278,7 +278,7 @@ scheduling as its own piece of work rather than a step inside this agent.
 2. **Send from a tenant's own mailbox (their Gmail OAuth) or from a platform
    address?** Tenant mailbox has far better deliverability and reply behavior;
    platform address is simpler and looks like bulk mail.
-3. **Who owns template copy** — Onsumm defaults, tenant-edited, or both? Proposal:
+3. **Who owns template copy** — Reckon.ai defaults, tenant-edited, or both? Proposal:
    ship defaults, allow tenant edits, keep `auto_send_ok` platform-controlled.
 4. **Do replies feed back into the originating agent automatically**, or land in a
    human inbox first? Human-first is safer; agent-first is what makes follow-up

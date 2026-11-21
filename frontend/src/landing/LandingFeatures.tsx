@@ -47,7 +47,7 @@ const SECTIONS = [
     badge: 'GST & TDS COMPLIANCE',
     badgeColor: '#059669',
     headline: 'GST compliance, TDS automation and audit trail — built in',
-    sub: 'onsumm.ai was designed from the ground up for India. Not retrofitted. GST automation, GSTIN verification and TDS on vendor bills are first-class, and every edge case in Indian taxation is handled.',
+    sub: 'Reckon.ai was designed from the ground up for India. Not retrofitted. GST automation, GSTIN verification and TDS on vendor bills are first-class, and every edge case in Indian taxation is handled.',
     features: [
       { icon: <Shield size={16} strokeWidth={1.5} />, title: 'GSTIN verification', desc: 'GSTIN validation against the GST portal in real time, plus GST invoice validation against the GSTIN the bill claims.' },
       { icon: <CheckSquare size={16} strokeWidth={1.5} />, title: 'Automated TDS calculation', desc: 'TDS deduction automation at source by vendor type, section and PAN status, with TDS tracking through to the quarterly return.' },
@@ -73,7 +73,7 @@ const SECTIONS = [
     badge: 'INTEGRATIONS',
     badgeColor: '#d97706',
     headline: 'Tally Prime and Zoho Books integration, out of the box',
-    sub: 'onsumm.ai integrates with the tools Indian finance teams already use — no rip-and-replace required. Approved bills post themselves, so the automation ends in your books rather than in another export.',
+    sub: 'Reckon.ai integrates with the tools Indian finance teams already use — no rip-and-replace required. Approved bills post themselves, so the automation ends in your books rather than in another export.',
     features: [
       { icon: <RefreshCw size={16} strokeWidth={1.5} />, title: 'Tally Prime integration', desc: 'The Tally connector syncs bi-directionally with Tally Prime and Tally ERP 9. Direct Tally posting maps each approved bill to your existing ledgers and voucher types.' },
       { icon: <Upload size={16} strokeWidth={1.5} />, title: 'SAP & Oracle', desc: 'Enterprise-grade connectors for SAP S/4HANA, Oracle Fusion, and NetSuite.' },
@@ -145,7 +145,7 @@ export default function LandingFeatures({ onNavigate, onLogin }: Props) {
             Ready to see it in action?
           </h2>
           <p style={{ fontSize: 14, color: 'rgba(255,255,255,0.75)', margin: '0 0 32px', lineHeight: 1.7, fontFamily: '"Inter", sans-serif' }}>
-            Book a personalised demo with our team. We'll walk through your specific accounts payable workflow — including your Tally Prime or Zoho Books setup — and show you exactly how onsumm.ai fits in.
+            Book a personalised demo with our team. We'll walk through your specific accounts payable workflow — including your Tally Prime or Zoho Books setup — and show you exactly how Reckon.ai fits in.
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <button onClick={onLogin} style={{ background: '#fff', color: C.primaryCont, border: 'none', borderRadius: 4, padding: '11px 28px', fontSize: 14, fontWeight: 700, cursor: 'pointer', fontFamily: '"Inter", sans-serif' }}>

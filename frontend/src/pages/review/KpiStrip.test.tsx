@@ -50,9 +50,9 @@ describe('KpiStrip', () => {
     expect(screen.getByText('131')).toBeInTheDocument()
     expect(screen.getByText('14 today, 91% accepted as proposed')).toBeInTheDocument()
 
-    // 131 × 17 minutes ≈ 37h, credited to Onsumm.
+    // 131 × 17 minutes ≈ 37h, credited to Reckon.ai.
     expect(screen.getByText('37')).toBeInTheDocument()
-    expect(screen.getByText('Via Onsumm')).toBeInTheDocument()
+    expect(screen.getByText('Via Reckon.ai')).toBeInTheDocument()
   })
 
   it('says what a zero means instead of showing a row of noughts', () => {

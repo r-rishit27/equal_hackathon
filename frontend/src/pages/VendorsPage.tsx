@@ -3153,7 +3153,7 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
                       ? <span className="vc__tagc vc__tagc--verified"><ShieldCheck size={13} />KYB verified</span>
                       : <span className="vc__tagc vc__tagc--warn"><ShieldAlert size={13} />{statusWords(vendor.status)}</span>}
                     {/* When the vendor was added here — not when the relationship began. */}
-                    {since && <span className="vc__tagc" title="When this vendor was added to Onsumm"><CalendarDays size={13} />Added {since.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>}
+                    {since && <span className="vc__tagc" title="When this vendor was added to Reckon.ai"><CalendarDays size={13} />Added {since.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>}
                     {summary.bills.length > 0 && <button type="button" className="vc__tagc vc__tagc--btn" title="Open all bills" onClick={() => goBills('all')}><Receipt size={13} />{summary.bills.length} bills</button>}
                   </div>
                 </div>

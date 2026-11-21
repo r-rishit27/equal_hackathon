@@ -1,4 +1,4 @@
-# Onsumm.ai
+# Reckon.ai
 
 > Finance operations for payables, receivables, and working capital.
 
@@ -43,7 +43,7 @@ Bring invoice capture, vendor reconciliation, tax review, approvals, payouts, an
 
 ## 1. Product Overview
 
-Onsumm helps finance teams manage accounts payable, accounts receivable, and working capital from a single workspace. Teams can capture bills, check them against supporting documents, route approvals, and track payment status. On the receivables side, they can import bank credits, match them to sales invoices, and review exceptions before applying cash.
+Reckon.ai helps finance teams manage accounts payable, accounts receivable, and working capital from a single workspace. Teams can capture bills, check them against supporting documents, route approvals, and track payment status. On the receivables side, they can import bank credits, match them to sales invoices, and review exceptions before applying cash.
 
 | Workflow | What teams can do |
 |---|---|
@@ -59,7 +59,7 @@ Onsumm helps finance teams manage accounts payable, accounts receivable, and wor
 
 | Integration | Scope |
 |---|---|
-| **Tally Prime** | The Windows connector pulls XML ledgers and vouchers from Tally, then uploads them to Onsumm. Server-side Tally workers are available in the code and disabled in the default worker list. |
+| **Tally Prime** | The Windows connector pulls XML ledgers and vouchers from Tally, then uploads them to Reckon.ai. Server-side Tally workers are available in the code and disabled in the default worker list. |
 | **Apideck and SAP** | The ingestion pipeline normalizes Apideck accounting payloads. The SAP workflow supports item and vendor-code mapping. Connector direction and posting behavior depend on the integration. |
 | **Banking** | The payout integration centers on IMPS and gateway status checks. Receivables has a separate bank-statement import and cash application flow. |
 | **AI and vendor verification** | OCR, email processing, vendor verification, and bank calls depend on the configured provider, credentials, and tenant entitlements. |
@@ -1599,4 +1599,4 @@ Expense export (XLSX, CSV, ZIP) was originally inside the Reports page. Moving i
 
 ---
 
-*ONSUMM.AI — Intelligent Cashflow for Indian SMEs*
+*Reckon.ai — Intelligent Cashflow for Indian SMEs*

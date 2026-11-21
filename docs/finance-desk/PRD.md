@@ -1,8 +1,8 @@
-# Onsumm Finance Desk
+# Reckon.ai Finance Desk
 
 **Hackathon PRD · One-day build · Primary SaaS reference is Odoo Accounting**
 
-**Pitch:** Give an MSME owner the finance team's morning briefing and decision queue in one place. Onsumm reads approved bills, open receivables, bank balances, and reconciliation exceptions. It shows when cash could run short, proposes actions with supporting evidence, and lets the owner approve a plan while the accountant works the exceptions.
+**Pitch:** Give an MSME owner the finance team's morning briefing and decision queue in one place. Reckon.ai reads approved bills, open receivables, bank balances, and reconciliation exceptions. It shows when cash could run short, proposes actions with supporting evidence, and lets the owner approve a plan while the accountant works the exceptions.
 
 > **Expanded hackathon scope.** See the [technical design](TECHNICAL_DESIGN.md) for the inventory-aware cash forecast, vendor selection and database-backed assistant. The integrated demo and build order are defined in [delivery and verification](DELIVERY_AND_VERIFICATION.md). The cash-only example below explains the initial planning workflow.
 
@@ -118,7 +118,7 @@ flowchart LR
 
 The [delivery plan](DELIVERY_AND_VERIFICATION.md) prioritizes the forecast, supplier comparison, cited assistant and durable approval. Cut extra accounts, optional exports, live statement refresh and advanced search first. Use the seeded environment if live integrations are unavailable.
 
-**Closing line:** “Your accountant closes exceptions. Your owner sees what can be paid. Onsumm assembles the cash plan and keeps the evidence in one place.”
+**Closing line:** “Your accountant closes exceptions. Your owner sees what can be paid. Reckon.ai assembles the cash plan and keeps the evidence in one place.”
 
 ## Pilot readiness
 

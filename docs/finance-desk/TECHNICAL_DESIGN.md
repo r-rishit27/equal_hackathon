@@ -1,8 +1,8 @@
-# Onsumm Finance Desk technical design
+# Reckon.ai Finance Desk technical design
 
 **Status:** Proposed for the hackathon on `uat2`
 
-**Product reference:** Odoo Accounting. The [product PRD](PRD.md) describes the customer, positioning, and other SaaS references. This design extends that brief with an inventory-aware forecast and an assistant over Onsumm data.
+**Product reference:** Odoo Accounting. The [product PRD](PRD.md) describes the customer, positioning, and other SaaS references. This design extends that brief with an inventory-aware forecast and an assistant over Reckon.ai data.
 
 ## 1. Product outcome and scope
 
@@ -24,7 +24,7 @@ A distributor should be able to ask, “What can I pay this week, and which stoc
 | AR open invoices, applied cash and evidence | Use the [receivables API](../../backend_ocr/app/routers/receivables.py) and [receivables repository](../../backend_ocr/app/receivables/repo.py). Outstanding amounts must reflect allocations, reversals, and partial payments as of the snapshot. |
 | Inventory position, sales demand, supplier offers and open POs | Introduce an explicit import adapter backed by reviewed sample CSVs for the demo. Use catalog SKU links where verified. Accounting vouchers alone cannot establish available physical stock or the timing of inbound units. |
 | Bank opening balance | Use a timestamped, reconciled account balance when available. Use a labeled fixture or owner-provided snapshot until an account feed is connected. |
-| Evidence relationships | Extend the [Onsumm Fact Graph](../../backend_ocr/app/domain/fact_graph.py) and [Agent Hub routes](../../backend_ocr/app/routers/agent_hub.py). PostgreSQL source records remain authoritative. |
+| Evidence relationships | Extend the [Reckon.ai Fact Graph](../../backend_ocr/app/domain/fact_graph.py) and [Agent Hub routes](../../backend_ocr/app/routers/agent_hub.py). PostgreSQL source records remain authoritative. |
 | Local execution | Keep the same adapter contracts for existing PostgreSQL and the seeded dataset. Use an isolated local store for demo snapshots and plans if the cloud database remains unreachable. The earlier cloud probe returned connection refused. |
 
 ```mermaid
@@ -37,7 +37,7 @@ flowchart LR
     Snap --> Reorder["Replenishment and offer evaluation"]
     Reorder -->|Dated purchase outflows| Flow
     Flow -->|Reserve feasibility| Reorder
-    Snap --> Graph[("Onsumm evidence graph")]
+    Snap --> Graph[("Reckon.ai evidence graph")]
     Flow --> Desk["Finance Desk · compare scenarios"]
     Reorder --> Desk
     Flow --> Tools["Typed finance tools"]
@@ -87,7 +87,7 @@ A scenario overlays date or quantity changes on an immutable snapshot. Reevaluat
 
 ### Inventory reference and scope
 
-The linked [Paytm repository](https://github.com/r-rishit27/paytm/tree/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1) is an **inventory optimization reference only**. Its [inventory agent](https://github.com/r-rishit27/paytm/blob/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1/backend/agents/inventory.py) illustrates daily demand, EOQ, safety stock, reorder point and alert reasons. Its [QUBO solver](https://github.com/r-rishit27/paytm/blob/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1/backend/agents/qubo_solver.py) illustrates a budget/capacity objective decoded into a reorder plan. Use those concepts as design input. No external code is copied into this proposal. Onsumm uses supplier-specific terms and hard feasibility checks after rounding quantities to packs.
+The linked [Paytm repository](https://github.com/r-rishit27/paytm/tree/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1) is an **inventory optimization reference only**. Its [inventory agent](https://github.com/r-rishit27/paytm/blob/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1/backend/agents/inventory.py) illustrates daily demand, EOQ, safety stock, reorder point and alert reasons. Its [QUBO solver](https://github.com/r-rishit27/paytm/blob/cc1a4133022dfdde9cd1e5928623b8eab0aec5a1/backend/agents/qubo_solver.py) illustrates a budget/capacity objective decoded into a reorder plan. Use those concepts as design input. No external code is copied into this proposal. Reckon.ai uses supplier-specific terms and hard feasibility checks after rounding quantities to packs.
 
 ### Replenishment and supplier selection
 
@@ -171,4 +171,4 @@ A single Finance Desk page has a scenario chart, a vendor comparison table, and 
 
 ## Expanded design references
 
-The [inventory code review](INVENTORY_REFERENCE.md) documents the pinned Paytm source and Onsumm adaptation. The [assistant architecture](ASSISTANT_ARCHITECTURE.md), [financial guardrails](FINANCIAL_GUARDRAILS.md), [API and data models](API_AND_DATA_MODELS.md) and [AWS design](AWS_DEPLOYMENT.md) specify the integration and scale path.
+The [inventory code review](INVENTORY_REFERENCE.md) documents the pinned Paytm source and Reckon.ai adaptation. The [assistant architecture](ASSISTANT_ARCHITECTURE.md), [financial guardrails](FINANCIAL_GUARDRAILS.md), [API and data models](API_AND_DATA_MODELS.md) and [AWS design](AWS_DEPLOYMENT.md) specify the integration and scale path.

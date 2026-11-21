@@ -10,7 +10,7 @@
 ; (8002 is the dev API, 8100 is reserved for a future prod Nova instance).
 
 [Unit]
-Description=Onsumm Nova Reconciliation Service (dev)
+Description=Reckon.ai Nova Reconciliation Service (dev)
 After=network.target
 ; The service reads dim_tenants/fact_invoices from the same DB as the dev API,
 ; but does not require it to be running.

@@ -487,7 +487,7 @@ def resolve_tenant(tenant: str, supplier_id: str | None = None) -> int:
         return 0
 
     results = []
-    with httpx.Client(timeout=8, follow_redirects=True, headers={"User-Agent": "Onsumm/1.0"}) as client:
+    with httpx.Client(timeout=8, follow_redirects=True, headers={"User-Agent": "Reckon.ai/1.0"}) as client:
         def one(row):
             try:
                 return _resolve_one(client, row, own, buyers)
@@ -620,7 +620,7 @@ def set_vendor_logo(supplier_id: str, body: LogoWebsiteBody):
     finally:
         put_conn(conn)
     try:
-        with httpx.Client(timeout=8, follow_redirects=True, headers={"User-Agent": "Onsumm/1.0"}) as client:
+        with httpx.Client(timeout=8, follow_redirects=True, headers={"User-Agent": "Reckon.ai/1.0"}) as client:
             icon = fetch_icon(client, domain)
     except httpx.HTTPError:
         raise HTTPException(status_code=502, detail="Couldn't reach the logo service. Try again in a moment.")

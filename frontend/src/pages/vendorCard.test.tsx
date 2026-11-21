@@ -134,7 +134,7 @@ describe('vendor card', () => {
   it('has no Copilot banner on the overview', async () => {
     await open()
     expect(await screen.findByText('Open bills')).toBeInTheDocument()
-    expect(screen.queryByText('Onsumm Copilot')).not.toBeInTheDocument()
+    expect(screen.queryByText('Reckon.ai Copilot')).not.toBeInTheDocument()
   })
 
   it('switches views through the route tab', async () => {

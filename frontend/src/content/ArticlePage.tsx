@@ -35,7 +35,7 @@ export default function ArticlePage({ article, onNavigate }: { article: Article;
     <article style={{ maxWidth: 760, margin: '0 auto', padding: '56px 24px 80px' }}>
       <nav aria-label="Breadcrumb" style={{ fontSize: 13, color: C.outline, marginBottom: 20 }}>
         <a href="/" style={{ color: C.primaryCont, textDecoration: 'none' }}>
-          Onsumm
+          Reckon.ai
         </a>
         <span aria-hidden="true"> / </span>
         <span>{article.title}</span>
@@ -74,7 +74,7 @@ export default function ArticlePage({ article, onNavigate }: { article: Article;
       </p>
 
       <p style={{ fontSize: 13, color: C.outline, margin: '0 0 44px' }}>
-        Last updated <time dateTime={article.updated}>{updated}</time> · Onsumm
+        Last updated <time dateTime={article.updated}>{updated}</time> · Reckon.ai
       </p>
 
       {article.sections.map(section => (

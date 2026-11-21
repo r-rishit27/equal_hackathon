@@ -280,7 +280,7 @@ export interface CaseContext {
 }
 export interface CaseDocument {
   id: string; role: 'po' | 'invoice' | 'evidence' | 'pod' | 'memo' | 'other'; kind: SegmentKind; title: string
-  /** upload = a file in Recon; bill = the bill already in Onsumm; register = the PO register. */
+  /** upload = a file in Recon; bill = the bill already in Reckon.ai; register = the PO register. */
   source: 'upload' | 'bill' | 'register'
   file_name: string | null; doc_id: string | null; pages: number[]; link_method: string | null
   /** Protected path to the original file (streamed after a tenant check), and what kind of file it is. */

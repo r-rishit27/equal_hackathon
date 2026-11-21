@@ -112,7 +112,7 @@ export function ReceiptPrintout({ data, actions, onPrinted }: ReceiptPrintoutPro
       <div className="rcpt-machine">
         <div className="rcpt-printer">
           <span className={`rcpt-led${done ? ' rcpt-led--idle' : ''}`} />
-          <span className="rcpt-printer__name">ONSUMM</span>
+          <span className="rcpt-printer__name">Reckon.ai</span>
           <span className="rcpt-slit" />
         </div>
 
@@ -141,7 +141,7 @@ export function ReceiptPrintout({ data, actions, onPrinted }: ReceiptPrintoutPro
             <div className="rcpt-next" aria-hidden="true" />
             <div className="rcpt-perf" aria-hidden="true" />
             <div className="rcpt-doc">
-            <div className="rcpt-brand">ONSUMM</div>
+            <div className="rcpt-brand">Reckon.ai</div>
             <div className="rcpt-kind">PAYMENT RECEIPT</div>
             <div className="rcpt-rule" />
 

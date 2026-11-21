@@ -63,7 +63,7 @@ export function enterImpersonation(grant: ImpersonationGrant): void {
   clearTenantCaches()
   sessionStorage.setItem('onsum_auth', JSON.stringify({
     username: grant.impersonation.actor,
-    name: `${grant.impersonation.actor} (Onsumm Support)`,
+    name: `${grant.impersonation.actor} (Reckon.ai Support)`,
     email: grant.impersonation.actor,
     role: 'auditor',
     company_id: grant.impersonation.tenant_id,

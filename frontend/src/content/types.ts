@@ -45,7 +45,7 @@ export interface ArticleSection {
 export interface Article {
   /** Absolute route, e.g. '/tds-automation-on-vendor-bills'. */
   path: string
-  /** <title>, before the ` · Onsumm` suffix. Keep the whole thing under ~60. */
+  /** <title>, before the ` · Reckon.ai` suffix. Keep the whole thing under ~60. */
   title: string
   h1: string
   /** <meta description>. Under 160 characters — see MAX_DESCRIPTION_CHARS. */

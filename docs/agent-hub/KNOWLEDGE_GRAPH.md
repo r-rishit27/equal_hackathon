@@ -1,4 +1,4 @@
-# Knowledge Graph — Onsumm Context Graph
+# Knowledge Graph — Reckon.ai Context Graph
 
 Source of truth: `onsumm-agenthub-lowlevel.html` (Knowledge graph tab). Grounded in `fact_graph_nodes` / `fact_graph_edges` in the live PostgreSQL schema.
 

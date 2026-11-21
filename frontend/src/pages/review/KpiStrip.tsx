@@ -87,7 +87,7 @@ export function KpiStrip({ counts }: { counts: ReviewCounts | null }) {
         tone="rh-t--brand"
         value={<>{formatHours(hoursSaved(closed))}<span className="rh__kpi-suffix">h</span></>}
         unit="this month"
-        sub="Via Onsumm"
+        sub="Via Reckon.ai"
       />
     </div>
   )

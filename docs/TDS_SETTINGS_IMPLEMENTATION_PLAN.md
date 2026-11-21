@@ -1,6 +1,6 @@
 # TDS Dynamic Settings — Implementation Plan
 
-> ONSUMM.AI | FY 2026-27 | Finalized 27 May 2026
+> Reckon.ai | FY 2026-27 | Finalized 27 May 2026
 
 ---
 

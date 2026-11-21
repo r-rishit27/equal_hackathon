@@ -175,7 +175,7 @@ def forgot_password(body: dict):
     html = f"""
     <html><body style="font-family:Arial,sans-serif;max-width:480px;margin:auto;color:#333;">
       <h2 style="color:#004080;">Password Reset OTP</h2>
-      <p>You requested a password reset for your Onsumm account.</p>
+      <p>You requested a password reset for your Reckon.ai account.</p>
       <div style="font-size:36px;font-weight:bold;letter-spacing:10px;color:#004080;
                   background:#eff4ff;padding:20px;text-align:center;border-radius:8px;margin:24px 0;">
         {otp}
@@ -185,7 +185,7 @@ def forgot_password(body: dict):
     </body></html>
     """
     msg = MIMEMultipart("alternative")
-    msg["Subject"] = "Your Onsumm Password Reset OTP"
+    msg["Subject"] = "Your Reckon.ai Password Reset OTP"
     msg["From"] = SMTP_USER
     msg["To"] = email
     msg.attach(MIMEText(html, "html"))
