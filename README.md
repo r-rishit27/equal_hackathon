@@ -2,7 +2,7 @@
 
 > Finance operations for payables, receivables, and working capital.
 
-Bring invoice capture, vendor reconciliation, tax review, approvals, payouts, and cash application into one workspace. This README describes the application and deployment paths in the `uat2` codebase.
+Reckon.ai brings invoice capture, vendor reconciliation, tax review, approvals, payouts, and cash application into one workspace. This README describes the code on `main`, including the tenant-licensed workflows and deployment configurations checked into the repository.
 
 ---
 
@@ -13,6 +13,7 @@ Bring invoice capture, vendor reconciliation, tax review, approvals, payouts, an
    - [Components and integrations](#components-and-integrations)
    - [Payables flow](#payables-flow)
    - [Receivables flow](#receivables-flow)
+   - [Deployment architecture](#deployment-architecture)
 3. [Technology Stack](#3-technology-stack)
 4. [Data Model & Table Taxonomy](#4-data-model--table-taxonomy)
 5. [Pipeline Engine](#5-pipeline-engine)
@@ -53,6 +54,19 @@ Reckon.ai helps finance teams manage accounts payable, accounts receivable, and 
 | **Vendor records and tax** | Maintain GSTINs, bank accounts, contacts, and documents. Verify supported GSTIN, PAN, and bank details, and configure TDS sections, thresholds, rules, and vendor overrides. |
 | **Receivables and cash application** | Capture sales invoices, import PDF/CSV/XLSX statements, add remittance advice, match credits to invoices, and apply or reverse allocations. The review board surfaces exceptions and cash-application KPIs. |
 | **Reporting and review** | Inspect spend, outstanding balances, and approval activity. Export expense data in XLSX or CSV and review findings across bills, vendors, and related records. |
+| **Review Hub and Agent Hub** | Triage findings, inspect evidence, and resolve or snooze exceptions in Review Hub. Agent Hub surfaces watched contacts, mailbox activity, and vendor invoice drafts for review. |
+| **Vendor Playground** | Build and run a visual workflow from a licensed vendor card. Use document and data nodes to structure vendor-specific checks and inspect their results. |
+| **Nova billing reconciliation** | Compare vendor invoices with Nova usage and certified rates. Review saved results by vendor and service month, or inspect the upstream billing response in the Raw Nova API view. |
+| **Tenant and brand administration** | Switch brands in the workspace and manage roles, approval chains, mappings, and integrations. The separate operations console manages tenant service licensing. |
+
+| Where to start | Paths |
+|---|---|
+| Payables | `/dashboard`, `/upload`, `/bills`, `/vendors`, `/payments` |
+| Review and automation | `/review`, `/review/browse`, `/agent-hub`, `/nova` |
+| Receivables | `/receivables/cash-application`, `/receivables/invoices`, `/receivables/customers` |
+| Reporting and setup | `/reports`, `/data-extraction`, `/integrations`, `/settings` |
+
+Vendor reconciliation and its dashboard are available from the vendor card's **Documents** view. **Playground** has its own vendor-card tab. The tenant's service plan and the signed-in user's role determine which workflows are available. [Route map](frontend/src/routes/paths.ts) · [Service catalog](backend_ocr/app/security/services.py)
 
 <details>
 <summary><strong>Connector coverage and deployment requirements</strong></summary>
@@ -118,16 +132,18 @@ flowchart LR
     API --> Providers["OCR · email · KYB providers"]
     Workers --> Providers
     API -->|IMPS and status checks| Bank["Bank gateway"]
-    API -->|Billing reconciliation| Nova["Nova reconciliation service"]
+    Web -->|Nova dashboard and raw explorer| Nova["Nova reconciliation service"]
+    Nova -->|Saved runs and tenant configuration| DB
+    Nova -->|Vendor usage by month| NovaUpstream["Nova billing API"]
 
     classDef client fill:#dbeafe,stroke:#2563eb,color:#172554;
     classDef compute fill:#ede9fe,stroke:#7c3aed,color:#2e1065;
     classDef data fill:#ccfbf1,stroke:#0f766e,color:#042f2e;
     classDef external fill:#ffedd5,stroke:#c2410c,color:#431407;
     class People,Web client;
-    class API,Agents,Workers compute;
+    class API,Agents,Workers,Nova compute;
     class DB,Files data;
-    class Tally,Sources,Providers,Bank,Nova external;
+    class Tally,Sources,Providers,Bank,NovaUpstream external;
 ```
 
 <details>
@@ -199,6 +215,72 @@ flowchart TD
 ```
 
 [Payables reconciliation lifecycle](docs/RECON_AGENT.md) · [Receivables user flows](docs/receivables/03_USER_FLOWS.md)
+
+### Deployment architecture
+
+The repository documents an AWS topology with Amplify serving the static frontend, an EC2 reverse proxy terminating HTTPS for the APIs, and PostgreSQL on RDS. Nova runs as a separate process. These are deployment configurations from the repository. The live host, branch mappings, and enabled services are set in the deployment environment.
+
+```mermaid
+flowchart LR
+    Git["GitHub repository"] -->|"npm ci and npm run build"| Amplify["AWS Amplify<br/>Static frontend and prerendered pages"]
+    User["Finance workspace"] -->|HTTPS| Amplify
+    User -->|"API and Nova base URLs"| Proxy
+
+    subgraph EC2["AWS EC2"]
+        Proxy["Nginx<br/>HTTPS and route prefixes"]
+        Prod["Production API<br/>FastAPI and Uvicorn"]
+        Dev["Development API<br/>Separate systemd unit"]
+        Pipeline["Pipeline worker process"]
+        Nova["Nova reconciliation service<br/>Separate Uvicorn process"]
+        Proxy -->|Production API| Prod
+        Proxy -->|Development API| Dev
+        Proxy -->|Configured Nova route| Nova
+    end
+
+    RDS[("Amazon RDS<br/>PostgreSQL")]
+    S3[("Amazon S3<br/>Document objects")]
+    CDN["CloudFront<br/>Optional signed document delivery"]
+    Providers["OCR, email, verification,<br/>banking and Nova providers"]
+
+    Prod --> RDS
+    Dev --> RDS
+    Pipeline <-->|Queries and notifications| RDS
+    Nova --> RDS
+    Prod -->|When configured| S3
+    Dev -->|When configured| S3
+    CDN --> S3
+    User -.->|Signed download| CDN
+    Prod --> Providers
+    Pipeline --> Providers
+    Nova --> Providers
+
+    classDef entry fill:#dbeafe,stroke:#1d4ed8,color:#172554;
+    classDef compute fill:#ede9fe,stroke:#6d28d9,color:#2e1065;
+    classDef storage fill:#ccfbf1,stroke:#0f766e,color:#134e4a;
+    classDef external fill:#ffedd5,stroke:#c2410c,color:#431407;
+    class Git,User,Amplify,CDN entry;
+    class Proxy,Prod,Dev,Pipeline,Nova compute;
+    class RDS,S3 storage;
+    class Providers external;
+
+    click Amplify href "https://github.com/r-rishit27/equal_hackathon/blob/main/frontend/amplify.yml" "Open the Amplify build spec" _blank
+    click Proxy href "https://github.com/r-rishit27/equal_hackathon/blob/main/docs/DEV_ENVIRONMENT.md" "Open the deployment routing notes" _blank
+    click Nova href "https://github.com/r-rishit27/equal_hackathon/blob/main/services/nova_reconciliation/README.md" "Open Nova service setup" _blank
+```
+
+<details>
+<summary>Deployment components and configuration</summary>
+
+| Component | Configuration |
+|---|---|
+| Frontend | Amplify installs dependencies, runs `npm run build`, and serves `frontend/dist`. Configure `VITE_API_URL` and, for Nova, `VITE_NOVA_RECONCILIATION_API_URL` at build time. Apply the documented SPA rewrite for authenticated routes while allowing static and prerendered files through. |
+| API and workers | Run the main FastAPI app on EC2 behind Nginx. The deployment notes show separate production and development API units on ports `8001` and `8002`. Run the ingestion pipeline separately with `python main.py`. |
+| Nova | Run the independent Nova service with the intended database, frontend origin, and tenant credentials. The checked-in development unit binds to `127.0.0.1:8102`. Its local default is `8100`. |
+| Database and files | APIs, workers, and Nova use PostgreSQL. Document storage can use S3 and signed delivery, with local storage available when S3 is unconfigured. Use the configured connection strings to identify the database for each environment. |
+
+</details>
+
+Use the diagram nodes to open configuration files in renderers that support Mermaid links. [Frontend build spec](frontend/amplify.yml) · [AWS deployment guide](docs/aws-deploy/README.md) · [Development routing](docs/DEV_ENVIRONMENT.md) · [Nova service](services/nova_reconciliation/README.md)
 
 ---
 
