@@ -520,6 +520,7 @@ function PaymentRoute() {
 
 // ── Public (signed-out) routes ───────────────────────────────────────────────
 function PublicRoutes() {
+  const { login, loginWithSso } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
   useDocumentTitle(titleForPath(location.pathname))
@@ -537,10 +538,11 @@ function PublicRoutes() {
 
   return (
     <Routes>
-      <Route path={LOGIN_PATH} element={<LoginPage onBack={() => navigate('/')} />} />
+      <Route path="/" element={<Navigate to={LOGIN_PATH} replace />} />
+      <Route path={LOGIN_PATH} element={<LoginPage login={login} loginWithSso={loginWithSso} />} />
       {/* The four marketing pages and every long-form article: all public,
           all rendered inside the same chrome by LandingApp. */}
-      {PUBLIC_PATHS.map(p => (
+      {PUBLIC_PATHS.filter(p => p !== '/').map(p => (
         <Route key={p} path={p} element={<LandingApp onLogin={() => navigate(LOGIN_PATH)} />} />
       ))}
       {/* A deep link into the app while signed out is remembered and replayed

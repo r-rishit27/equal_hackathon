@@ -15,6 +15,7 @@
  */
 import { renderToStaticMarkup } from 'react-dom/server'
 import { StaticRouter } from 'react-router'
+import LoginPage from '../src/pages/LoginPage'
 import LandingApp from '../src/landing/LandingApp'
 import { PAGE_SEO, SITE_URL } from '../src/seo/useSeo'
 import { titleForPath } from '../src/routes/paths'
@@ -58,6 +59,12 @@ export interface RouteHead {
 
 /** The head that useSeo would have written on the client, computed in Node. */
 export function headFor(pathname: string): RouteHead {
+  if (pathname === '/') return {
+    title: titleForPath('/login'),
+    description: 'Sign in to Reckon.ai to manage accounts payable and accounts receivable.',
+    canonical: SITE_URL + '/',
+    schemas: [],
+  }
   const page = PAGE_SEO[pathname]
   if (!page) throw new Error(`no PAGE_SEO entry for ${pathname}`)
   return {
@@ -75,7 +82,7 @@ export function headFor(pathname: string): RouteHead {
 export function renderRoute(pathname: string): string {
   return renderToStaticMarkup(
     <StaticRouter location={pathname}>
-      <LandingApp onLogin={() => {}} />
+      {pathname === '/' ? <LoginPage login={async () => false} loginWithSso={async () => false} /> : <LandingApp onLogin={() => {}} />}
     </StaticRouter>,
   )
 }

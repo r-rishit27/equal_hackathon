@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { useAuth } from '../auth/AuthContext'
-import { Eye, EyeOff, ArrowRight, CheckCircle, CheckCircle2 } from 'lucide-react'
+import type { useAuth } from '../auth/AuthContext'
+import { Eye, EyeOff, ArrowRight, ArrowDownLeft, FileSearch, GitBranch, Shield, CheckCircle, CheckCircle2 } from 'lucide-react'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
-
-interface Props { onBack?: () => void }
 
 type ForgotStep = 'login' | 'forgot' | 'otp' | 'reset' | 'done'
 type SsoProvider = 'google' | 'microsoft'
@@ -45,8 +43,7 @@ function MicrosoftMark() {
   )
 }
 
-export default function LoginPage({ onBack }: Props) {
-  const { login, loginWithSso } = useAuth()
+export default function LoginPage({ login, loginWithSso }: Pick<ReturnType<typeof useAuth>, 'login' | 'loginWithSso'>) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [show, setShow]         = useState(false)
@@ -151,15 +148,9 @@ export default function LoginPage({ onBack }: Props) {
   return (
     <>
       {/* ── Top nav ── */}
-      <nav className="lp__nav">
-        <button className="lp__nav-logo" onClick={onBack}>
-          <img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" />
-        </button>
-
-        <div style={{ marginLeft: 'auto' }}>
-          <button className="lp__nav-back" onClick={onBack}>← Back to site</button>
-        </div>
-      </nav>
+      <header className="lp__nav">
+        <span className="lp__nav-logo"><img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" /></span>
+      </header>
 
       <div className="lp">
 
@@ -169,11 +160,51 @@ export default function LoginPage({ onBack }: Props) {
           <div className="lp__grid-bg" />
 
           <div className="lp__left-inner">
-            <img className="lp__brand" src="/brand/reckon-wordmark-light.svg" alt="Reckon.ai" />
-            <h2 className="lp__left-headline">Your finance workspace</h2>
+            {/* Brand */}
+            <div className="lp__brand">
+              <div className="lp__brand-logo"><img src="/brand/reckon-wordmark-light.svg" alt="Reckon.ai" /></div>
+              <div className="lp__brand-badge">AP/AR Automation Platform</div>
+            </div>
+
+            <h2 className="lp__left-headline">
+              Automate your<br />
+              <span className="lp__teal-text">payables and receivables</span>
+            </h2>
             <p className="lp__left-sub">
-              Review invoices, track what needs attention, and manage payments in one place.
+              Capture bills, approve vendor payments and match customer receipts to open invoices.
             </p>
+
+            {/* Feature list */}
+            <div className="lp__feat-list">
+              {[
+                { icon: <FileSearch size={15} strokeWidth={1.5} />, label: 'AI Invoice Capture & OCR', sub: 'Extract vendor and line-item details from supplier bills' },
+                { icon: <GitBranch size={15} strokeWidth={1.5} />, label: 'Multi-level Approval Workflows', sub: 'Route bills by team and approval threshold' },
+                { icon: <Shield size={15} strokeWidth={1.5} />, label: 'GST & TDS Compliance', sub: 'Verify GST registration and calculate withholding tax' },
+                { icon: <ArrowDownLeft size={15} strokeWidth={1.5} />, label: 'Accounts Receivable', sub: 'Track customer invoices, record collections and match receipts' },
+              ].map((f, i) => (
+                <div key={i} className="lp__feat">
+                  <div className="lp__feat-icon">{f.icon}</div>
+                  <div>
+                    <div className="lp__feat-label">{f.label}</div>
+                    <div className="lp__feat-sub">{f.sub}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Stats row */}
+            <div className="lp__stats">
+              {[
+                { val: '95%', label: 'Less manual entry' },
+                { val: '3×', label: 'Faster approvals' },
+                { val: '100%', label: 'Audit-ready' },
+              ].map((s, i) => (
+                <div key={i} className="lp__stat">
+                  <div className="lp__stat-val">{s.val}</div>
+                  <div className="lp__stat-lbl">{s.label}</div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
 
@@ -193,7 +224,7 @@ export default function LoginPage({ onBack }: Props) {
               </div>
               <div>
                 <h1 className="lp__title">Welcome back</h1>
-                <p className="lp__subtitle">Sign in to your Reckon.ai account</p>
+                <p className="lp__subtitle">Sign in to your AP/AR workspace</p>
               </div>
             </div>
 
@@ -374,7 +405,6 @@ export default function LoginPage({ onBack }: Props) {
           letter-spacing: -0.02em;
           background: none;
           border: none;
-          cursor: pointer;
           padding: 0;
           flex-shrink: 0;
           margin-right: 8px;
@@ -433,21 +463,74 @@ export default function LoginPage({ onBack }: Props) {
           position: relative;
           z-index: 1;
         }
-        .lp__brand { display: block; width: 160px; margin-bottom: 32px; }
+        .lp__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+        .lp__brand-logo {
+          font-family: "Public Sans", sans-serif;
+          font-size: 22px; font-weight: 700;
+          color: #fff; letter-spacing: -0.02em;
+        }
+        .lp__brand-logo img { display:block; width:144px; height:31px; }
+        .lp__brand-badge {
+          font-size: 10px; font-weight: 600;
+          color: rgba(255,255,255,0.45);
+          text-transform: uppercase; letter-spacing: 0.07em;
+          padding: 3px 8px;
+          border: 1px solid rgba(255,255,255,0.12);
+          border-radius: 4px;
+        }
         .lp__left-headline {
           font-family: "Public Sans", sans-serif;
-          font-size: clamp(2rem, 4vw, 3.5rem);
+          font-size: clamp(24px, 2.5vw, 32px);
           font-weight: 700; color: #fff;
           letter-spacing: -0.02em;
           line-height: 1.25;
           margin-bottom: 16px;
         }
+        .lp__teal-text { color: #5cd8da; }
         .lp__left-sub {
           font-size: 14px;
           color: rgba(255,255,255,0.75);
           line-height: 1.7;
-          margin-bottom: 40px;
+          margin-bottom: 24px;
         }
+
+        .lp__feat-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 24px; }
+        .lp__feat {
+          display: flex; align-items: flex-start; gap: 14px;
+          padding: 14px 16px;
+          background: rgba(255,255,255,0.05);
+          border: 1px solid rgba(255,255,255,0.08);
+          border-radius: 6px;
+          transition: background 0.15s;
+        }
+        .lp__feat:hover { background: rgba(255,255,255,0.08); }
+        .lp__feat-icon {
+          width: 32px; height: 32px; border-radius: 4px; flex-shrink: 0;
+          background: rgba(92,216,218,0.12);
+          border: 1px solid rgba(92,216,218,0.2);
+          display: flex; align-items: center; justify-content: center;
+          color: #5cd8da;
+          margin-top: 1px;
+        }
+        .lp__feat-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
+        .lp__feat-sub   { font-size: 11px; color: rgba(255,255,255,0.72); }
+
+        .lp__stats {
+          display: grid; grid-template-columns: repeat(3, 1fr);
+          gap: 1px; background: rgba(255,255,255,0.08);
+          border-radius: 6px; overflow: hidden;
+          border: 1px solid rgba(255,255,255,0.08);
+        }
+        .lp__stat {
+          background: rgba(0,42,88,0.6);
+          padding: 16px; text-align: center;
+        }
+        .lp__stat-val {
+          font-family: "Public Sans", sans-serif;
+          font-size: 20px; font-weight: 700;
+          color: #fff; margin-bottom: 3px;
+        }
+        .lp__stat-lbl { font-size: 11px; color: rgba(255,255,255,0.72); }
 
         .lp__right {
           background: var(--brand-50);
@@ -603,7 +686,8 @@ export default function LoginPage({ onBack }: Props) {
 
         @media (max-width: 820px) {
           .lp { grid-template-columns: 1fr; }
-          .lp__left { display: none; }
+          .lp__left { grid-row: 2; padding: 32px 20px; }
+          .lp__brand { flex-wrap: wrap; }
           .lp__right { padding: 40px 24px; border-left: none; }
           .lp__mobile-logo { display: block; }
           .lp__nav-links { display: none; }
