@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertTriangle, BarChart3, ChevronDown, FileSearch, FileText, Folder, FolderOpen, LayoutDashboard, Loader2, RotateCw, Trash2, Upload, X } from 'lucide-react'
+import { AlertTriangle, FileSearch, FileText, Folder, FolderOpen, Loader2, RotateCw, Trash2, Upload, X } from 'lucide-react'
 
 import axios from 'axios'
 import {
@@ -20,8 +20,6 @@ import {
   type ReconFolderKey,
 } from './reconFormat'
 
-/** Remembered per browser, so the screen opens the way it was left. */
-const BOARD_KEY = 'recon.dashboard.open'
 import './recon.css'
 
 const ACCEPT = '.pdf,.png,.jpg,.jpeg,.webp,.heic,.tif,.tiff,.xlsx,.xlsm,.csv'
@@ -35,14 +33,13 @@ const POLL_LIMIT_MS = 10 * 60 * 1000
  * are read in the background, filed against the right invoice, and each invoice
  * becomes a case reconciled line by line against its PO and the report.
  */
-export default function ReconFolder({ supplierId, brandId, notify, view: screen = 'documents', onView }: {
+export default function ReconFolder({ supplierId, brandId, notify, view: screen }: {
   supplierId: string
   brandId: string | null
   notify: (msg: string, type?: 'error' | 'info') => void
   /** 'board' is the dashboard screen, reached from its own entry in the
    *  vendor's sidebar; 'documents' is the folders of files. */
   view?: 'documents' | 'board'
-  onView?: (v: 'documents' | 'board') => void
 }) {
   // A case opens as its own card over the page (?open=recon:<id>), like a bill or vendor.
   const { openRecon } = useRecordCards()
@@ -116,12 +113,7 @@ export default function ReconFolder({ supplierId, brandId, notify, view: screen 
   const [view, setView] = useState<{ id: string; data: ReconFileView | null; error: string | null } | null>(null)
   // What the dashboard is currently asking to see. Null is everything.
   const [focus, setFocus] = useState<string | null>(null)
-  // Open by default, and remembered — a finance manager opens this screen to
-  // see where the money stands, not to click a toggle first.
   const onBoard = screen === 'board'
-  const [board, setBoard] = useState<boolean>(() => {
-    try { return localStorage.getItem(BOARD_KEY) !== '0' } catch { return true }
-  })
 
   const files = (docs ?? []).filter(d => d.recon_status !== 'PENDING' && d.recon_status !== 'RUNNING')
   const openId = viewing !== null ? files[viewing]?.id ?? null : null
@@ -161,21 +153,13 @@ export default function ReconFolder({ supplierId, brandId, notify, view: screen 
   }
 
   return (
-    <div className="rc">
+    <div className={`rc${onBoard ? ' rc--board' : ''}`}>
       <div className="vc__folder-h">
         <div className="vc__grow">
-          <div className="vc__folder-t">{onBoard ? 'Recon dashboard' : 'Recon'}</div>
-          <div className="vc__folder-d">{onBoard
-            ? 'Where every invoice on this vendor stands. Pick anything to see only those.'
-            : 'Every PO, invoice and site audit you add is read, filed against its invoice and checked line by line.'}</div>
+          <div className="vc__folder-t">{onBoard ? 'Reconciliation Dashboard' : 'Supporting Documents'}</div>
         </div>
-        {onView && (
-          <button className="vc__btn vc__btn--sm" onClick={() => onView(onBoard ? 'documents' : 'board')}>
-            {onBoard ? <><FolderOpen size={14} />Documents</> : <><LayoutDashboard size={14} />Dashboard</>}
-          </button>
-        )}
         <button className="vc__btn vc__btn--primary vc__btn--sm" onClick={() => input.current?.click()} disabled={uploading}>
-          {uploading ? <Loader2 size={14} className="rc__spin" /> : <Upload size={14} />}Add documents
+          {uploading ? <Loader2 size={14} className="rc__spin" /> : <Upload size={14} />}Upload supporting documents
         </button>
         <input ref={input} type="file" multiple accept={ACCEPT} hidden
           onChange={e => { const f = Array.from(e.target.files ?? []); e.target.value = ''; send(f) }} />
@@ -187,15 +171,20 @@ export default function ReconFolder({ supplierId, brandId, notify, view: screen 
         onDragOver={e => { e.preventDefault(); setOver(true) }} onDragLeave={() => setOver(false)}
         onDrop={e => { e.preventDefault(); setOver(false); send(Array.from(e.dataTransfer.files)) }}>
         <FileSearch size={18} strokeWidth={1.8} />
-        <span>{over ? 'Drop to read them' : 'Drop POs, invoices, audit reports, delivery proofs, memos or spreadsheets'}</span>
-        <span className="vc__muted vc__xs">PDF, photo, XLSX or CSV · up to {MAX_MB} MB each · any order</span>
+        <span>{over ? 'Drop to read them' : 'Drop source documents'}</span>
+        <span className="vc__muted vc__xs">POs, invoices, audit reports, receipts or spreadsheets · up to {MAX_MB} MB each</span>
       </div>
 
       {error && <div className="vc__err vc__err--inline">{error} <button className="vc__lnk" onClick={load}>Try again</button></div>}
+      {!error && cases === null && <p className="vc__muted" role="status">Loading reconciliation cases…</p>}
+      {onBoard && !error && cases?.length === 0 && (
+        <div className="vc__empty">
+          <div className="vc__empty-t">No reconciliation cases yet</div>
+          <p className="vc__muted">Add an invoice and its supporting documents to start a case.</p>
+        </div>
+      )}
 
-      {/* On the dashboard screen the board IS the screen. On the documents
-          screen it stays a panel that can be folded away. */}
-      {onBoard ? (
+      {onBoard && (
         <>
           <ReconDashboard cases={cases} active={focus} onPick={setFocus} />
           {/* The invoices the counts above are made of. Without this the
@@ -207,25 +196,7 @@ export default function ReconFolder({ supplierId, brandId, notify, view: screen 
             cases={cases.filter(c => matchesFilter(c, focus))
               .slice().sort((a, b) => Number(!!a.bill_deleted) - Number(!!b.bill_deleted))} />}
         </>
-      ) : (cases?.length ?? 0) > 0 && (
-        <>
-          <div className="rc__dashbar">
-            <button type="button" className={`rc__dashbtn${board ? ' on' : ''}`}
-              aria-expanded={board} aria-controls="recon-dashboard"
-              onClick={() => { setBoard(b => !b); try { localStorage.setItem(BOARD_KEY, board ? '0' : '1') } catch { /* private window */ } }}>
-              <BarChart3 size={15} aria-hidden />
-              <span className="vc__grow">Reconciliation dashboard</span>
-              <span className="vc__muted vc__xs">{board ? 'Hide' : `${cases!.length} invoice${cases!.length === 1 ? '' : 's'}`}</span>
-              <ChevronDown size={15} aria-hidden className={`rc__chev${board ? ' on' : ''}`} />
-            </button>
-          </div>
-          <div id="recon-dashboard" hidden={!board}>
-            {board && <ReconDashboard cases={cases} active={focus} onPick={setFocus} />}
-          </div>
-        </>
       )}
-
-
 
       {(needs.length > 0 || failed.length > 0) && (
         <section className="rc__sec" aria-label="Needs you">

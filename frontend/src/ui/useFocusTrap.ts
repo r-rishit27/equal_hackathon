@@ -35,7 +35,8 @@ export function useFocusTrap(ref: RefObject<HTMLElement | null>, active: boolean
 
     // Focus the first control, or the container itself if there is none.
     const focusables = () => Array.from(node.querySelectorAll<HTMLElement>(FOCUSABLE))
-    const first = focusables()[0]
+    const controls = focusables()
+    const first = controls.find(control => control.hasAttribute('data-autofocus')) ?? controls[0]
     if (first) first.focus()
     else {
       node.setAttribute('tabindex', '-1')

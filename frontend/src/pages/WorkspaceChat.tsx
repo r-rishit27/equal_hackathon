@@ -4,6 +4,7 @@ import { ArrowUp, ChevronRight, FileText, Maximize2, Paperclip, RotateCcw, X } f
 import { useAuth } from '../auth/AuthContext'
 import { useEntitlements } from '../auth/EntitlementsContext'
 import { readImpersonation } from '../admin/impersonation'
+import { COPILOT_ROLES } from '../components/workspaceNavigation'
 import './workspace-chat.css'
 
 interface Source { id: string; title: string; path: string | null; domain: string; values: Record<string, unknown> }
@@ -97,11 +98,11 @@ function ChatView({ turns,text,setText,file,setFile,busy,notice,setNotice,reset,
     <div className="wc-toolbar">
       <button type="button" onClick={reset} aria-label="New conversation"><RotateCcw size={15} /> New chat</button></div>
     <div ref={scroll} className="wc-feed" role="log" aria-label="Conversation">
-      {!turns.length && <div className="wc-welcome"><img src="/favicon.svg" alt="" /><h2>How can I help?</h2>
+      {!turns.length && <div className="wc-welcome"><img src="/brand/reckon-mark.svg" alt="" /><h2>How can I help?</h2>
         <p>Explore your finance workspace or attach a document to review.</p>
         <div className="wc-prompts">{prompts.map(p=><button key={p} onClick={()=>void send(p)}>{p}<ChevronRight size={15}/></button>)}</div></div>}
       {turns.map((turn,i)=><div className="wc-turn" key={i}><div className="wc-question">{turn.question}{turn.file && <small><Paperclip size={12}/>{turn.file}</small>}</div>
-        {turn.message && <div className="wc-answer"><div className="wc-author"><img src="/favicon.svg" alt="" width={20} height={20}/><strong>Reckon Copilot</strong></div><Reply turn={turn} />
+        {turn.message && <div className="wc-answer"><div className="wc-author"><img src="/brand/reckon-mark.svg" alt="" width={20} height={20}/><strong>Reckon Copilot</strong></div><Reply turn={turn} />
           {!!turn.sources?.length && <details><summary>Sources ({turn.sources.length})</summary>{turn.sources.map(s=><div className="wc-source" key={s.id}>
             {s.path ? <Link to={s.path}>[{s.id}] {s.title}</Link> : <strong>[{s.id}] {s.title}</strong>}
             <dl>{Object.entries(s.values).filter(([k,v])=>v!=null && typeof v!=='object' && k!=='more_bills').map(([k,v])=><div key={k}><dt>{k.replace(/_/g,' ')}</dt><dd>{typeof v==='boolean' ? (v?'Yes':'No') : String(v)}</dd></div>)}</dl>
@@ -140,7 +141,7 @@ export function CopilotLauncher() {
     const onKey=(e:KeyboardEvent)=>{if(e.key==='Escape')setOpen(false)}
     window.addEventListener('keydown',onKey);return ()=>window.removeEventListener('keydown',onKey)
   },[open])
-  if(!user||readImpersonation()||user.role==='member'||!has('fact_graph')||pathname==='/finance-desk/copilot')return null
+  if(!user||readImpersonation()||!COPILOT_ROLES.includes(user.role)||!has('fact_graph')||pathname==='/finance-desk/copilot')return null
   return <aside className="wc-launcher">{open && <section className="wc-panel" aria-label="Reckon Copilot chat">
     <header><img src="/brand/reckon-mark.svg" alt=""/><strong>Reckon Copilot</strong><Link to="/finance-desk/copilot" aria-label="Open full chat"><Maximize2 size={16}/></Link>
       <button onClick={()=>setOpen(false)} aria-label="Close chat"><X size={18}/></button></header>

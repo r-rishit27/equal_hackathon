@@ -12,16 +12,18 @@ import { AuthProvider, useAuth } from './auth/AuthContext'
 import { isAdminPath } from './routes/adminPaths'
 import ImpersonationBanner from './components/ImpersonationBanner'
 const AdminApp = lazy(() => import('./admin/AdminApp'))
-import { EntitlementsProvider } from './auth/EntitlementsContext'
+import { EntitlementsProvider, useEntitlements } from './auth/EntitlementsContext'
 import { RequireRole, RequireService } from './auth/guards'
 import { can } from './auth/permissions'
 import Sidebar from './components/Sidebar'
+import { COPILOT_ROLES } from './components/workspaceNavigation'
 import { ConversationProvider } from './pages/WorkspaceChat'
 import MobileNav from './components/MobileNav'
 import TopBar from './components/TopBar'
 import RecordCardHost from './components/records/RecordCardHost'
 import { useRecordCards } from './components/records/recordLinks'
 import './components/shell.css'
+import './styles/workspace.css'
 import LandingApp from './landing/LandingApp'
 import LoginPage from './pages/LoginPage'
 
@@ -95,6 +97,7 @@ function defaultPath(role: string): string {
 // ── Authenticated shell ──────────────────────────────────────────────────────
 function AppShell() {
   const { user, activeBrand } = useAuth()
+  const { has } = useEntitlements()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -235,16 +238,14 @@ function AppShell() {
               <Route
                 path={PATHS.dashboard}
                 element={
-                  <DashboardPage
-                    onGoToBills={() => navigate(PATHS.bills)}
-                    onGoToUpload={() => navigate(PATHS.upload)}
-                    // The bill card, over the dashboard. This used to mount a
-                    // second BillsPage inside the dashboard route behind a
-                    // hand-rolled "← Back to Dashboard" bar, which gave the bill no
-                    // URL and no browser history. The card has both, and Back
-                    // closes it back onto the dashboard.
-                    onGoToBill={openBill}
-                  />
+                  <RequireService service="reports">
+                    <DashboardPage
+                      onGoToBills={has('bills') ? () => navigate(PATHS.bills) : undefined}
+                      onGoToUpload={has('upload_ocr') && user && can(user.role, 'payables.initiate')
+                        ? () => navigate(PATHS.upload) : undefined}
+                      onGoToBill={has('bills') ? openBill : undefined}
+                    />
+                  </RequireService>
                 }
               />
 
@@ -253,11 +254,11 @@ function AppShell() {
                 vendor's contacts can be linked to, bookmarked and reached with
                 Back. */}
               {[PATHS.bills, `${PATHS.bills}/:invoiceId`].map(path => (
-                <Route key={path} path={path} element={<BillsPage onReviewDraft={handleReviewDraft} />} />
+                <Route key={path} path={path} element={<RequireService service="bills"><BillsPage onReviewDraft={handleReviewDraft} /></RequireService>} />
               ))}
               {[PATHS.vendors, `${PATHS.vendors}/:supplierId`, `${PATHS.vendors}/:supplierId/:tab`].map(
                 path => (
-                  <Route key={path} path={path} element={<VendorsPage onNavigateToBill={openBill} />} />
+                  <Route key={path} path={path} element={<RequireService service="vendors"><VendorsPage onNavigateToBill={openBill} /></RequireService>} />
                 ),
               )}
               {/* Money movement gets a real address — the audit's finding N2: the
@@ -283,9 +284,9 @@ function AppShell() {
                   </RequireService>
                 }
               />
-              <Route path={PATHS.copilot} element={<RequireService service="fact_graph"><RequireRole roles={['admin','finance_controller','accountant','approver','auditor']}><CopilotPage /></RequireRole></RequireService>} />
+              <Route path={PATHS.copilot} element={<RequireService service="fact_graph"><RequireRole roles={COPILOT_ROLES}><CopilotPage /></RequireRole></RequireService>} />
               <Route path={PATHS.inventory} element={<RequireService service="reports"><InventoryPage /></RequireService>} />
-              <Route path={PATHS.reports} element={<ReportsPage />} />
+              <Route path={PATHS.reports} element={<RequireService service="reports"><ReportsPage /></RequireService>} />
               <Route
                 path={PATHS['data-extraction']}
                 element={
@@ -359,7 +360,7 @@ function AppShell() {
                   path={path}
                   element={
                     <RequireRole roles={['admin']}>
-                      <SettingsPage />
+                      <RequireService service="settings"><SettingsPage /></RequireService>
                     </RequireRole>
                   }
                 />
@@ -368,11 +369,9 @@ function AppShell() {
               <Route
                 path={PATHS.upload}
                 element={
-                  <UploadPage
-                    uploadQueue={uploadQueue}
-                    setUploadQueue={setUploadQueue}
-                    onReview={handleReview}
-                  />
+                  <RequireService service="upload_ocr">
+                    <UploadPage uploadQueue={uploadQueue} setUploadQueue={setUploadQueue} onReview={handleReview} />
+                  </RequireService>
                 }
               />
               {/* The review + done steps hold in-memory queue state. Landing on them
@@ -383,17 +382,19 @@ function AppShell() {
                 path={UPLOAD_REVIEW_PATH}
                 element={
                   current ? (
-                    <ReviewPage
-                      data={current.data}
-                      loading={false}
-                      error=""
-                      file={current.file}
-                      queue={reviewQueue}
-                      queueIndex={idx}
-                      onNav={setIdx}
-                      onBack={goBack}
-                      onDone={handleBillSent}
-                    />
+                    <RequireService service="upload_ocr">
+                      <ReviewPage
+                        data={current.data}
+                        loading={false}
+                        error=""
+                        file={current.file}
+                        queue={reviewQueue}
+                        queueIndex={idx}
+                        onNav={setIdx}
+                        onBack={goBack}
+                        onDone={handleBillSent}
+                      />
+                    </RequireService>
                   ) : (
                     <Navigate to={PATHS.upload} replace />
                   )
@@ -570,7 +571,7 @@ function AppRoutes() {
       </Suspense>
     )
   }
-  return user ? <AppShell /> : <PublicRoutes />
+  return user ? <AppShell key={`${user.company_id}/${user.username}/${user.role}`} /> : <PublicRoutes />
 }
 
 export default function App() {

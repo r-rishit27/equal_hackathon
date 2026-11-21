@@ -18,12 +18,12 @@ describe('ReconDashboard', () => {
   it('leads with the exposure, because that is what stops a payment', async () => {
     render(<ReconDashboard cases={[c({ money_at_risk: '31350' }), c({})]} active={null} onPick={() => {}} />)
     expect(screen.getByText('₹31,350.00')).toBeInTheDocument()
-    expect(screen.getByText(/Billed above what is supported/)).toBeInTheDocument()
+    expect(screen.getByText(/Billed above supported value/)).toBeInTheDocument()
   })
 
   it('says so plainly when nothing is over-billed', () => {
     render(<ReconDashboard cases={[c({}), c({})]} active={null} onPick={() => {}} />)
-    expect(screen.getByText('All clear')).toBeInTheDocument()
+    expect(screen.getByText('\u20b90.00')).toBeInTheDocument()
   })
 
   it('separates the vendor’s own shortfall from the exposure', () => {

@@ -56,6 +56,7 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
   const [c, setC] = useState<ReconCase | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [filter, setFilter] = useState<LineFilter | null>(null)
+  const [showSources, setShowSources] = useState(false)
   const [open, setOpen] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
   const [matching, setMatching] = useState<LineResult | null>(null)
@@ -223,12 +224,12 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
           the line-by-line view, so that judgement was wrong. */}
       <details className="rc__sec rc__linesdetail" open>
         <summary className="vc__subhead rc__linessummary">
-          Every line, side by side ({c.lines.length})
+          Line items ({c.lines.length})
         </summary>
       <section aria-label="Lines">
         <div className="rc__lineshead">
           <div className="vc__subhead vc__sr-only">Lines</div>
-          <div className="rc__filters" role="tablist">
+          <div className="rc__filters" role="tablist" aria-label="Line filters">
             {FILTERS.map(f => {
               const n = filterLines(c.lines, f.key).length
               // An empty group is not worth a chip; "All lines" always stays.
@@ -244,11 +245,19 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
               )
             })}
           </div>
+          <button type="button" className="vc__btn vc__btn--sm" aria-pressed={showSources}
+            onClick={() => setShowSources(value => !value)}>Source columns</button>
         </div>
         <div className="rc__scroll">
-          <table className="rc__table rc__table--lines rc__srctable">
+          <table className={`rc__table rc__table--lines rc__srctable${showSources ? '' : ' rc__table--summary'}`}>
             {/* One colour per source, the same as in the document viewer: PO, site audit, invoice, then the result. */}
-            <thead>
+            <thead>{!showSources ? (
+              <tr>
+                <th scope="col">Item</th><th scope="col">Quantity by source</th>
+                <th scope="col" className="rc__num">Billed</th><th scope="col" className="rc__num">Expected</th>
+                <th scope="col" className="rc__num">Difference</th><th scope="col">Status</th>
+              </tr>
+            ) : <>
               <tr className="rc__group">
                 <th rowSpan={2} className="rc__sticky rc__group-item">Item (as on PO)</th>
                 <th rowSpan={2} className="rc__group-item">Unit</th>
@@ -282,9 +291,9 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
                     computed all along, shown nowhere. */}
                 <th className="rc__src rc__src--result" title="How this line was paired with its counterpart, and how sure that pairing is.">Match</th>
               </tr>
-            </thead>
+            </>}</thead>
             <tbody>
-              {lines.length === 0 && <tr><td colSpan={12} className="vc__muted vc__xs rc__pad">Nothing here.</td></tr>}
+              {lines.length === 0 && <tr><td colSpan={showSources ? 16 : 6} className="vc__muted vc__xs rc__pad">Nothing here.</td></tr>}
               {lines.map(l => {
                 const ps = primaryStatus(l)
                 const isOpen = open === l.id
@@ -292,7 +301,13 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
                 return (
                   <Fragment key={l.id}>
                     <tr className={`rc__click${isOpen ? ' is-open' : ''}${l.reviewed ? ' is-reviewed' : ''}`} onClick={() => setOpen(isOpen ? null : l.id)}>
-                      <td className="rc__sticky rc__item">{isOpen ? <ChevronDown size={13} /> : <ChevronRight size={13} />}<span>{l.description}</span></td>
+                      <td className={showSources ? 'rc__sticky' : undefined}>
+                        <button type="button" className="rc__item rc__item-button" aria-expanded={isOpen}>
+                          {isOpen ? <ChevronDown size={14} aria-hidden="true" /> : <ChevronRight size={14} aria-hidden="true" />}
+                          <span>{l.description}</span>
+                        </button>
+                      </td>
+                      {showSources ? <>
                       <td>{l.unit ?? '—'}</td>
                       <td className={`rc__src rc__src--po rc__src-start rc__num${has(l, 'OVER_PO') ? ' rc__diff' : ''}`}>{qty(l.po_qty)}</td>
                       <td className={`rc__src rc__src--po rc__num${has(l, 'RATE_HIGHER', 'RATE_LOWER') ? ' rc__diff' : ''}`}>{inr(l.po_rate)}</td>
@@ -342,9 +357,16 @@ export default function ReconCaseView({ caseId, notify, onClose }: {
                           </span>
                         ) : <span className="vc__muted vc__xs">—</span>
                       })()}</td>
+                      </> : <>
+                        <td><LineQuantities line={l} /></td>
+                        <td className="rc__num">{inr(l.billed_amt)}</td>
+                        <td className="rc__num">{inr(l.expected_amt)}</td>
+                        <td className={`rc__num${d > 0 && l.severity !== 'INFO' && l.severity !== 'OK' ? ' vc__bad' : ''}`}>{inr(l.delta)}</td>
+                        <td><span className={`vc__chip vc__chip--${SEVERITY_TONE[l.severity]} vc__chip--xs`}>{STATUS_LABEL[ps]}</span>{l.reviewed && <Check size={12} className="vc__okc" aria-label="Reviewed" />}</td>
+                      </>}
                     </tr>
                     {isOpen && (
-                      <tr className="rc__detail"><td colSpan={15}>
+                      <tr className="rc__detail"><td colSpan={showSources ? 16 : 6}>
                         <LineDetail line={l} busy={busy}
                           onMatch={() => setMatching(l)} onCorrect={() => setCorrecting(l)}
                           onReview={note => run(() => reviewLine(l.id, note), 'Marked reviewed')} />
@@ -475,6 +497,30 @@ function Total({ label, v, tone, hint }: { label: string; v: string | null; tone
     <div className="rc__total" title={hint}>
       <div className="vc__muted vc__xs">{label}</div>
       <div className={`rc__total-v${tone === 'bad' ? ' vc__bad' : ''}`}>{v === null || v === undefined ? '—' : `₹${inr(v)}`}</div>
+    </div>
+  )
+}
+
+function LineQuantities({ line }: { line: LineResult }) {
+  const values = [
+    { key: 'po', label: 'PO', value: line.po_qty },
+    { key: 'evidence', label: 'Audit', value: line.verified_qty },
+    { key: 'pod', label: 'Receipt', value: line.received_qty },
+    { key: 'invoice', label: 'Invoice', value: line.billed_qty },
+  ]
+  const max = Math.max(1, ...values.map(({ value }) => Math.abs(Number(value) || 0)))
+  return (
+    <div className="rc__quantity-chart">
+      {values.map(({ key, label, value }) => (
+        <div className="rc__quantity" key={key}>
+          <span>{label}</span>
+          <span className="rc__quantity-track" aria-hidden="true">
+            <span className={`rc__quantity-bar rc__quantity-bar--${key}`}
+              style={{ width: `${Math.abs(Number(value) || 0) / max * 100}%` }} />
+          </span>
+          <span className="rc__num" title={value == null ? 'No quantity on source' : undefined}>{qty(value)}</span>
+        </div>
+      ))}
     </div>
   )
 }

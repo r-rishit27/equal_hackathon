@@ -2,14 +2,17 @@
 
 ## 1. Placement
 
-The Vendor card's **Documents** panel (`frontend/src/components/vendor/VendorDocuments.tsx`) has
-a folder nav: `recent | bills | contracts | t:<label>`. Recon is added there:
+The **Reconciliation** tab beside **Compliance** opens the vendor's dashboard when
+the tenant has the `recon` service. **Dashboard** and **Supporting Documents**
+are separate view buttons inside the tab. Supporting Documents holds source
+files and uploads. **Playground** appears in the tab row when licensed.
 
-- `DocFolder` gains `'recon'`, i.e. `'recent' | 'bills' | 'contracts' | 'recon' | `t:${string}``.
-- The folder appears in the nav **only when the tenant has the `recon` service**. Check it the
-  same way other licensed UI is gated: `hasService('recon')` from the licence context.
-- **Deep link:** `/vendors/:sid?tab=documents&folder=recon&case=:caseId`. Review Hub findings and
-  the bill approval screen use it.
+- **Deep links:** `/vendors/:sid/reconciliation` and
+  `/vendors/:sid/reconciliation-documents`. Older folder and case links still
+  open the corresponding view.
+- **Case line items:** the default table compares quantities and shows billed,
+  expected, and difference amounts. **Source columns** opens the full
+  comparison across the PO, site audit, goods receipt, and invoice.
 - **Bill detail and approval:** a compact `ReconBadge` showing
   `Recon · 1 blocker · ₹1,850 under-billed → open`. It reads `GET /api/bills/{id}/recon`.
 
@@ -22,7 +25,7 @@ When the user is inside the Recon folder, `UploadDialog` is bypassed: everything
 
 ```mermaid
 flowchart TD
-    VD[VendorDocuments.tsx<br/>folder === 'recon'] --> RF[recon/ReconFolder.tsx]
+    VD[Vendor card Reconciliation tab] --> RF[recon/ReconFolder.tsx]
     RF --> RU[ReconUploadZone<br/>BigDrop reuse, multi-file]
     RF --> RQ[ReconDocQueue<br/>files being read + needs-you items]
     RF --> RCL[ReconCaseList]

@@ -14,6 +14,7 @@
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { RefreshCw, Download } from 'lucide-react'
 import { useBills } from '../hooks/useBills'
+import { useService } from '../auth/EntitlementsContext'
 import {
   fetchCategories,
   fetchCategoryExpHeads,
@@ -469,6 +470,7 @@ export default function ReportsPage() {
   const [allCats, setAllCats] = useState(false)
   const { bills, loading, refresh } = useBills()
   const { user } = useAuth()
+  const fxEnabled = useService('fx')
   const [tab, setTab] = useState<'dashboard' | 'spend' | 'category' | 'aging' | 'approval' | 'vendor' | 'fx'>(
     'dashboard',
   )
@@ -487,14 +489,18 @@ export default function ReportsPage() {
   }, [user?.company_id])
 
   useEffect(() => {
-    if (tab === 'fx') {
+    if (tab === 'fx' && !fxEnabled) setTab('dashboard')
+    if (tab === 'fx' && fxEnabled) {
+      let current = true
       setFxReportLoading(true)
       fetchFxReport(user?.company_id)
-        .then(setFxReport)
+        .then(report => { if (current) setFxReport(report) })
         .catch(() => {})
-        .finally(() => setFxReportLoading(false))
+        .finally(() => { if (current) setFxReportLoading(false) })
+      return () => { current = false }
     }
-  }, [tab, user?.company_id])
+    setFxReport(null)
+  }, [tab, fxEnabled, user?.company_id])
 
   const load = (force = false) => {
     if (force) refresh()
@@ -652,9 +658,9 @@ export default function ReportsPage() {
         { key: 'aging', label: 'Payment Aging' },
         { key: 'vendor', label: 'Vendor Report' },
         { key: 'approval', label: 'Approval Metrics' },
-        ...(data.hasFxBills ? [{ key: 'fx', label: 'Currency & FX' }] : []),
+        ...(fxEnabled && data.hasFxBills ? [{ key: 'fx', label: 'Currency & FX' }] : []),
       ] as { key: typeof tab; label: string }[],
-    [data.hasFxBills],
+    [data.hasFxBills, fxEnabled],
   )
 
   // ── Sliding tab indicator ──────────────────────────────────────────────────
@@ -1508,7 +1514,7 @@ export default function ReportsPage() {
               )}
 
               {/* ══ CURRENCY & FX ══ */}
-              {tab === 'fx' &&
+              {fxEnabled && tab === 'fx' &&
                 (fxReportLoading ? (
                   <LoadingSkeleton />
                 ) : !fxReport ? (

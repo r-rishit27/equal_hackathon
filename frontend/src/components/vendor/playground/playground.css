@@ -1038,3 +1038,17 @@
 .pg[data-theme='light'] .pg__run-checks li.pg__run-check--warn {
   color: var(--pg-amber);
 }
+.pg {
+  font-family: var(--font-sans);
+}
+
+.pg .pg__pgroup-h,
+.pg .pg__chip-t,
+.pg .pg__bar-t,
+.pg .pg__palette-hint {
+  font-size: var(--fs-sm);
+}
+
+.pg .pg__tb {
+  min-height: 32px;
+}

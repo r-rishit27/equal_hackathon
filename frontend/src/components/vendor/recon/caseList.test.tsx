@@ -51,7 +51,7 @@ describe('CaseList', () => {
   it('labels the way through, rather than leaving a chevron to be hovered', () => {
     // An unexplained icon is a thing you hover to find out what it does.
     show([c({})])
-    const btn = screen.getByRole('link', { name: /Recon/ })
+    const btn = screen.getByRole('link', { name: 'Recon View' })
     expect(btn).toHaveAttribute('title', 'Open the line-by-line reconciliation')
     expect(decodeURIComponent(btn.getAttribute('href') ?? '')).toContain('open=recon:c1')
   })

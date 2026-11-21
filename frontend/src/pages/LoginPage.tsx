@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../auth/AuthContext'
-import { Eye, EyeOff, ArrowRight, FileSearch, GitBranch, Shield, CheckCircle, CheckCircle2 } from 'lucide-react'
+import { Eye, EyeOff, ArrowRight, CheckCircle, CheckCircle2 } from 'lucide-react'
 
 const API_BASE = import.meta.env.VITE_API_URL || ''
 
@@ -169,50 +169,11 @@ export default function LoginPage({ onBack }: Props) {
           <div className="lp__grid-bg" />
 
           <div className="lp__left-inner">
-            {/* Brand */}
-            <div className="lp__brand">
-              <div className="lp__brand-logo"><img src="/brand/reckon-wordmark-light.svg" alt="Reckon.ai" /></div>
-              <div className="lp__brand-badge">AP Automation Platform</div>
-            </div>
-
-            <h2 className="lp__left-headline">
-              Automate your entire<br />
-              <span className="lp__teal-text">Accounts Payable</span> workflow
-            </h2>
+            <img className="lp__brand" src="/brand/reckon-wordmark-light.svg" alt="Reckon.ai" />
+            <h2 className="lp__left-headline">Your finance workspace</h2>
             <p className="lp__left-sub">
-              From intelligent invoice capture to 3-way matching and zero-touch vendor payments — built for Indian finance teams.
+              Review invoices, track what needs attention, and manage payments in one place.
             </p>
-
-            {/* Feature list */}
-            <div className="lp__feat-list">
-              {[
-                { icon: <FileSearch size={15} strokeWidth={1.5} />, label: 'AI Invoice Capture & OCR', sub: '99.9% accuracy on Indian formats' },
-                { icon: <GitBranch size={15} strokeWidth={1.5} />, label: 'Multi-level Approval Workflows', sub: 'Configurable per team & threshold' },
-                { icon: <Shield size={15} strokeWidth={1.5} />, label: 'GST & TDS Compliance', sub: 'Auto-validate GSTIN, calculate TDS' },
-              ].map((f, i) => (
-                <div key={i} className="lp__feat">
-                  <div className="lp__feat-icon">{f.icon}</div>
-                  <div>
-                    <div className="lp__feat-label">{f.label}</div>
-                    <div className="lp__feat-sub">{f.sub}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Stats row */}
-            <div className="lp__stats">
-              {[
-                { val: '95%', label: 'Less manual entry' },
-                { val: '3×', label: 'Faster approvals' },
-                { val: '100%', label: 'Audit-ready' },
-              ].map((s, i) => (
-                <div key={i} className="lp__stat">
-                  <div className="lp__stat-val">{s.val}</div>
-                  <div className="lp__stat-lbl">{s.label}</div>
-                </div>
-              ))}
-            </div>
           </div>
         </div>
 
@@ -241,14 +202,14 @@ export default function LoginPage({ onBack }: Props) {
               <>
               <form className="lp__form" onSubmit={e => { e.preventDefault(); handleLogin() }}>
                 <div className="lp__field">
-                  <label className="lp__lbl">Username</label>
-                  <input className="lp__inp" placeholder="e.g. admin" value={username}
+                  <label className="lp__lbl" htmlFor="reckon-login-username">Username</label>
+                  <input id="reckon-login-username" className="lp__inp" placeholder="e.g. admin" value={username}
                     onChange={e => setUsername(e.target.value)} autoFocus autoComplete="username" />
                 </div>
                 <div className="lp__field">
-                  <label className="lp__lbl">Password</label>
+                  <label className="lp__lbl" htmlFor="reckon-login-password">Password</label>
                   <div className="lp__pw-wrap">
-                    <input className="lp__inp lp__inp--pw" type={show ? 'text' : 'password'}
+                    <input id="reckon-login-password" className="lp__inp lp__inp--pw" type={show ? 'text' : 'password'}
                       placeholder="Enter your password" value={password}
                       onChange={e => setPassword(e.target.value)} autoComplete="current-password" />
                     <button
@@ -268,7 +229,7 @@ export default function LoginPage({ onBack }: Props) {
                   </button>
                 </div>
                 {error && (
-                  <div className="lp__err">
+                  <div className="lp__err" role="alert">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
                     {error}
                   </div>
@@ -303,7 +264,7 @@ export default function LoginPage({ onBack }: Props) {
                   <label className="lp__lbl">Username</label>
                   <input className="lp__inp" placeholder="e.g. admin" value={fpUser} onChange={e => setFpUser(e.target.value)} autoFocus />
                 </div>
-                {fpErr && <div className="lp__err"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
+                {fpErr && <div className="lp__err" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
                 <button className="lp__btn" onClick={handleForgot} disabled={fpLoading || !fpUser}>
                   {fpLoading ? <><span className="lp__spin" /> Sending OTP…</> : <>Send OTP</>}
                 </button>
@@ -328,7 +289,7 @@ export default function LoginPage({ onBack }: Props) {
                     maxLength={6}
                   />
                 </div>
-                {fpErr && <div className="lp__err"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
+                {fpErr && <div className="lp__err" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
                 <button className="lp__btn" onClick={handleVerifyOtp} disabled={fpLoading || otp.length !== 6}>
                   {fpLoading ? <><span className="lp__spin" /> Verifying…</> : <>Verify OTP</>}
                 </button>
@@ -356,7 +317,7 @@ export default function LoginPage({ onBack }: Props) {
                     </button>
                   </div>
                 </div>
-                {fpErr && <div className="lp__err"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
+                {fpErr && <div className="lp__err" role="alert"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>{fpErr}</div>}
                 <button className="lp__btn" onClick={handleReset} disabled={fpLoading || newPw.length < 6}>
                   {fpLoading ? <><span className="lp__spin" /> Updating…</> : <>Update Password</>}
                 </button>
@@ -443,7 +404,7 @@ export default function LoginPage({ onBack }: Props) {
         /* ── Main layout ── */
         .lp {
           display: grid;
-          grid-template-columns: 55% 45%;
+          grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
           min-height: calc(100vh - 56px);
           font-family: "Inter", -apple-system, sans-serif;
         }
@@ -472,30 +433,15 @@ export default function LoginPage({ onBack }: Props) {
           position: relative;
           z-index: 1;
         }
-        .lp__brand { display: flex; align-items: center; gap: 12px; margin-bottom: 40px; }
-        .lp__brand-logo {
-          font-family: "Public Sans", sans-serif;
-          font-size: 22px; font-weight: 700;
-          color: #fff; letter-spacing: -0.02em;
-        }
-        .lp__brand-logo img { display:block; width:144px; height:31px; }
-        .lp__brand-badge {
-          font-size: 10px; font-weight: 600;
-          color: rgba(255,255,255,0.45);
-          text-transform: uppercase; letter-spacing: 0.07em;
-          padding: 3px 8px;
-          border: 1px solid rgba(255,255,255,0.12);
-          border-radius: 4px;
-        }
+        .lp__brand { display: block; width: 160px; margin-bottom: 32px; }
         .lp__left-headline {
           font-family: "Public Sans", sans-serif;
-          font-size: clamp(24px, 2.5vw, 32px);
+          font-size: clamp(2rem, 4vw, 3.5rem);
           font-weight: 700; color: #fff;
           letter-spacing: -0.02em;
           line-height: 1.25;
           margin-bottom: 16px;
         }
-        .lp__teal-text { color: #5cd8da; }
         .lp__left-sub {
           font-size: 14px;
           color: rgba(255,255,255,0.75);
@@ -503,54 +449,19 @@ export default function LoginPage({ onBack }: Props) {
           margin-bottom: 40px;
         }
 
-        .lp__feat-list { display: flex; flex-direction: column; gap: 12px; margin-bottom: 40px; }
-        .lp__feat {
-          display: flex; align-items: flex-start; gap: 14px;
-          padding: 14px 16px;
-          background: rgba(255,255,255,0.05);
-          border: 1px solid rgba(255,255,255,0.08);
-          border-radius: 6px;
-          transition: background 0.15s;
-        }
-        .lp__feat:hover { background: rgba(255,255,255,0.08); }
-        .lp__feat-icon {
-          width: 32px; height: 32px; border-radius: 4px; flex-shrink: 0;
-          background: rgba(92,216,218,0.12);
-          border: 1px solid rgba(92,216,218,0.2);
-          display: flex; align-items: center; justify-content: center;
-          color: #5cd8da;
-          margin-top: 1px;
-        }
-        .lp__feat-label { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.9); margin-bottom: 2px; }
-        .lp__feat-sub   { font-size: 11px; color: rgba(255,255,255,0.72); }
-
-        .lp__stats {
-          display: grid; grid-template-columns: repeat(3, 1fr);
-          gap: 1px; background: rgba(255,255,255,0.08);
-          border-radius: 6px; overflow: hidden;
-          border: 1px solid rgba(255,255,255,0.08);
-        }
-        .lp__stat {
-          background: rgba(0,42,88,0.6);
-          padding: 16px; text-align: center;
-        }
-        .lp__stat-val {
-          font-family: "Public Sans", sans-serif;
-          font-size: 20px; font-weight: 700;
-          color: #fff; margin-bottom: 3px;
-        }
-        .lp__stat-lbl { font-size: 11px; color: rgba(255,255,255,0.72); }
-
-        /* ── Right panel ── */
         .lp__right {
-          background: #f8f9ff;
+          background: var(--brand-50);
           display: flex;
           align-items: center;
           justify-content: center;
           padding: 56px 48px;
           border-left: 1px solid #e2e8f0;
         }
-        .lp__form-wrap { max-width: 380px; width: 100%; }
+        .lp__form-wrap {
+          max-width: 460px; width: 100%; padding: clamp(20px, 4vw, 38px);
+          background: var(--surface-0); border: 1px solid var(--line-200);
+          border-radius: var(--r-lg); box-shadow: var(--e-2);
+        }
 
         .lp__mobile-logo {
           display: none;

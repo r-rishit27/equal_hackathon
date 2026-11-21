@@ -43,7 +43,9 @@ const STATUS_GROUP = [
   { key: 'waiting', label: 'Waiting on a document', fill: '#f59e0b', icon: Clock,
     has: (c: ReconCaseSummary) => c.status.startsWith('AWAITING') },
   { key: 'done', label: 'Signed off', fill: '#2563eb', icon: FileClock,
-    has: (c: ReconCaseSummary) => c.status === 'ACKNOWLEDGED' || c.status === 'IN_PROGRESS' },
+    has: (c: ReconCaseSummary) => c.status === 'ACKNOWLEDGED' },
+  { key: 'queued', label: 'In progress', fill: '#64748b', icon: Clock,
+    has: (c: ReconCaseSummary) => c.status === 'IN_PROGRESS' },
 ] as const
 
 /** One whole per leg, so each gets its own meter rather than a shared axis. */
@@ -97,10 +99,10 @@ export function ReconDashboard({ cases, active, onPick }: Props) {
           chart, it is a number with decoration. */}
       <div className="rd__hero">
         <div className="rd__hero-k">
-          {d.risk > 0 ? 'Billed above what is supported' : 'Nothing billed above support'}
+          Billed above supported value
         </div>
         <div className={`rd__hero-v${d.risk > 0 ? ' rd__hero-v--bad' : ''}`}>
-          {d.risk > 0 ? `₹${inr(d.risk)}` : 'All clear'}
+          ₹{inr(d.risk)}
         </div>
         <div className="rd__hero-d">
           across {total} invoice{total === 1 ? '' : 's'}

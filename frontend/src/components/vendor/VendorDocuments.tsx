@@ -1,10 +1,9 @@
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { Clock, Download, Eye, FileCheck2, FileSearch, Folder, FolderInput, LayoutDashboard, Plus, Receipt, Search, Sparkles, Trash2, Upload, X } from 'lucide-react'
+import { Clock, Download, Eye, FileCheck2, Folder, FolderInput, Plus, Receipt, Search, Sparkles, Trash2, Upload, X } from 'lucide-react'
 import type { Bill } from '../../api/invoices'
 import { classifyVendorDocument, fetchDocumentTypes, uploadVendorDocument, setVendorDocumentType, type DocType, type DocVerdict, type VendorDocument } from '../../api/vendorCard'
 import { BillStatus, ClaimsChip, FileIcon, LoadNote, type LoadStatus } from './VendorViews'
-import ReconFolder from './recon/ReconFolder'
 import {
   MONTHS_FULL, billAmount, billMoney, billState, currencyOf, dayOf, foreignAmount, isLateInApproval, isOpen, isOverdue, isPaid,
   isUnconverted, monthlyTotals, money, outstandingOf, plural, shortDate, stageOf, unconvertedNote,
@@ -31,8 +30,6 @@ export type { LoadStatus } from './VendorViews'
 
 export type DocFolder =
   | 'recent' | 'bills' | 'contracts'
-  | 'recon'            // the documents: folders of POs, audit reports, receipts
-  | 'recon-board'      // the dashboard: where the whole queue stands
   | `t:${string}`
 export type BillFilter = 'all' | 'outstanding' | 'overdue' | 'late' | 'review' | 'approval' | 'paid'
 
@@ -89,7 +86,7 @@ const digitsOf = (s: string) => s.replace(/[₹,\s]/g, '').replace(/^(rs\.?|inr)
 export default function VendorDocuments({
   vendorName, supplierId, brandId, bills, docs, now, folder, onFolder, billFilter, onBillFilter,
   currentUser, onReload, onPreviewDoc, onDownloadDoc, onDeleteDoc, onPreviewBill, onOpenBill, onUploadBill, notify, uploadRequest = 0, onUploadRequestDone,
-  billsStatus = 'ready', docsStatus = 'ready', onRetry, reconEnabled = false,
+  billsStatus = 'ready', docsStatus = 'ready', onRetry,
 }: {
   vendorName: string
   supplierId: string
@@ -121,9 +118,6 @@ export default function VendorDocuments({
   docsStatus?: LoadStatus
   /** Fetch again after a failed load. */
   onRetry?: () => void
-  /** The tenant is licensed for Recon (PO ↔ invoice ↔ site report). */
-  reconEnabled?: boolean
-  /** The recon case open in the Recon folder (kept in the URL by the page). */
 }) {
   const [tenantTypes, setTenantTypes] = useState<string[]>([])
   const [upload, setUpload] = useState<{ preset: DocFolder | 'any'; file: File | null } | null>(null)
@@ -347,14 +341,6 @@ export default function VendorDocuments({
         </div>
       </>
     )
-  } else if (folder === 'recon' || folder === 'recon-board') {
-    body = reconEnabled ? (
-      <ReconFolder supplierId={supplierId} brandId={brandId ?? null} notify={notify}
-        view={folder === 'recon-board' ? 'board' : 'documents'}
-        onView={v => onFolder(v === 'board' ? 'recon-board' : 'recon')} />
-    ) : (
-      <div className="vc__empty"><div className="vc__empty-t">Recon isn’t switched on for your company</div></div>
-    )
   } else if (folder === 'contracts') {
     body = (
       <>
@@ -411,11 +397,9 @@ export default function VendorDocuments({
         {fold('recent', 'Recent', <Clock size={14} />)}
         {fold('bills', 'Bills', <Receipt size={14} />, billsReady ? bills.length : undefined)}
         {fold('contracts', 'Contracts & IOs', <FileCheck2 size={14} />, docsState === 'ready' ? contracts.length : undefined)}
-        {reconEnabled && fold('recon', 'Recon', <FileSearch size={14} />)}
         {/* Its own entry, not a panel tucked inside the documents list. Where
             the whole queue stands is a different question from where one
             file is, and it is the one a finance manager opens first. */}
-        {reconEnabled && fold('recon-board', 'Recon dashboard', <LayoutDashboard size={14} />)}
         {navLabels.map(l => fold(`t:${l}`, l, <Folder size={14} />, byLabel.get(l.toLowerCase())?.docs.length ?? 0))}
         <button className="vc__fold vc__fold--add" onClick={() => setUpload({ preset: 'any', file: null })} title="Name a type when you upload. It’s offered for every vendor."><Plus size={14} />New type</button>
       </nav>

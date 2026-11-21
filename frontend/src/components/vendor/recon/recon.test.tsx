@@ -126,17 +126,14 @@ describe('ReconFolder', () => {
     Object.values(api).forEach(f => f.mockClear())
   })
 
-  it('gives the dashboard a real control, not a heading that happens to click', async () => {
+  it('keeps dashboard metrics out of Supporting Documents even when a case exists', async () => {
     api.fetchReconDocuments.mockResolvedValue([
       file({ id: 'd1', file_name: 'PO.pdf', segments: [seg({ id: 's1', kind: 'PURCHASE_ORDER', case_id: 'c1' })] })])
     api.fetchReconCases.mockResolvedValue([{ ...summary, docs: { po: true, invoice: true, evidence: 1, pod: false, memo: false } }])
     render(<ReconFolder supplierId="s" brandId={null} notify={() => {}} />)
-    const btn = await screen.findByRole('button', { name: /Reconciliation dashboard/ })
-    // Open by default: a finance manager opens this screen to see where the
-    // money stands, not to click a toggle first.
-    expect(btn).toHaveAttribute('aria-expanded', 'true')
-    await userEvent.click(btn)
-    expect(btn).toHaveAttribute('aria-expanded', 'false')
+    expect(await screen.findByText('PO.pdf')).toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Where the queue stands' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /reconciliation dashboard/i })).not.toBeInTheDocument()
   })
 
   it('says how much of the invoice each document accounts for', async () => {
@@ -426,6 +423,7 @@ describe('ReconCaseView', () => {
     })
     render(<ReconCaseView caseId="c1" notify={() => {}} onClose={() => {}} />)
     await userEvent.click(await screen.findByRole('tab', { name: '2 · Reconciliation' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Source columns' }))
     const table = await screen.findByRole('table')
     expect(within(table).getByText('62%')).toBeInTheDocument()
   })
@@ -438,6 +436,7 @@ describe('ReconCaseView', () => {
     })
     render(<ReconCaseView caseId="c1" notify={() => {}} onClose={() => {}} />)
     await userEvent.click(await screen.findByRole('tab', { name: '2 · Reconciliation' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Source columns' }))
     const table = await screen.findByRole('table')
     expect(within(table).getByText('Exact')).toBeInTheDocument()
     expect(within(table).queryByText('100%')).not.toBeInTheDocument()
@@ -452,6 +451,7 @@ describe('ReconCaseView', () => {
     })
     render(<ReconCaseView caseId="c1" notify={() => {}} onClose={() => {}} />)
     await userEvent.click(await screen.findByRole('tab', { name: '2 · Reconciliation' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Source columns' }))
     const table = await screen.findByRole('table')
     expect(within(table).getByText('6,365.00')).toBeInTheDocument()
     expect(within(table).getByText('19,095.00')).toBeInTheDocument()
@@ -467,6 +467,7 @@ describe('ReconCaseView', () => {
     })
     render(<ReconCaseView caseId="c1" notify={() => {}} onClose={() => {}} />)
     await userEvent.click(await screen.findByRole('tab', { name: '2 · Reconciliation' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Source columns' }))
     const cell = (await screen.findByText('13,680.00')).closest('td')
     expect(cell).toHaveAttribute('title', expect.stringContaining('bills no quantity'))
     expect(cell).toHaveClass('vc__muted')
@@ -483,6 +484,7 @@ describe('ReconCaseView', () => {
     })
     render(<ReconCaseView caseId="c1" notify={() => {}} onClose={() => {}} />)
     await userEvent.click(await screen.findByRole('tab', { name: '2 · Reconciliation' }))
+    await userEvent.click(screen.getByRole('button', { name: 'Source columns' }))
     const table = await screen.findByRole('table')
     expect(within(table).getByText('6,75,432.00')).toBeInTheDocument()
   })

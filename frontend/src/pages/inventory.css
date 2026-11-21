@@ -51,7 +51,6 @@
 }
 .inventory-heading h1 { color: #203d5f; font-size: clamp(28px, 3vw, 40px); }
 .inventory-heading p { color: #50647b; max-width: 460px; }
-.inventory-heading p.terminal-brand { display: flex; align-items: center; gap: 8px; margin: 0 0 9px; color: #38668c; }
 .terminal-counts { display: flex; margin: 0; gap: 24px; }
 .terminal-counts div { padding-left: 15px; border-left: 1px solid #d9e3ef; }
 .terminal-counts dt { color: #52667e; font-size: 12px; }

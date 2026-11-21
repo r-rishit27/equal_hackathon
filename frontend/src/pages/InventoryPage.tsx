@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
-import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp, Activity, Boxes } from 'lucide-react'
+import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp, Activity } from 'lucide-react'
 import InventoryVendorPicker from './InventoryVendorPicker'
 import './inventory.css'
 
@@ -96,8 +96,7 @@ function Planner() {
   }
   return <main className="inventory-desk">
     <header className="inventory-heading">
-      <div><p className="terminal-brand"><Boxes size={20} /> Finance Desk / Supply chain</p>
-        <h1>Inventory terminal</h1><p>Plan your next purchase against seven days of demand and available cash.</p>
+      <div><h1>Inventory planning</h1><p>Plan your next purchase against seven days of demand and available cash.</p>
       </div>
       <dl className="terminal-counts"><div><dt>Vendors</dt><dd>{loading || (!prices.length && error) ? '?' : vendors.length}</dd></div>
         <div><dt>Priced invoice lines</dt><dd>{loading || (!prices.length && error) ? '?' : prices.length.toLocaleString('en-IN')}</dd></div></dl>

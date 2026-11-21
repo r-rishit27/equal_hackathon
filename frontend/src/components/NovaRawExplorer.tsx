@@ -83,7 +83,7 @@ export default function NovaRawExplorer() {
     background: '#fff', border: '1px solid #e5e7eb', borderRadius: 12, overflow: 'hidden',
   }
   const sel: React.CSSProperties = {
-    padding: '7px 10px', fontSize: 13, borderRadius: 8, border: '1px solid #cbd5e1',
+    padding: '7px 10px', fontSize: 'var(--fs-sm)', fontFamily: 'inherit', borderRadius: 8, border: '1px solid #cbd5e1',
     background: '#fff', color: '#0f172a', minWidth: 150,
   }
 
@@ -92,8 +92,7 @@ export default function NovaRawExplorer() {
       <div style={{ padding: '12px 16px', borderBottom: '1px solid #f1f5f9' }}>
         <div style={{ fontSize: 14, fontWeight: 700, color: '#0f172a' }}>Raw Nova API</div>
         <div style={{ fontSize: 12, color: '#64748b', marginTop: 2 }}>
-          Exactly what <code>GET /billing/monthly</code> returned — no reconciliation applied.
-          Each brand uses its own API key, so changing brand queries a different ledger.
+          View the billing response for a brand, vendor, and month.
         </div>
       </div>
 
@@ -119,7 +118,7 @@ export default function NovaRawExplorer() {
           onClick={fetchRaw}
           disabled={loading || !vendor || !month}
           style={{ display: 'inline-flex', alignItems: 'center', gap: 6, padding: '8px 14px', fontSize: 13,
-                   fontWeight: 600, borderRadius: 8, border: '1px solid #4338ca', background: '#4f46e5',
+                   fontWeight: 600, borderRadius: 8, border: '1px solid var(--brand-600)', background: 'var(--brand-600)',
                    color: '#fff', cursor: loading ? 'default' : 'pointer', opacity: loading ? 0.6 : 1 }}>
           {loading ? <RefreshCw size={13} /> : <Search size={13} />} {loading ? 'Calling Nova…' : 'Fetch'}
         </button>
@@ -131,7 +130,7 @@ export default function NovaRawExplorer() {
       </div>
 
       {err && (
-        <div style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '12px 16px',
+        <div role="alert" style={{ display: 'flex', gap: 8, alignItems: 'flex-start', padding: '12px 16px',
                       color: '#b91c1c', fontSize: 13, background: '#fef2f2' }}>
           <AlertCircle size={14} style={{ marginTop: 2, flexShrink: 0 }} /> {err}
         </div>

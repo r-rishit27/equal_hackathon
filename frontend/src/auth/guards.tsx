@@ -12,15 +12,15 @@
  */
 import type { ReactNode } from 'react'
 import { Lock } from 'lucide-react'
-import { EmptyState, LoadingMark } from '../ui'
+import { EmptyState, ErrorState, LoadingMark } from '../ui'
 import { useAuth } from './AuthContext'
-import { useServiceState } from './EntitlementsContext'
+import { useEntitlements, useServiceState } from './EntitlementsContext'
 import { SERVICE_DESCRIPTIONS, SERVICE_LABELS, type ServiceKey } from './services'
 import type { Role } from './permissions'
 
 export function RequireRole({
   roles, children, fallback,
-}: { roles: Role[]; children: ReactNode; fallback?: ReactNode }) {
+}: { roles: readonly Role[]; children: ReactNode; fallback?: ReactNode }) {
   const { user } = useAuth()
   if (user && roles.includes(user.role)) return <>{children}</>
   return (
@@ -50,6 +50,15 @@ export function RequireService({
   service, children, fallback,
 }: { service: ServiceKey; children: ReactNode; fallback?: ReactNode }) {
   const state = useServiceState(service)
+  const { status, refresh } = useEntitlements()
+
+  if (status === 'error') {
+    return (
+      <div className="guard__wrap">
+        <ErrorState message="Could not load workspace access." onRetry={() => { void refresh() }} />
+      </div>
+    )
+  }
 
   if (state === 'loading') {
     return (

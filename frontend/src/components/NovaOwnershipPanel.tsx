@@ -125,9 +125,11 @@ export default function NovaOwnershipPanel() {
 
   return (
     <div>
-      <div style={{ display: 'flex', gap: 12, marginBottom: 16, alignItems: 'center', padding: '14px 16px', borderRadius: 14, border: '1px solid #e5e7eb', background: '#f9fafb', flexWrap: 'wrap' }}>
-        <label style={{ fontSize: 13, color: '#475467', fontWeight: 600 }}>Vendor:</label>
+      <div className="nova-filters">
+        <div className="nova-filter">
+        <label htmlFor="nova-summary-vendor">Vendor</label>
         <select
+          id="nova-summary-vendor"
           value={vendor}
           onChange={e => { setVendor(e.target.value); setPeriod(''); setSelectedBillId(null) }}
           style={{ padding: '8px 12px', borderRadius: 10, border: '1px solid #dfe3ea', fontSize: 13, color: '#0f172a', background: '#fff', minWidth: 160 }}
@@ -135,9 +137,12 @@ export default function NovaOwnershipPanel() {
           <option value="">All vendors</option>
           {vendors.map(v => <option key={v} value={v}>{v}</option>)}
         </select>
+        </div>
 
-        <label style={{ fontSize: 13, color: '#475467', fontWeight: 600 }}>Service month:</label>
+        <div className="nova-filter">
+        <label htmlFor="nova-summary-month">Service month</label>
         <select
+          id="nova-summary-month"
           value={period}
           onChange={e => { setPeriod(e.target.value); setSelectedBillId(null) }}
           disabled={months.length === 0}
@@ -146,6 +151,7 @@ export default function NovaOwnershipPanel() {
           <option value="">{months.length === 0 ? 'No data yet' : 'Latest per vendor'}</option>
           {months.map(m => <option key={m} value={m}>{monthLabel(m)}</option>)}
         </select>
+        </div>
 
         {(vendor || period) && (
           <button onClick={() => { setVendor(''); setPeriod(''); setSelectedBillId(null) }} style={{ background: 'none', border: 'none', color: '#2563eb', cursor: 'pointer', fontSize: 12, fontWeight: 600 }}>
@@ -160,33 +166,57 @@ export default function NovaOwnershipPanel() {
 
       {!loading && summary && (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, minmax(0, 1fr))', gap: 12, marginBottom: 12 }}>
-            <Tile label="Certified" value={String(summary.totals.certified)} color="#16a34a" />
-            <Tile label="Uncertified" value={String(summary.totals.uncertified)} color={summary.totals.uncertified ? '#dc2626' : undefined} />
-            <Tile label="Ambiguous" value={String(summary.totals.ambiguous)} color={summary.totals.ambiguous ? '#d97706' : undefined} />
-            <Tile label="Unresolved module" value={String(summary.totals.unresolved_module)} color={summary.totals.unresolved_module ? '#d97706' : undefined} />
-            <Tile label="Pending lookup" value={String(summary.totals.pending_extended_lookup)} color={summary.totals.pending_extended_lookup ? '#d97706' : undefined} />
-            <Tile label="Nova logic missing" value={String(summary.totals.nova_logic_missing)} color={summary.totals.nova_logic_missing ? '#64748b' : undefined} />
-            <Tile label="Rate mismatches" value={String(summary.totals.rate_mismatch)} color={summary.totals.rate_mismatch ? '#dc2626' : undefined} />
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(5, minmax(0, 1fr))', gap: 12, marginBottom: 20 }}>
-            <Tile label="Qty mismatches (2% tol.)" value={String(summary.totals.qty_mismatch)} color={summary.totals.qty_mismatch ? '#dc2626' : undefined} />
-            <Tile label="Missing in invoice" value={String(summary.totals.missing_in_invoice)} color={summary.totals.missing_in_invoice ? '#d97706' : undefined} />
-            <Tile label="Extra in invoice" value={String(summary.totals.extra_in_invoice)} color={summary.totals.extra_in_invoice ? '#dc2626' : undefined} />
-            <Tile label="Nova self-inconsistent" value={String(summary.totals.self_inconsistent)} color={summary.totals.self_inconsistent ? '#dc2626' : undefined} />
-            <Tile label="Variance" value={inr(summary.totals.variance_amount_rupees)} color={summary.totals.variance_amount_rupees ? '#dc2626' : '#16a34a'} />
-          </div>
+          {summary.by_vendor.length > 0 && (
+            <>
+              <div className="nova-metrics" aria-label="Reconciliation totals">
+                <Tile label="Vendor months" value={String(summary.by_vendor.length)} />
+                <Tile label="Certified lines" value={String(summary.totals.certified)} />
+                <Tile label="Rate / quantity mismatches" value={`${summary.totals.rate_mismatch} / ${summary.totals.qty_mismatch}`} />
+                <Tile label="Net variance" value={inr(summary.totals.variance_amount_rupees)} />
+              </div>
+              <div className="nova-status" aria-label="Vendor month status">
+                <div className="nova-status__bar" aria-hidden="true">
+                  {(['RED', 'YELLOW', 'GREEN'] as const).map(status => (
+                    <span key={status} style={{
+                      flexGrow: summary.by_vendor.filter(row => row.rollup_status === status).length,
+                      background: ROLLUP_COLOR[status],
+                    }} />
+                  ))}
+                </div>
+                <div className="nova-status__legend">
+                  {(['RED', 'YELLOW', 'GREEN'] as const).map((status, index) => (
+                    <span key={status}><i style={{ background: ROLLUP_COLOR[status] }} />
+                      {['Exceptions', 'Incomplete', 'Matched'][index]} <strong>{summary.by_vendor.filter(row => row.rollup_status === status).length}</strong>
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <details className="nova-checks">
+                <summary>All check counts</summary>
+                <div className="nova-metrics">
+                  <Tile label="Uncertified" value={String(summary.totals.uncertified)} />
+                  <Tile label="Ambiguous" value={String(summary.totals.ambiguous)} />
+                  <Tile label="Unresolved module" value={String(summary.totals.unresolved_module)} />
+                  <Tile label="Pending lookup" value={String(summary.totals.pending_extended_lookup)} />
+                  <Tile label="Nova logic missing" value={String(summary.totals.nova_logic_missing)} />
+                  <Tile label="Missing in invoice" value={String(summary.totals.missing_in_invoice)} />
+                  <Tile label="Extra in invoice" value={String(summary.totals.extra_in_invoice)} />
+                  <Tile label="Nova totals inconsistent" value={String(summary.totals.self_inconsistent)} />
+                </div>
+              </details>
+            </>
+          )}
 
           {summary.by_vendor.length === 0 && (
-            <div style={{ padding: 24, textAlign: 'center', color: '#94a3b8', border: '1px solid #e2e8f0', borderRadius: 8 }}>
+            <div className="nova-empty">
               {vendor || period
                 ? 'No runs match this filter — try clearing it.'
-                : 'No ownership reconciliation runs yet for this tenant — this populates once a bill has been posted to POST /v1/reconcile.'}
+                : 'No reconciliation runs yet for this workspace.'}
             </div>
           )}
 
           {summary.by_vendor.length > 0 && (
-            <div style={{ border: '1px solid #e2e8f0', borderRadius: 14, overflow: 'hidden', background: '#fff', marginBottom: 20 }}>
+            <div style={{ border: '1px solid #e2e8f0', borderRadius: 14, overflowX: 'auto', background: '#fff', marginBottom: 20 }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
                 <thead>
                   <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
@@ -208,9 +238,12 @@ export default function NovaOwnershipPanel() {
                       }}
                     >
                       <td style={td}><span style={{ width: 8, height: 8, borderRadius: '50%', display: 'inline-block', background: ROLLUP_COLOR[row.rollup_status] }} /></td>
-                      <td style={{ ...td, color: '#0f172a', fontWeight: 600 }}>{row.vendor}</td>
+                      <td style={td}>
+                        <button type="button" className="nova-run-link" aria-expanded={selectedBillId === row.bill_id}
+                          onClick={event => { event.stopPropagation(); setSelectedBillId(row.bill_id) }}>{row.vendor}</button>
+                      </td>
                       <td style={{ ...td, color: '#475467' }}>{monthLabel(row.month)}</td>
-                      <td style={{ ...td, color: '#475467', fontFamily: 'monospace', fontSize: 11 }}>{row.bill_id}</td>
+                      <td style={td} title={row.bill_id}><code>{row.bill_id.length > 16 ? row.bill_id.slice(0, 8) + '…' : row.bill_id}</code></td>
                       <td style={td}><Badge label={row.rollup_status} color={ROLLUP_COLOR[row.rollup_status]} /></td>
                     </tr>
                   ))}
@@ -306,14 +339,14 @@ export default function NovaOwnershipPanel() {
   )
 }
 
-function Tile({ label, value, color }: { label: string; value: string; color?: string }) {
+function Tile({ label, value }: { label: string; value: string }) {
   return (
-    <div style={{ border: '1px solid #e2e8f0', borderRadius: 14, padding: '14px 16px', background: '#fff', boxShadow: '0 4px 12px rgba(15,23,42,0.03)' }}>
-      <div style={{ fontSize: 10.5, color: '#64748b', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.08em' }}>{label}</div>
-      <div style={{ fontSize: 15, fontWeight: 800, color: color ?? '#0f172a', marginTop: 6, letterSpacing: '-0.02em' }}>{value}</div>
+    <div className="nova-metric">
+      <span>{label}</span>
+      <strong>{value}</strong>
     </div>
   )
 }
 
-const th: React.CSSProperties = { padding: '10px 12px', fontWeight: 700, color: '#475467', borderBottom: '1px solid #e2e8f0', letterSpacing: '0.02em', fontSize: 10.5, textTransform: 'uppercase', whiteSpace: 'nowrap' }
-const td: React.CSSProperties = { padding: '10px 12px', fontSize: 12, verticalAlign: 'middle' }
+const th: React.CSSProperties = { padding: '10px 12px', fontWeight: 600, color: 'var(--brand-800)', borderBottom: '1px solid var(--line-200)', fontSize: 'var(--fs-sm)', whiteSpace: 'nowrap' }
+const td: React.CSSProperties = { padding: '10px 12px', fontSize: 'var(--fs-sm)', verticalAlign: 'middle', fontVariantNumeric: 'tabular-nums' }

@@ -27,7 +27,9 @@ import {
 } from '../api/invoices'
 import type { Charge, CoaRule, CompanyUser, TdsSection, VendorCategory, TdsMappingRule, TdsPreferences, VendorTdsOverride, VendorTdsFyState, CatchupSummary, Vendor, Category, FxSettings } from '../api/invoices'
 import { fetchFxSettings, updateFxSettings, fetchDemoPaymentSettings, saveDemoPaymentSettings } from '../api/invoices'
-import { useService } from '../auth/EntitlementsContext'
+import { useEntitlements } from '../auth/EntitlementsContext'
+import { ServiceUnavailable } from '../auth/guards'
+import type { ServiceKey } from '../auth/services'
 import { useNavigate, useParams } from 'react-router-dom'
 import { SETTINGS_SECTIONS, settingsPath, type SettingsSection as RouteSettingsSection } from '../routes/paths'
 import { useAuthedObjectUrl } from '../api/authedFiles'
@@ -3116,18 +3118,18 @@ function DemoPaymentsSettings({ companyId }: { companyId?: string }) {
 // The section list lives in routes/paths.ts because it is also the URL contract.
 type SettingsSection = RouteSettingsSection
 
-const SETTINGS_NAV: { id: SettingsSection; label: string; sub: string; icon: React.ReactNode; color: string }[] = [
-  { id: 'approval-chain', label: 'Approval Chain',     sub: 'Customise bill approval workflow',             icon: <GitBranch size={16} />,  color: '#7c3aed' },
-  { id: 'roles',          label: 'Roles & Permissions', sub: 'View what each role can access',               icon: <Shield size={16} />,     color: '#059669' },
-  { id: 'team',           label: 'Team Members',        sub: 'Manage users in your company',                 icon: <Users size={16} />,      color: '#2563eb' },
-  { id: 'brands',         label: 'Brands',              sub: 'Manage brands under this account',             icon: <Building2 size={16} />,  color: '#db2777' },
-  { id: 'cost-centers',   label: 'Cost Centers',        sub: 'Optional expense segmentation per brand',      icon: <Layers size={16} />,     color: '#0284c7' },
-  { id: 'charges',        label: 'Charges Master',      sub: 'Reusable charge types with HSN/SAC codes',     icon: <Tag size={16} />,        color: '#ea580c' },
-  { id: 'categories',     label: 'Expense Categories',  sub: 'Category list for bills and COA rules',        icon: <Tag size={16} />,        color: '#16a34a' },
-  { id: 'coa',            label: 'COA Rules',           sub: 'Map vendors and categories to expense heads',  icon: <BookOpen size={16} />,   color: '#0d9488' },
-  { id: 'tds',            label: 'TDS Configuration',   sub: 'TDS sections, mappings and preferences',       icon: <Percent size={16} />,    color: '#4f46e5' },
-  { id: 'fx',             label: 'FX & Currency',       sub: 'FX alert thresholds and multi-currency config', icon: <TrendingUp size={16} />, color: '#0891b2' },
-  { id: 'demo-payments',  label: 'Demo Payments',       sub: 'Simulated payments and where receipts go',      icon: <Wallet size={16} />,     color: '#d97706' },
+const SETTINGS_NAV: { id: SettingsSection; label: string; sub: string; icon: React.ReactNode; service?: ServiceKey }[] = [
+  { id: 'approval-chain', label: 'Approval Chain',     sub: 'Customise bill approval workflow',             icon: <GitBranch size={16} /> },
+  { id: 'roles',          label: 'Roles & Permissions', sub: 'View what each role can access',               icon: <Shield size={16} /> },
+  { id: 'team',           label: 'Team Members',        sub: 'Manage users in your company',                 icon: <Users size={16} /> },
+  { id: 'brands',         label: 'Brands',              sub: 'Manage brands under this account',             icon: <Building2 size={16} /> },
+  { id: 'cost-centers',   label: 'Cost Centers',        sub: 'Optional expense segmentation per brand',      icon: <Layers size={16} /> },
+  { id: 'charges',        label: 'Charges Master',      sub: 'Reusable charge types with HSN/SAC codes',     icon: <Tag size={16} /> },
+  { id: 'categories',     label: 'Expense Categories',  sub: 'Category list for bills and COA rules',        icon: <Tag size={16} /> },
+  { id: 'coa',            label: 'COA Rules',           sub: 'Map vendors and categories to expense heads',  icon: <BookOpen size={16} /> },
+  { id: 'tds',            label: 'TDS Configuration',   sub: 'TDS sections, mappings and preferences',       icon: <Percent size={16} />, service: 'tds' },
+  { id: 'fx',             label: 'FX & Currency',       sub: 'FX alert thresholds and multi-currency config', icon: <TrendingUp size={16} />, service: 'fx' },
+  { id: 'demo-payments',  label: 'Demo Payments',       sub: 'Simulated payments and where receipts go',      icon: <Wallet size={16} />, service: 'demo_payments' },
 ]
 
 export default function SettingsPage() {
@@ -3145,7 +3147,7 @@ export default function SettingsPage() {
   const [sharedCats, setSharedCats] = useState<string[]>(getAllCategories())
 
   const isAdmin = user?.role === 'admin'
-  const demoPayments = useService('demo_payments')
+  const { has } = useEntitlements()
 
   if (!isAdmin) {
     return (
@@ -3157,9 +3159,9 @@ export default function SettingsPage() {
     )
   }
 
-  // Demo Payments only exists for a tenant with that licence.
-  const nav = SETTINGS_NAV.filter(n => n.id !== 'demo-payments' || demoPayments)
-  const active = nav.find(n => n.id === activeSection) ?? nav[0]
+  const nav = SETTINGS_NAV.filter(item => !item.service || has(item.service))
+  const active = SETTINGS_NAV.find(item => item.id === activeSection) ?? SETTINGS_NAV[0]
+  const lockedService = active.service && !has(active.service) ? active.service : undefined
 
   return (
     <>
@@ -3173,13 +3175,13 @@ export default function SettingsPage() {
                 key={item.id}
                 className={`sp__nav-item ${activeSection === item.id ? 'sp__nav-item--active' : ''}`}
                 onClick={() => setActiveSection(item.id)}
-                style={activeSection === item.id ? { '--nav-color': item.color } as React.CSSProperties : {}}
+                aria-current={activeSection === item.id ? 'page' : undefined}
               >
-                <span className="sp__nav-icon" style={{ color: activeSection === item.id ? item.color : '#9ca3af' }}>
+                <span className="sp__nav-icon" style={{ color: activeSection === item.id ? 'var(--brand-700)' : 'var(--ink-500)' }}>
                   {item.icon}
                 </span>
                 <span className="sp__nav-label">{item.label}</span>
-                {activeSection === item.id && <ChevronRight size={14} className="sp__nav-chevron" style={{ color: item.color }} />}
+                {activeSection === item.id && <ChevronRight size={14} className="sp__nav-chevron" aria-hidden="true" />}
               </button>
             ))}
           </nav>
@@ -3188,16 +3190,17 @@ export default function SettingsPage() {
         {/* ── Main content ── */}
         <div className="sp__main">
           <div className="sp__page-hdr">
-            <span className="sp__page-icon" style={{ background: active.color + '18', color: active.color }}>
+            <span className="sp__page-icon">
               {active.icon}
             </span>
             <div>
-              <div className="sp__page-title">{active.label}</div>
+              <h1 className="sp__page-title" style={{ margin: 0 }}>{active.label}</h1>
               <div className="sp__page-sub">{active.sub}</div>
             </div>
           </div>
 
           <div className="sp__page-body">
+            {lockedService && <ServiceUnavailable service={lockedService} />}
 
             {activeSection === 'approval-chain' && (
               <DeptChainEditor companyId={user?.company_id} />
@@ -3277,15 +3280,15 @@ export default function SettingsPage() {
               <CostCentersManager companyId={user?.company_id} />
             )}
 
-            {activeSection === 'tds' && (
+            {activeSection === 'tds' && !lockedService && (
               <TdsConfigManager companyId={user?.company_id} />
             )}
 
-            {activeSection === 'fx' && (
+            {activeSection === 'fx' && !lockedService && (
               <FxSettingsManager companyId={user?.company_id} />
             )}
 
-            {activeSection === 'demo-payments' && demoPayments && (
+            {activeSection === 'demo-payments' && !lockedService && (
               <DemoPaymentsSettings companyId={user?.company_id} />
             )}
 

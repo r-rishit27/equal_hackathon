@@ -58,8 +58,9 @@ export function EntitlementsProvider({ children }: { children: ReactNode }) {
     setStatus('loading')
     setError(null)
     try {
-      const fresh = await fetchEntitlements()
+      const fresh = await fetchEntitlements(companyId)
       if (id !== requestId.current) return
+      if (fresh.company_id !== companyId) throw new Error('The plan does not match this workspace')
       setEntitlements(fresh)
       writeCache(fresh)
       setStatus('ready')
@@ -76,12 +77,16 @@ export function EntitlementsProvider({ children }: { children: ReactNode }) {
     }
   }, [companyId])
 
-  useEffect(() => { void load() }, [load])
+  useEffect(() => {
+    void load()
+    return () => { requestId.current += 1 }
+  }, [load])
 
   // Signing out must drop the cache, or the next person to sign in on this
   // browser briefly sees the previous tenant's modules.
   useEffect(() => {
     const onLogout = () => {
+      requestId.current += 1
       clearCache()
       setEntitlements(null)
       setStatus('idle')
@@ -95,14 +100,18 @@ export function EntitlementsProvider({ children }: { children: ReactNode }) {
     }
   }, [load])
 
-  const value = useMemo<EntitlementsState>(() => ({
-    status,
-    entitlements,
-    error,
-    has: (key) => (status === 'loading' && !entitlements ? false : hasService(entitlements, key)),
-    usage: (key) => usageFor(entitlements, key),
-    refresh: load,
-  }), [status, entitlements, error, load])
+  const value = useMemo<EntitlementsState>(() => {
+    const plan = companyId && entitlements?.company_id === companyId ? entitlements : null
+    const currentStatus = !companyId ? 'idle' : plan ? status : 'loading'
+    return {
+      status: currentStatus,
+      entitlements: plan,
+      error: currentStatus === 'error' ? error : null,
+      has: (key) => hasService(plan, key),
+      usage: (key) => usageFor(plan, key),
+      refresh: load,
+    }
+  }, [companyId, status, entitlements, error, load])
 
   return <Ctx.Provider value={value}>{children}</Ctx.Provider>
 }

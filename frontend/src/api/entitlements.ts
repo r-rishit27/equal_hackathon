@@ -5,6 +5,7 @@
 import { normalizeEntitlements, type Entitlements } from '../auth/entitlements'
 
 const BASE = () => import.meta.env.VITE_API_URL ?? ''
+const LEGACY_CORE = ['bills', 'vendors', 'upload_ocr', 'reports', 'settings']
 
 function authHeaders(): HeadersInit {
   const token = sessionStorage.getItem('onsum_token')
@@ -18,13 +19,20 @@ function authHeaders(): HeadersInit {
  * endpoint is missing, so the frontend can deploy ahead of the backend without
  * losing SAP gating in the interim.
  */
-export async function fetchEntitlements(): Promise<Entitlements> {
+export async function fetchEntitlements(companyId?: string): Promise<Entitlements> {
   const res = await fetch(`${BASE()}/api/tenant/entitlements`, { headers: authHeaders() })
   if (res.ok) return normalizeEntitlements(await res.json())
 
   if (res.status === 404) {
     const legacy = await fetch(`${BASE()}/api/tenant/features`, { headers: authHeaders() })
-    if (legacy.ok) return normalizeEntitlements(await legacy.json())
+    if (legacy.ok) {
+      const { sap_matching } = await legacy.json()
+      const services = Object.fromEntries(LEGACY_CORE.map(key => [key, { enabled: true }]))
+      return normalizeEntitlements({ company_id: companyId, services: {
+        ...services,
+        sap_matching: { enabled: sap_matching === true },
+      } })
+    }
   }
   throw new Error(`Could not load your plan (${res.status})`)
 }

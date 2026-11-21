@@ -36,7 +36,7 @@ export function ledgerForPath(pathname: string): Ledger | null {
   if (pathname === RECEIVABLES_ROOT || pathname.startsWith(`${RECEIVABLES_ROOT}/`)) return 'receivable'
   const page = pageForPath(pathname)
   // Shared pages (settings, integrations) keep whichever side the user was on.
-  if (!page || page === 'settings' || page === 'integrations') return null
+  if (!page || page === 'settings' || page === 'integrations' || page === 'nova') return null
   return 'payable'
 }
 
@@ -91,7 +91,7 @@ export function arPaymentPath(paymentId: string): string {
  * right place: contacts → conversations, bank/gstins/tds → compliance at that
  * section, statements → documents' Bills.
  */
-export const VENDOR_TABS = ['details', 'spend', 'documents', 'conversations', 'activity', 'compliance', 'playground', 'contacts', 'bank', 'gstins', 'tds', 'statements'] as const
+export const VENDOR_TABS = ['details', 'spend', 'documents', 'conversations', 'activity', 'compliance', 'reconciliation', 'reconciliation-documents', 'playground', 'contacts', 'bank', 'gstins', 'tds', 'statements'] as const
 export type VendorTab = (typeof VENDOR_TABS)[number]
 
 export function billPath(invoiceId: string): string {

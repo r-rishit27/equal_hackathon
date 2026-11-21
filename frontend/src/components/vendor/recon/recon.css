@@ -591,31 +591,6 @@
 
 /* The way in to the dashboard. A real control with a state, not a heading
    that happens to be clickable. */
-.rc__dashbar { margin-bottom: 10px; }
-
-.rc__dashbtn {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  width: 100%;
-  padding: 11px 14px;
-  border: 1px solid var(--line-200);
-  border-radius: 12px;
-  background: var(--surface-0);
-  font-size: 13px;
-  font-weight: 600;
-  color: var(--ink-900);
-  text-align: left;
-  cursor: pointer;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.rc__dashbtn:hover { border-color: var(--line-300, #cbd3e1); }
-.rc__dashbtn.on { border-color: var(--brand-600, #004080); background: var(--brand-50, #f2f6fd); }
-.rc__dashbtn:focus-visible { outline: 2px solid var(--brand-600, #004080); outline-offset: 2px; }
-.rc__chev { transition: transform 0.2s; color: var(--ink-400, #7a8599); }
-.rc__chev.on { transform: rotate(180deg); }
-
 /* The panels arrive rather than appearing, which makes the connection between
    the button and what it opened. Nothing moves for anyone who has asked the
    system for less motion. */
@@ -800,6 +775,18 @@
 /* The way through to a line-by-line reconciliation. A real button on the row,
    so the action is readable without hovering to find out. */
 .cl__open { display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; }
+.vc__btn.cl__open {
+  color: var(--surface-0);
+  background: var(--success-600);
+  border-color: var(--success-600);
+  text-decoration: none;
+}
+
+.vc__btn.cl__open:hover {
+  color: var(--surface-0);
+  background: var(--success-700);
+  border-color: var(--success-700);
+}
 
 /* ── How the documents are linked ──────────────────────────────────────────
    The graph the matcher actually built, in place of a log of when it ran. */
@@ -846,3 +833,74 @@
 }
 
 @keyframes rg-draw { to { stroke-dashoffset: 0; } }
+.rc__table--summary {
+  min-width: 620px;
+}
+
+.rc__table--summary th,
+.rc__table--summary td {
+  font-size: var(--fs-sm);
+}
+
+.rc__table--summary th {
+  color: var(--brand-800);
+  background: var(--surface-2);
+}
+
+.rc__table--summary th:first-child,
+.rc__table--summary td:first-child {
+  min-width: 9rem;
+}
+
+.rc__table--summary .rc__detail td {
+  min-width: 0;
+}
+
+.rc__table .rc__item-button {
+  max-width: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-weight: var(--fw-semibold);
+  text-align: left;
+  cursor: pointer;
+}
+
+.rc__item-button svg { flex-shrink: 0; }
+
+.rc__quantity-chart {
+  display: grid;
+  gap: 3px;
+  min-width: 10rem;
+  max-width: 16rem;
+}
+
+.rc__quantity {
+  display: grid;
+  grid-template-columns: 3.4rem minmax(2.5rem, 1fr) minmax(2.25rem, auto);
+  align-items: center;
+  gap: 6px;
+  color: var(--ink-600);
+  font-size: var(--fs-xs);
+}
+
+.rc__quantity-track {
+  display: block;
+  height: 5px;
+  border-radius: var(--r-full);
+  background: var(--line-100);
+  overflow: hidden;
+}
+
+.rc__quantity-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand-400);
+}
+
+.rc__quantity-bar--evidence { background: var(--brand-500); }
+.rc__quantity-bar--pod { background: var(--info-500); }
+.rc__quantity-bar--invoice { background: var(--brand-700); }

@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { HelpCircle, Bell, ChevronDown, FileText, LogOut, Check, Settings, Briefcase } from 'lucide-react'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { Bell, ChevronDown, ChevronRight, FileText, LogOut, Check, Settings, Briefcase } from 'lucide-react'
 import { useAuth, type Brand } from '../auth/AuthContext'
 import { useEntitlements } from '../auth/EntitlementsContext'
 import { fetchBills, fetchNotificationCount, type Bill } from '../api/invoices'
@@ -9,10 +9,12 @@ import { type Finding, fetchFindings } from '../api/review'
 import { SeverityBadge } from '../pages/review/FindingBadges'
 import { severityDisplay } from '../pages/review/reviewFormat'
 import { useReviewCounts } from '../pages/review/useReviewStore'
-import { findingPath, reviewPath } from '../routes/paths'
+import { findingPath, pageForPath, reviewPath } from '../routes/paths'
 import { formatMoneyCompact } from '../ui'
 import ProfileSettingsModal from './ProfileSettingsModal'
 import { CopilotLauncher } from '../pages/WorkspaceChat'
+import WorkspaceSearch from './WorkspaceSearch'
+import { workspaceNavigation } from './workspaceNavigation'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -39,6 +41,7 @@ interface Props {
 export default function TopBar({ onGoToBills, onGoToBill }: Props) {
   const { user, logout, brands, activeBrand, setActiveBrand } = useAuth()
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const [count, setCount]                 = useState(0)
   const [bills, setBills]                 = useState<Bill[]>([])
   const [open, setOpen]                   = useState(false)
@@ -61,6 +64,9 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
   // here either, matching how the Bills page already says nothing about Nova
   // for a tenant not licensed for it.
   const { has } = useEntitlements()
+  const activePage = pageForPath(pathname)
+  const currentPage = workspaceNavigation(user?.role, has).flatMap(group => group.items)
+    .find(item => item.page === activePage)
   const reviewEnabled = has('review_hub')
   const reviewCounts = useReviewCounts()
   const [reviewTop, setReviewTop] = useState<Finding[]>([])
@@ -168,17 +174,21 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
           )}
         </div>
 
+        {currentPage && (
+          <div className="tb__location" aria-label="Current section">
+            <ChevronRight size={15} aria-hidden="true" />
+            <currentPage.icon size={16} aria-hidden="true" />
+            <span>{currentPage.label}</span>
+          </div>
+        )}
         <div className="tb__right">
+          <WorkspaceSearch />
           <CopilotLauncher />
-          <button className="tb__help">
-            <HelpCircle size={16} />
-            <span>Help</span>
-          </button>
 
           {/* Notification bell — also the Review Hub's "peek" surface (design
               brief §4 artboard 9) when the tenant has that module. */}
           <div className="tb__notif-wrap" ref={ref}>
-            <button className="tb__notif" onClick={() => setOpen(o => !o)}>
+            <button className="tb__notif" aria-label="Notifications" aria-expanded={open} onClick={() => setOpen(o => !o)}>
               <Bell size={17} />
               {bellTotal > 0 && <span className="tb__badge">{bellTotal > 9 ? '9+' : bellTotal}</span>}
             </button>
@@ -336,14 +346,6 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
         }
         .tb__brand-item-name { flex: 1; }
 
-        .tb__help {
-          display: flex; align-items: center; gap: 5px; padding: 6px 10px;
-          border-radius: 4px; background: none; border: none; color: #424750;
-          font-size: 13px; font-weight: 500; cursor: pointer;
-          font-family: 'Inter', sans-serif;
-        }
-        .tb__help:hover { background: #eff4ff; color: #004080; }
-
         .tb__notif-wrap { position: relative; }
         .tb__notif {
           position: relative; width: 34px; height: 34px; border-radius: 4px;
@@ -472,7 +474,6 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
           .tb__client-logo { height: 32px; flex-shrink: 0; }
           .tb__client-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
           .tb__right { flex-shrink: 0; }
-          .tb__help { display: none; }
           .tb__notif { width: 40px; height: 40px; }
           .tb__user { padding: 6px; border-color: transparent; }
           .tb__user > span, .tb__user > svg { display: none; }

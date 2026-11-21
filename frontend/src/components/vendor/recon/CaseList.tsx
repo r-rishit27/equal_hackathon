@@ -90,7 +90,7 @@ export function CaseList({ cases, filtered }: {
                         line-by-line table and should say so. */}
                     <ReconLink caseId={c.id} className="vc__btn vc__btn--sm cl__open"
                       title="Open the line-by-line reconciliation">
-                      Recon<ChevronRight size={14} />
+                      Recon View<ChevronRight size={14} aria-hidden="true" />
                     </ReconLink>
                   </td>
                 </tr>

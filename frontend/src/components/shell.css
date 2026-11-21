@@ -4,11 +4,11 @@
 .shell {
   --sidebar-w-expanded: 232px;
   --topbar-h: 60px;
-  --canvas: #f4f8ff;
-  --surface-1: #f7faff;
-  --surface-2: #edf4ff;
+  --canvas: #edf4fd;
+  --surface-1: #f5f9ff;
+  --surface-2: #eaf2fd;
   --line-100: #eaf1fb;
-  --line-200: #dce7f7;
+  --line-200: #d5e3f5;
   --line-300: #c1d3ed;
   display: flex;
   height: 100vh;
@@ -99,27 +99,13 @@
   display: none;
 }
 
-.mn__sheet-item {
-  padding: var(--sp-3) var(--sp-2);
-  font-family: var(--font-sans);
-  font-size: var(--fs-md);
-  font-weight: var(--fw-medium);
-  color: var(--ink-700);
-  text-align: left;
-  background: none;
-  border: none;
-  border-bottom: 1px solid var(--line-100);
-  border-radius: var(--r-sm);
-  cursor: pointer;
-}
-
-.mn__sheet-item:hover {
-  background: var(--surface-1);
-}
-
 @media (width <= 768px) {
-  .shell__main {
+  .shell__main,
+  .sb--open + .shell__main {
     margin-left: 0;
+  }
+
+  .shell__main {
     padding-bottom: calc(58px + env(safe-area-inset-bottom)); /* clears the fixed bottom bar */
   }
 

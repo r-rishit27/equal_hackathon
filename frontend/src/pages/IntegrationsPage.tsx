@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { useService } from '../auth/EntitlementsContext'
+import { PageHeader } from '../ui'
 import {
   Zap, CheckCircle2, AlertCircle, Clock, RefreshCw,
   Copy, Download, ChevronRight, Loader2, WifiOff,
@@ -370,18 +371,10 @@ export default function IntegrationsPage() {
   const sapStatus: ConnectionStatus = sapConn?.status ?? 'NOT_CONNECTED'
 
   return (
-    <div style={{ height: '100%', overflow: 'auto', background: '#f8fafc', padding: '28px 32px' }}>
+    <div className="workspace-scroll-page">
 
       {/* Page header */}
-      <div style={{ marginBottom: 28 }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 4 }}>
-          <Zap size={20} color="#004080" strokeWidth={2} />
-          <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: '#0b1c30' }}>Integrations</h1>
-        </div>
-        <p style={{ margin: 0, fontSize: 13, color: '#64748b' }}>
-          Connect your accounting &amp; ERP systems to automatically sync invoices, bills, item masters and payments.
-        </p>
-      </div>
+      <PageHeader title="Integrations" sub="Connect your accounting systems to sync invoices, bills, item masters, and payments." />
 
       {/* Tally card */}
       <div style={{

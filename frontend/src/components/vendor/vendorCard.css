@@ -5305,3 +5305,15 @@ textarea.vc__kv-in {
 .vc__banklogo img { width: 16px; height: 16px; object-fit: contain; display: block; }
 /* In a light list there's no dark card to lift it off: a hairline, not a shadow. */
 .vc__banklogo--line { box-shadow: none; border: 1px solid var(--line-200); }
+.vc__recon-views {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-2);
+  margin-bottom: var(--sp-4);
+}
+
+.vc__recon-views button[aria-pressed="true"] {
+  color: var(--brand-800);
+  background: var(--brand-100);
+  border-color: var(--brand-400);
+}

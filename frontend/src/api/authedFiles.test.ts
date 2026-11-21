@@ -5,6 +5,15 @@ import { fetchAuthedObjectUrl, fetchAuthedBlob, downloadAuthed, withApiBase, SIG
 
 const SRC = join(process.cwd(), 'src')
 
+function readBlob(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(String(reader.result))
+    reader.onerror = () => reject(reader.error)
+    reader.readAsText(blob)
+  })
+}
+
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap(entry => {
     const full = join(dir, entry)
@@ -35,7 +44,7 @@ describe('authenticated file access', () => {
 
     const blob = await fetchAuthedBlob('/api/docs/abc')
 
-    expect(await blob.text()).toBe('from-storage')
+    expect(await readBlob(blob)).toBe('from-storage')
     const calls = vi.mocked(fetch).mock.calls
     expect(calls[0][0]).toBe('/api/docs/abc?signed=1')
     expect(calls[1][0]).toBe(link)
@@ -54,7 +63,7 @@ describe('authenticated file access', () => {
 
     const blob = await fetchAuthedBlob('/api/bills/1/attachments/2/download?preview=true')
 
-    expect(await blob.text()).toBe('from-api')
+    expect(await readBlob(blob)).toBe('from-api')
     expect(vi.mocked(fetch).mock.calls[2][0]).toBe('/api/bills/1/attachments/2/download?preview=true')
   })
 

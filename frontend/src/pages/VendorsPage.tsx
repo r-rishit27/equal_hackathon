@@ -32,6 +32,7 @@ import { LogoEditor, VendorLogo } from '../components/vendor/VendorLogo'
 import VendorDocuments, { type BillFilter, type DocFolder } from '../components/vendor/VendorDocuments'
 import VendorInbox from '../components/vendor/VendorInbox'
 import VendorActivity from '../components/vendor/VendorActivity'
+import ReconFolder from '../components/vendor/recon/ReconFolder'
 import VendorPlayground from '../components/vendor/playground/VendorPlayground'
 import '../components/vendor/vendorCard.css'
 
@@ -2123,16 +2124,16 @@ function VendorTdsPanel({ vendor, companyId, tdsCategories, onCategoryChange, ca
 // ── Vendor Detail Panel ───────────────────────────────────────────────────────
 // Exported for components/records/VendorCard, which opens it by id over any page.
 /** The card's six views; every route tab (old ones included) maps onto one. */
-type View = 'overview' | 'spend' | 'documents' | 'conversations' | 'activity' | 'compliance' | 'playground'
+type View = 'overview' | 'spend' | 'documents' | 'conversations' | 'activity' | 'compliance' | 'reconciliation' | 'reconciliation-documents' | 'playground'
 const VIEW_OF: Record<VendorTab, View> = {
   details: 'overview', spend: 'spend', documents: 'documents', statements: 'documents',
   conversations: 'conversations', contacts: 'conversations', activity: 'activity',
   compliance: 'compliance', bank: 'compliance', gstins: 'compliance', tds: 'compliance',
-  playground: 'playground',
+  reconciliation: 'reconciliation', 'reconciliation-documents': 'reconciliation-documents', playground: 'playground',
 }
 const TAB_OF: Record<View, VendorTab> = {
   overview: 'details', spend: 'spend', documents: 'documents', conversations: 'conversations', activity: 'activity', compliance: 'compliance',
-  playground: 'playground',
+  reconciliation: 'reconciliation', 'reconciliation-documents': 'reconciliation-documents', playground: 'playground',
 }
 
 /**
@@ -2181,7 +2182,11 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
   refreshKey?: number
 }) {
   const [vendor, setVendor] = useState<Vendor>(initialVendor)
-  const view: View = VIEW_OF[tab] ?? 'overview'
+  const [search, setSearch] = useSearchParams()
+  const legacyFolder = tab === 'documents' ? search.get('folder') : null
+  const view: View = legacyFolder === 'recon' ? 'reconciliation-documents'
+    : legacyFolder === 'recon-board' ? 'reconciliation' : VIEW_OF[tab] ?? 'overview'
+  const activeTab = view === 'reconciliation-documents' ? 'reconciliation' : view
   // An outside write (a contract value accepted on this card): read it again.
   useEffect(() => {
     if (!refreshKey) return
@@ -2803,11 +2808,6 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
   // card (?open=recon:<id>, components/records). Older links said ?case=<id>:
   // turn those into the card, in place, so they still land on the case.
   const reconOn = useService('recon')
-  const [search, setSearch] = useSearchParams()
-  useEffect(() => {
-    const f = search.get('folder')
-    if (f === 'recon' || f === 'recon-board') setDocFolder(f)
-  }, [search])
   // ?thread=<gmail thread id> opens that conversation — how Review Hub's
   // "Open email" lands on the exact message a finding came from.
   const threadParam = search.get('thread')
@@ -2821,23 +2821,13 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
       return n
     }, { replace: true })
   }, [search, setSearch])
-  const pickFolder = useCallback((f: DocFolder) => {
-    setDocFolder(f)
-    setSearch(prev => {
-      const n = new URLSearchParams(prev)
-      if (f === 'recon' || f === 'recon-board') n.set('folder', f)
-      else { n.delete('folder'); n.delete('case') }
-      return n
-    }, { replace: true })
-  }, [setSearch])
-
   const mainRef = useRef<HTMLElement>(null)
   const tabsRef = useRef<HTMLDivElement>(null)
   const tabBtns = useRef<Partial<Record<View, HTMLButtonElement | null>>>({})
   const [ink, setInk] = useState<{ left: number; width: number } | null>(null)
   useLayoutEffect(() => {
     const place = () => {
-      const b = tabBtns.current[view]
+      const b = tabBtns.current[activeTab]
       if (b) setInk({ left: b.offsetLeft, width: b.offsetWidth })
     }
     place()
@@ -2849,7 +2839,7 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
       Object.values(tabBtns.current).forEach(b => { if (b) ro.observe(b) })
     }
     return () => { window.removeEventListener('resize', place); ro?.disconnect() }
-  }, [view])
+  }, [activeTab])
 
   const stackSide = useMediaQuery('(width <= 960px)')
   const goView = (v: View) => {
@@ -2867,7 +2857,7 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
   // Tabs follow the tab pattern: arrows move between them (and open them),
   // Home/End jump to the ends; only the open tab is in the Tab order.
   const onTabKey = (e: ReactKeyboardEvent<HTMLButtonElement>, v: View) => {
-    const order: View[] = ['overview', 'spend', 'documents', 'conversations', 'activity', 'compliance']
+    const order = VIEWS.map(item => item.v)
     const i = order.indexOf(v)
     const to = e.key === 'ArrowRight' ? order[(i + 1) % order.length]
       : e.key === 'ArrowLeft' ? order[(i - 1 + order.length) % order.length]
@@ -2920,9 +2910,8 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
     { v: 'conversations', label: 'Conversations', icon: <MessageSquare size={14} />, count: inbox?.threads.length, hot: inbox?.threads.filter(t => t.needs_reply).length },
     { v: 'activity', label: 'Activity', icon: <History size={14} /> },
     { v: 'compliance', label: 'Compliance', icon: <Shield size={14} /> },
-    ...(playgroundEnabled
-      ? [{ v: 'playground' as View, label: 'Playground', icon: <Workflow size={14} /> }]
-      : []),
+    ...(reconOn ? [{ v: 'reconciliation' as const, label: 'Reconciliation', icon: <LayoutGrid size={14} /> }] : []),
+    ...(playgroundEnabled ? [{ v: 'playground' as const, label: 'Playground', icon: <Workflow size={14} /> }] : []),
   ]
 
   const since = vendor.created_at ? new Date(vendor.created_at) : null
@@ -3174,10 +3163,10 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
 
               <div className="vc__tabs" ref={tabsRef} role="tablist" aria-label="Vendor views">
                 {VIEWS.map(t => (
-                  <button key={t.v} ref={el => { tabBtns.current[t.v] = el }} role="tab" aria-selected={view === t.v}
-                          id={`vc-tab-${t.v}`} aria-controls="vc-tabpanel" tabIndex={view === t.v ? 0 : -1}
+                  <button key={t.v} ref={el => { tabBtns.current[t.v] = el }} role="tab" aria-selected={activeTab === t.v}
+                          id={`vc-tab-${t.v}`} aria-controls="vc-tabpanel" tabIndex={activeTab === t.v || (!VIEWS.some(item => item.v === activeTab) && t.v === 'overview') ? 0 : -1}
                           onKeyDown={e => onTabKey(e, t.v)}
-                          className={`vc__tab${view === t.v ? ' on' : ''}`} onClick={() => goView(t.v)}>
+                          className={`vc__tab${activeTab === t.v ? ' on' : ''}`} onClick={() => goView(t.v)}>
                     {t.icon}{t.label}
                     {t.hot ? <span className="vc__cnt vc__cnt--hot" title={`${t.hot} need a reply`}>{t.hot}</span>
                       : t.count != null && t.count > 0 ? <span className="vc__cnt">{t.count}</span> : null}
@@ -3186,7 +3175,8 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
                 {ink && <span className="vc__tabs-ink" style={{ left: ink.left, width: ink.width }} />}
               </div>
 
-              <div key={view} className="vc__fadein" role="tabpanel" id="vc-tabpanel" aria-labelledby={`vc-tab-${view}`}>
+              <div key={activeTab} className="vc__fadein" role="tabpanel" id="vc-tabpanel" aria-labelledby={VIEWS.some(item => item.v === activeTab) ? `vc-tab-${activeTab}` : undefined}
+                aria-label={VIEWS.some(item => item.v === activeTab) ? undefined : 'Vendor view'}>
                 {view === 'overview' && (
                   <>
                     <div className="vc__sec vc__ovtop">
@@ -3232,8 +3222,7 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
                     vendorName={vendor.name} supplierId={vendor.supplier_id} brandId={activeBrand?.id ?? null}
                     bills={summary.bills} docs={vendorDocs} now={now}
                     billsStatus={billsStatus} docsStatus={docsStatus} onRetry={retryDocsAndBills}
-                    folder={docFolder} onFolder={pickFolder} billFilter={billFilter} onBillFilter={setBillFilter}
-                    reconEnabled={reconOn}
+                    folder={docFolder} onFolder={setDocFolder} billFilter={billFilter} onBillFilter={setBillFilter}
                     currentUser={user?.name ?? ''} onReload={loadDocs}
                     onPreviewDoc={previewVendorDoc} onDownloadDoc={downloadVendorDoc} onDeleteDoc={handleDocDelete}
                     onPreviewBill={previewBill} onOpenBill={onNavigateToBill}
@@ -3261,7 +3250,20 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
 
                 {/* Keyed per vendor so switching cards loads that vendor's own canvas
                     rather than carrying the previous one's nodes across. */}
-                {view === 'playground' && (
+                {activeTab === 'reconciliation' && (reconOn ? (
+                  <>
+                    <div className="vc__recon-views" role="group" aria-label="Reconciliation views">
+                      <button type="button" className="vc__btn vc__btn--sm" aria-pressed={view === 'reconciliation'}
+                        onClick={() => goView('reconciliation')}><LayoutGrid size={14} aria-hidden="true" />Dashboard</button>
+                      <button type="button" className="vc__btn vc__btn--sm" aria-pressed={view === 'reconciliation-documents'}
+                        onClick={() => goView('reconciliation-documents')}><FolderOpen size={14} aria-hidden="true" />Supporting Documents</button>
+                    </div>
+                    <ReconFolder key={view} supplierId={vendor.supplier_id} brandId={activeBrand?.id ?? null}
+                      notify={showAlert} view={view === 'reconciliation' ? 'board' : 'documents'} />
+                  </>
+                ) : <p className="vc__muted">Reconciliation is unavailable for this workspace.</p>)}
+
+                {view === 'playground' && (playgroundEnabled ? (
                   <VendorPlayground
                     key={vendor.supplier_id}
                     supplierId={vendor.supplier_id}
@@ -3269,7 +3271,7 @@ export function VendorDetailPanel({ vendor: initialVendor, onClose, companyId, o
                     notify={showAlert}
                     onProduced={loadDocs}
                   />
-                )}
+                ) : <p className="vc__muted">Playground is unavailable for this workspace.</p>)}
 
                 {view === 'compliance' && (
                   <div className="vc__cgrid">

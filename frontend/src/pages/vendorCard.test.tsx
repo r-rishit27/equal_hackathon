@@ -153,6 +153,25 @@ describe('vendor card', () => {
     expect(within(rail).getByText('Rate cards')).toBeInTheDocument()
   })
 
+  it('opens one Reconciliation tab beside Compliance', async () => {
+    const { onTabChange } = await open('documents')
+    const recon = screen.getByRole('tab', { name: 'Reconciliation' })
+    expect(recon.previousElementSibling).toHaveTextContent('Compliance')
+    await userEvent.click(recon)
+    const playground = screen.getByRole('tab', { name: 'Playground' })
+    await userEvent.click(playground)
+    expect(onTabChange.mock.calls).toEqual([['reconciliation'], ['playground']])
+  })
+
+  it('keeps Reconciliation selected while switching from supporting documents to the dashboard', async () => {
+    const { onTabChange } = await open('reconciliation-documents')
+    expect(screen.getByRole('tab', { name: 'Reconciliation' })).toHaveAttribute('aria-selected', 'true')
+    const switcher = screen.getByRole('group', { name: 'Reconciliation views' })
+    expect(within(switcher).getByRole('button', { name: 'Supporting Documents' })).toHaveAttribute('aria-pressed', 'true')
+    await userEvent.click(within(switcher).getByRole('button', { name: 'Dashboard' }))
+    expect(onTabChange).toHaveBeenCalledWith('reconciliation')
+  })
+
   it('opens the old statements link on Documents › Bills', async () => {
     await open('statements')
     expect(await screen.findByTestId('bills-summary')).toHaveTextContent('2 unpaid · ₹80,000')

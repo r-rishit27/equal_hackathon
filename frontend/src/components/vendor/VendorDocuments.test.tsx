@@ -14,7 +14,6 @@ vi.mock('../../api/vendorCard', async orig => ({
   ...api,
 }))
 
-import { MemoryRouter } from 'react-router-dom'
 
 import VendorDocuments, { type BillFilter } from './VendorDocuments'
 import type { Bill } from '../../api/invoices'
@@ -273,46 +272,13 @@ describe('adding from a folder keeps that folder (B-H3)', () => {
   })
 })
 
-describe('the recon dashboard has its own way in', () => {
-  function nav(folder: Parameters<typeof VendorDocuments>[0]['folder'], onFolder = vi.fn()) {
-    render(
-      // The dashboard folder mounts ReconFolder, which links to case cards.
-      <MemoryRouter>
-      <VendorDocuments vendorName="Bosch" supplierId="s1" bills={[]} docs={[]} now={new Date('2026-11-20')}
-        folder={folder} onFolder={onFolder} billFilter="all" onBillFilter={() => {}} currentUser="Sumit"
-        onReload={() => {}} onPreviewDoc={() => {}} onDownloadDoc={() => {}} onDeleteDoc={() => {}}
-        onPreviewBill={() => {}} onOpenBill={() => {}} onUploadBill={onUploadBill} notify={() => {}}
-        uploadRequest={0} reconEnabled />
-      </MemoryRouter>,
-    )
-    return onFolder
-  }
-
-  it('is a sidebar entry beside Recon, not a panel buried inside it', async () => {
-    // Where the whole queue stands is a different question from where one
-    // file is, and it is the one a finance manager opens first.
-    const onFolder = nav('recent')
-    const entry = screen.getByRole('button', { name: /Recon dashboard/ })
-    expect(entry).toBeInTheDocument()
-    await userEvent.click(entry)
-    expect(onFolder).toHaveBeenCalledWith('recon-board')
-  })
-
-  it('marks itself as the page you are on', () => {
-    nav('recon-board')
-    expect(screen.getByRole('button', { name: /Recon dashboard/ })).toHaveAttribute('aria-current', 'page')
-    // ...and the documents entry is then not current.
-    expect(screen.getByRole('button', { name: /^Recon$/ })).not.toHaveAttribute('aria-current')
-  })
-
-  it('is absent for a tenant without recon', () => {
-    render(
-      <VendorDocuments vendorName="Bosch" supplierId="s1" bills={[]} docs={[]} now={new Date('2026-11-20')}
-        folder="recent" onFolder={() => {}} billFilter="all" onBillFilter={() => {}} currentUser="Sumit"
-        onReload={() => {}} onPreviewDoc={() => {}} onDownloadDoc={() => {}} onDeleteDoc={() => {}}
-        onPreviewBill={() => {}} onOpenBill={() => {}} onUploadBill={onUploadBill} notify={() => {}}
-        uploadRequest={0} />,
-    )
-    expect(screen.queryByRole('button', { name: /Recon dashboard/ })).not.toBeInTheDocument()
-  })
+it('keeps reconciliation out of the Documents navigation', () => {
+  render(
+    <VendorDocuments vendorName="Bosch" supplierId="s1" bills={[]} docs={[]} now={new Date('2026-11-20')}
+      folder="recent" onFolder={() => {}} billFilter="all" onBillFilter={() => {}} currentUser="Sumit"
+      onReload={() => {}} onPreviewDoc={() => {}} onDownloadDoc={() => {}} onDeleteDoc={() => {}}
+      onPreviewBill={() => {}} onOpenBill={() => {}} onUploadBill={onUploadBill} notify={() => {}}
+      uploadRequest={0} />,
+  )
+  expect(screen.queryByRole('button', { name: /recon/i })).not.toBeInTheDocument()
 })

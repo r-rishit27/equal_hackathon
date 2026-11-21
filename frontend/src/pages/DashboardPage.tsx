@@ -4,6 +4,7 @@ import {
   ArrowUpRight, FileText, RefreshCw, Upload, X,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
+import { useService } from '../auth/EntitlementsContext'
 import { useBills } from '../hooks/useBills'
 import SpendProgression from './SpendProgression'
 import { fetchFxExposure, fetchFxAgentBriefing, fetchFxAlerts, dismissFxAlert, type Bill, type FxExposureItem, type FxAgentBriefing, type FxAlert } from '../api/invoices'
@@ -275,6 +276,7 @@ export default function DashboardPage({
 }) {
   const { user } = useAuth()
   const { bills, loading, refresh } = useBills()
+  const fxEnabled = useService('fx')
   const [refreshing, setRefreshing] = useState(false)
   const [drillDown, setDrillDown] = useState<DrillDown>(null)
   const [fxExposure, setFxExposure] = useState<FxExposureItem[]>([])
@@ -282,10 +284,18 @@ export default function DashboardPage({
   const [fxAlerts, setFxAlerts] = useState<FxAlert[]>([])
 
   useEffect(() => {
-    fetchFxExposure(user?.company_id).then(setFxExposure).catch(() => {})
-    fetchFxAgentBriefing(user?.company_id).then(setFxBriefing).catch(() => {})
-    fetchFxAlerts(user?.company_id).then(setFxAlerts).catch(() => {})
-  }, [user?.company_id])
+    if (!fxEnabled || !user?.company_id) {
+      setFxExposure([])
+      setFxBriefing(null)
+      setFxAlerts([])
+      return
+    }
+    let current = true
+    fetchFxExposure(user.company_id).then(rows => { if (current) setFxExposure(rows ?? []) }).catch(() => {})
+    fetchFxAgentBriefing(user.company_id).then(brief => { if (current) setFxBriefing(brief) }).catch(() => {})
+    fetchFxAlerts(user.company_id).then(alerts => { if (current) setFxAlerts(alerts ?? []) }).catch(() => {})
+    return () => { current = false }
+  }, [fxEnabled, user?.company_id])
 
   const load = (force = false) => {
     if (force) { setRefreshing(true); refresh(); setTimeout(() => setRefreshing(false), 800) }
@@ -616,7 +626,7 @@ export default function DashboardPage({
         </div>
 
         {/* ── FX Exposure ── (only shown when non-INR bills exist) */}
-        {fxExposure.length > 0 && (
+        {fxEnabled && fxExposure.length > 0 && (
           <div className="db__card">
             <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 }}>
               <div>
