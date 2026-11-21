@@ -1,6 +1,8 @@
 # Email Agent
 
 **Stage:** 01 · Ingestion & capture
+
+**Related design:** [WhatsApp Agent PRD](whatsapp-agent-prd.md) · [WhatsApp Agent technical design](whatsapp-agent-technical-design.md)
 **Role:** Vendor email → draft bill, thread-aware
 
 ## What it does
