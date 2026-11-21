@@ -1,0 +1,49 @@
+from datetime import date
+from decimal import Decimal
+from uuid import uuid4
+
+import pytest
+from fastapi import HTTPException
+
+from backend_ocr.app.routers.inventory import Plan, evaluate
+
+
+def plan(**changes):
+    fields = dict(line_id=uuid4(), start=date(2026, 11, 21), on_hand=10, reserved=2,
+                  daily_demand=4, lead_days=2, pack=6, minimum_order=1, spendable_paise=50_000)
+    return Plan(**(fields | changes))
+
+
+def test_rounding_and_arrival_before_demand():
+    result = evaluate(plan(), Decimal("20.50"))
+    assert (result["units"], result["spend_paise"]) == (24, 49_200)
+    assert result["days"][2]["incoming"] == 24
+    assert result["days"][-1]["closing"] == 4
+    assert result["reasons"] == []
+
+
+def test_quote_budget_and_late_arrival():
+    result = evaluate(plan(lead_days=3, landed_unit_paise=2100, spendable_paise=37_000), Decimal("20.50"))
+    assert result["days"][2]["unmet"] == 4
+    assert result["spend_paise"] == 37_800
+    assert len(result["reasons"]) == 2
+
+
+def test_no_order_and_invalid_reservations():
+    assert evaluate(plan(on_hand=30), Decimal("20"))["units"] == 0
+    with pytest.raises(HTTPException):
+        evaluate(plan(reserved=11), Decimal("20"))
+
+def test_firm_inbound_covers_later_demand_only():
+    result = evaluate(plan(inbound_units=30, inbound_date=date(2026, 11, 25)), Decimal("20"))
+    assert result["units"] == 12
+    assert result["days"][4]["incoming"] == 30
+    assert not any(day["unmet"] for day in result["days"])
+
+
+def test_late_delivery_and_expired_quote():
+    result = evaluate(plan(lead_days=7), Decimal("20"))
+    assert result["units"] == 0
+    assert result["reasons"]
+    result = evaluate(plan(landed_unit_paise=2000, quote_expiry=date(2026, 11, 20)), Decimal("25"))
+    assert "expired" in result["reasons"][0]

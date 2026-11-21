@@ -14,6 +14,7 @@ export type NavPage =
   | 'vendors'
   | 'settings'
   | 'dashboard'
+  | 'inventory'
   | 'reports'
   | 'integrations'
   | 'data-extraction'
@@ -44,6 +45,7 @@ export const PATHS: Record<NavPage, string> = {
   bills:             '/bills',
   dashboard:         '/dashboard',
   vendors:           '/vendors',
+  inventory:         '/finance-desk/inventory',
   reports:           '/reports',
   'data-extraction': '/data-extraction',
   nova:              '/nova',
@@ -228,6 +230,7 @@ const TITLES: Record<string, string> = {
   [PATHS.bills]:             'Bills',
   [PATHS.dashboard]:         'Dashboard',
   [PATHS.vendors]:           'Vendors',
+  [PATHS.inventory]:         'Inventory optimization',
   [PATHS.reports]:           'Reports',
   [PATHS['data-extraction']]:'Data Extraction',
   [PATHS.nova]:              'Nova',

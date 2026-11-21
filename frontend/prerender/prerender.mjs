@@ -23,7 +23,7 @@ import { fileURLToPath } from 'node:url'
 const here = dirname(fileURLToPath(import.meta.url))
 const DIST = join(here, '..', 'dist')
 
-const { ROUTES, headFor, renderRoute, sitemapEntries } = await import(join(here, '.out', 'entry-server.mjs'))
+const { ROUTES, headFor, renderRoute, sitemapEntries } = await import('./.out/entry-server.mjs')
 
 const template = await readFile(join(DIST, 'index.html'), 'utf8')
 

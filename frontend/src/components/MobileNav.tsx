@@ -20,6 +20,7 @@ const PRIMARY: { icon: React.ElementType; label: string; page: NavPage; perm: st
 const OVERFLOW: { label: string; page: NavPage; perm: string | string[]; service?: ServiceKey }[] = [
   { label: 'Review', page: 'review', perm: 'payables.view', service: 'review_hub' },
   { label: 'Payment Hub', page: 'payments', perm: ['payables.view', 'payables.approve'], service: 'disbursement' },
+  { label: 'Inventory optimization', page: 'inventory', perm: 'payables.view', service: 'reports' },
   { label: 'Reports', page: 'reports', perm: 'payables.view' },
   { label: 'Data Extraction', page: 'data-extraction', perm: 'payables.view', service: 'data_extraction' },
   { label: 'Agent Hub', page: 'agent-hub', perm: 'payables.view', service: 'agent_hub' },

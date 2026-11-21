@@ -1,0 +1,14 @@
+.inventory-desk { height: 100%; overflow: auto; padding: clamp(16px, 3vw, 40px); }
+.inventory-desk h1 { margin: 4px 0; font-size: clamp(26px, 3vw, 38px); }
+.inventory-desk p { margin: 10px 0; }
+.inventory-desk form { max-width: 880px; margin: 24px 0; }
+.inventory-controls { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr)); gap: 14px; margin: 20px 0; padding: 16px; border: 1px solid #cbd5d6; border-radius: 8px; }
+.inventory-desk select, .inventory-controls input { display: block; width: 100%; margin-top: 5px; padding: 8px; border: 1px solid #bac6cb; border-radius: 5px; color: #20323a; background: white; font: inherit; }
+.inventory-desk button { padding: 9px 16px; border: 0; border-radius: 5px; color: white; background: #275e54; cursor: pointer; }
+.inventory-run { margin: 24px 0; border-top: 1px solid #cbd5d6; }
+.inventory-risk { color: #964211; }
+.inventory-scroll { overflow-x: auto; }
+.inventory-desk table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.inventory-desk th, .inventory-desk td { padding: 9px; text-align: right; border-bottom: 1px solid #d5dede; }
+.inventory-desk th:first-child { text-align: left; }
+.inventory-evidence { margin: 16px 0; padding: 12px 18px; background: #edf4f2; border-left: 3px solid #286b60; color: #1b4039; }

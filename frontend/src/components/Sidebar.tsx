@@ -5,6 +5,7 @@ import {
   Upload,
   FileText,
   Users,
+  Package,
   BarChart2,
   Database,
   Zap,
@@ -82,6 +83,7 @@ const NAV: NavGroup[] = [
   {
     title: 'Insights',
     items: [
+      { icon: Package, label: 'Inventory optimization', page: 'inventory', requiredPermission: 'payables.view', requiredService: 'reports' },
       { icon: BarChart2, label: 'Reports', page: 'reports', requiredPermission: 'payables.view' },
       {
         icon: Database, label: 'Data Extraction', page: 'data-extraction',

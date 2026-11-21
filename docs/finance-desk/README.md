@@ -1,6 +1,12 @@
 # Reckon.ai Finance Desk
 
-Design package for extending Reckon.ai's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The Finance Desk is proposed. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
+Design package for extending Reckon.ai's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The broader Finance Desk is proposed. The inventory planner is available at `/finance-desk/inventory` under Insights for users with payables viewing access and the Reports entitlement. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
+
+## Inventory planner on dev
+
+The planner reads the signed-in tenant's INR supplier bill lines from `onsumm_db`. Each price is tied to its bill date, quantity, unit and supplier. A planner selects a bill line and enters current stock, reserved units, daily demand, any confirmed inbound, lead time, MOQ, pack size and cash available after commitments and reserve. A confirmed landed price can replace the historical unit price for the calculation.
+
+The seven-day preview shows the pack-rounded order, projected spend, closing stock with and without the order, and unmet demand. It flags arrival delays, expired confirmed quotes and spend above the entered cash budget. Compare further scenarios in the same page session. The preview is read-only. Automated demand feeds, dated cash forecasting and persisted purchase decisions remain planned.
 
 ## Read in this order
 

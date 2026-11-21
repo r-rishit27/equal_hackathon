@@ -37,6 +37,7 @@ const PaymentPage = lazy(() => import('./pages/PaymentPage'))
 const VendorsPage = lazy(() => import('./pages/VendorsPage'))
 const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const InventoryPage = lazy(() => import('./pages/InventoryPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const DataExtractionPage = lazy(() => import('./pages/DataExtractionPage'))
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'))
@@ -280,6 +281,7 @@ function AppShell() {
                   </RequireService>
                 }
               />
+              <Route path={PATHS.inventory} element={<RequireService service="reports"><InventoryPage /></RequireService>} />
               <Route path={PATHS.reports} element={<ReportsPage />} />
               <Route
                 path={PATHS['data-extraction']}
