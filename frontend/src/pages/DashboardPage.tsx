@@ -460,6 +460,9 @@ export default function DashboardPage({
               <dt><Icon size={16} aria-hidden="true" />{label}</dt>
               <dd className="db__summary-amount">{fmt(amount)}</dd>
               <dd>{count} {count === 1 ? 'bill' : 'bills'}</dd>
+              <dd className="db__summary-meter" aria-hidden="true">
+                <span style={{ width: `${Math.max(0, amount) / Math.max(1, m.pendingAmt, m.dueSoonAmt, m.overdueAmt, m.paidAmt) * 100}%` }} />
+              </dd>
             </div>
           ))}
         </dl>

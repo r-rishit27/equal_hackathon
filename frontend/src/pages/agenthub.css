@@ -381,6 +381,55 @@
   margin-top: var(--sp-4);
 }
 
+.ah-workflow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1) var(--sp-2);
+  margin: var(--sp-2) 0;
+  padding: 0;
+  list-style: none;
+  color: var(--brand-700);
+  font-size: var(--fs-xs);
+}
+
+.ah-workflow li {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+}
+
+.ah-contact-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  text-align: left;
+  font-size: var(--fs-sm);
+}
+
+.ah-contact-table :is(th, td) {
+  padding: var(--sp-2);
+  border-bottom: 1px solid var(--line-200);
+  overflow-wrap: anywhere;
+}
+
+.ah-contact-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: var(--surface-1);
+  color: var(--brand-800);
+}
+
+.ah-contact-table tbody th {
+  font-weight: var(--fw-medium);
+}
+
+.ah-contact-table .ah-poc__mail {
+  display: block;
+  font-weight: var(--fw-normal);
+  white-space: normal;
+}
+
 .ah-panel {
   display: flex;
   flex-direction: column;

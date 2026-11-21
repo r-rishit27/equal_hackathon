@@ -2277,6 +2277,31 @@
   opacity: 0.75;
 }
 
+.rh__typechip--volume {
+  position: relative;
+  padding-bottom: 4px;
+}
+
+.rh__typechip-track {
+  position: absolute;
+  inset: auto 7px 3px;
+  height: 2px;
+  background: color-mix(in srgb, currentcolor 15%, transparent);
+  border-radius: 3px;
+}
+
+.rh__typechip-track > span {
+  display: block;
+  height: 100%;
+  background: currentcolor;
+  border-radius: inherit;
+  transition: width 220ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rh__typechip-track > span { transition: none; }
+}
+
 /* ── Vendor ────────────────────────────────────────────────────────────── */
 .rh__who {
   max-width: 260px;

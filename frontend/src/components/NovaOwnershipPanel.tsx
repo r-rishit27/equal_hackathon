@@ -83,6 +83,9 @@ export default function NovaOwnershipPanel() {
   const [selectedBillId, setSelectedBillId] = useState<string | null>(null)
   const [detail, setDetail] = useState<ReconcileResult | null>(null)
   const [detailLoading, setDetailLoading] = useState(false)
+  const [statusFilter, setStatusFilter] = useState<RollupStatus | null>(null)
+  const statusCounts = { RED: 0, YELLOW: 0, GREEN: 0 }
+  for (const row of summary?.by_vendor ?? []) statusCounts[row.rollup_status] += 1
 
   useEffect(() => {
     if (!ownerTenantId) return
@@ -111,12 +114,20 @@ export default function NovaOwnershipPanel() {
   useEffect(() => { loadSummary() }, [loadSummary])
 
   useEffect(() => {
-    if (!selectedBillId) { setDetail(null); return }
+    setDetail(null)
+    if (!selectedBillId) {
+      setDetailLoading(false)
+      return
+    }
+    let current = true
     setDetailLoading(true)
     getReconciliation(selectedBillId)
-      .then(setDetail)
-      .catch(e => setError(e instanceof Error ? e.message : 'Failed to load reconciliation detail'))
-      .finally(() => setDetailLoading(false))
+      .then(result => { if (current) setDetail(result) })
+      .catch(e => {
+        if (current) setError(e instanceof Error ? e.message : 'Failed to load reconciliation detail')
+      })
+      .finally(() => { if (current) setDetailLoading(false) })
+    return () => { current = false }
   }, [selectedBillId])
 
   if (!ownerTenantId) {
@@ -178,16 +189,21 @@ export default function NovaOwnershipPanel() {
                 <div className="nova-status__bar" aria-hidden="true">
                   {(['RED', 'YELLOW', 'GREEN'] as const).map(status => (
                     <span key={status} style={{
-                      flexGrow: summary.by_vendor.filter(row => row.rollup_status === status).length,
+                      flexGrow: statusCounts[status],
                       background: ROLLUP_COLOR[status],
                     }} />
                   ))}
                 </div>
-                <div className="nova-status__legend">
+                <div className="nova-status__legend" role="group" aria-label="Filter runs by status">
                   {(['RED', 'YELLOW', 'GREEN'] as const).map((status, index) => (
-                    <span key={status}><i style={{ background: ROLLUP_COLOR[status] }} />
-                      {['Exceptions', 'Incomplete', 'Matched'][index]} <strong>{summary.by_vendor.filter(row => row.rollup_status === status).length}</strong>
-                    </span>
+                    <button key={status} type="button" aria-pressed={statusFilter === status}
+                      onClick={() => {
+                        setStatusFilter(current => current === status ? null : status)
+                        setSelectedBillId(null)
+                      }}>
+                      <i aria-hidden="true" style={{ background: ROLLUP_COLOR[status] }} />
+                      {['Exceptions', 'Incomplete', 'Matched'][index]} <strong>{statusCounts[status]}</strong>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -228,7 +244,10 @@ export default function NovaOwnershipPanel() {
                   </tr>
                 </thead>
                 <tbody>
-                  {summary.by_vendor.map(row => (
+                  {statusFilter && statusCounts[statusFilter] === 0 && (
+                    <tr><td style={td} colSpan={5}>No runs with this status.</td></tr>
+                  )}
+                  {summary.by_vendor.filter(row => !statusFilter || row.rollup_status === statusFilter).map(row => (
                     <tr
                       key={row.run_id}
                       onClick={() => setSelectedBillId(row.bill_id)}
@@ -254,7 +273,7 @@ export default function NovaOwnershipPanel() {
 
           {detailLoading && <div style={{ padding: 20, textAlign: 'center', color: '#94a3b8' }}><Loader2 size={18} /> Loading lines…</div>}
 
-          {!detailLoading && detail && (() => {
+          {selectedBillId && !detailLoading && detail && (() => {
             // Nova/Invoice totals in this strip are scoped to services actually
             // present on this bill (certified + MATCHED) — not Nova's full-month
             // total across every module it billed, most of which this document

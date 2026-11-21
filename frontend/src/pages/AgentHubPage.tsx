@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import {
   Cpu, RefreshCw, FileText, Mail, XCircle, AlertTriangle, Clock, Network,
   GitCompare, ShieldCheck, Radar, Brain, Banknote, ScrollText, Percent, Landmark, HandCoins,
-  ClipboardCheck,
+  ClipboardCheck, ChevronRight, ScanLine,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import FactGraphModal from '../components/factgraph/FactGraphModal'
@@ -228,9 +228,11 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
               label="Vendor Bill Agent"
             />
           </div>
-          <div className="ah-agent__desc">
-            Watched mailbox → bill or contract → OCR/extraction → draft bill or typed claim.
-          </div>
+          <ol className="ah-workflow" aria-label="Communication Agent workflow">
+            <li><Mail size={15} aria-hidden="true" /> Mailbox</li>
+            <li><ChevronRight size={13} aria-hidden="true" /><ScanLine size={15} aria-hidden="true" /> Extract</li>
+            <li><ChevronRight size={13} aria-hidden="true" /><FileText size={15} aria-hidden="true" /> Draft or claim</li>
+          </ol>
           <div className="ah-agent__foot">
             <span style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
               <span className={`ah-dot ${live ? 'ah-dot--on' : ''}`} aria-hidden="true" />
@@ -345,21 +347,23 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
               {pocs.length === 0 && (
                 <div className="ah-empty">No vendor contacts with an email. Add points of contact on Vendors first.</div>
               )}
-              {pocs.map(p => (
-                <div key={p.id} className="ah-poc">
-                  <div style={{ minWidth: 0, flex: 1 }}>
-                    <div className="ah-poc__name">
-                      {p.name}{p.supplier_name && <span className="ah-poc__org"> · {p.supplier_name}</span>}
-                    </div>
-                    <div className="ah-poc__mail">{p.email}</div>
-                  </div>
-                  <Switch
-                    checked={p.agent_enabled}
-                    onChange={() => handleTogglePoc(p)}
-                    label={`Watch ${p.name}${p.email ? ` (${p.email})` : ''}`}
-                  />
-                </div>
-              ))}
+              {pocs.length > 0 && (
+                <table className="ah-contact-table" aria-label="Vendor contacts">
+                  <thead><tr><th scope="col">Contact</th><th scope="col">Vendor</th><th scope="col">Watch</th></tr></thead>
+                  <tbody>
+                    {pocs.map(p => (
+                      <tr key={p.id}>
+                        <th scope="row"><span className="ah-poc__name">{p.name}</span><span className="ah-poc__mail">{p.email}</span></th>
+                        <td>{p.supplier_name || '—'}</td>
+                        <td>
+                          <Switch checked={p.agent_enabled} onChange={() => handleTogglePoc(p)}
+                            label={`Watch ${p.name}${p.email ? ` (${p.email})` : ''}`} />
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
             </div>
           </div>
 

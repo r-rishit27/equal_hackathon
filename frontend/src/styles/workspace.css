@@ -370,10 +370,23 @@
   font-size: var(--fs-sm);
 }
 
-.nova-status__legend span {
+.nova-status__legend button {
   display: inline-flex;
   gap: var(--sp-2);
   align-items: center;
+  padding: var(--sp-1) var(--sp-2);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+  background: var(--surface-0);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.nova-status__legend button:hover,
+.nova-status__legend button[aria-pressed="true"] {
+  background: var(--brand-50);
+  border-color: var(--brand-500);
 }
 
 .nova-status__legend i {
@@ -398,3 +411,27 @@
 }
 
 .nova-run-link:hover { text-decoration: underline; }
+
+.db__summary .db__summary-meter {
+  height: 4px;
+  margin-top: var(--sp-2);
+  overflow: hidden;
+  border-radius: var(--r-full);
+  background: var(--brand-50);
+}
+
+.db__summary-meter > span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--brand-600);
+  transition: width 220ms ease-out;
+}
+
+.shell__content :is(.rh__wrap, .rh__browse-tablewrap, .bp__wrap, .vp__wrap, .rp__tblwrap, .ar-table-wrap, .u-table-wrap) tbody tr:hover > td {
+  background-color: var(--brand-50);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .db__summary-meter > span { transition: none; }
+}

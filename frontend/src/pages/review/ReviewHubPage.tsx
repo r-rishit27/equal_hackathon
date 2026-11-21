@@ -675,6 +675,7 @@ export default function ReviewHubPage() {
 
   const actionable = counts?.total_actionable ?? 0
   const visible = counts?.total_visible ?? 0
+  const peakFamily = Math.max(1, ...FAMILY_ORDER.map(family => counts?.by_family?.[family]?.actionable ?? 0))
 
   return (
     <div className="rh">
@@ -729,13 +730,16 @@ export default function ReviewHubPage() {
             <button
               key={fam}
               type="button"
-              className={`rh__type rh__type--c${cat} rh__typechip`}
+              className={`rh__type rh__type--c${cat} rh__typechip rh__typechip--volume`}
               aria-pressed={on}
               onClick={() => toggleType(fam)}
             >
               {on && <Check size={12} strokeWidth={3} aria-hidden="true" />}
               {label}
               <span className="rh__typechip-n">{n?.actionable ?? 0}</span>
+              <span className="rh__typechip-track" aria-hidden="true">
+                <span style={{ width: `${((n?.actionable ?? 0) / peakFamily) * 100}%` }} />
+              </span>
             </button>
           )
         })}
