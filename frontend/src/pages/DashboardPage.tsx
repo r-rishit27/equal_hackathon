@@ -419,8 +419,8 @@ export default function DashboardPage({
         {/* ── Header ── */}
         <div className="db__hdr">
           <div>
-            <div className="db__title">{greeting}, {user?.name?.split(' ')[0] ?? 'there'}</div>
-            <div className="db__sub">Here's your financial overview for today</div>
+            <h1 className="db__title">Finance overview</h1>
+            <div className="db__sub">{greeting}, {user?.name?.split(' ')[0] ?? 'there'}</div>
           </div>
           <div style={{ display:'flex', gap:8 }}>
             <button className="db__btn db__btn--ghost" onClick={() => load(true)} disabled={refreshing}>
@@ -439,7 +439,20 @@ export default function DashboardPage({
             is paid — today. This answers the question they cannot: better or
             worse than last period, on spend, settlement, approval turnaround,
             payment buffer and category mix. */}
-        <SpendProgression bills={bills} companyId={user?.company_id} />
+        <dl className="db__summary" aria-label="Payables summary">
+          {[
+            { label: 'Awaiting approval', amount: m.pendingAmt, count: m.pendingCount, icon: Clock },
+            { label: 'Due within 7 days', amount: m.dueSoonAmt, count: m.dueSoonCount, icon: FileText },
+            { label: 'Overdue', amount: m.overdueAmt, count: m.overdueCount, icon: AlertCircle },
+            { label: 'Paid', amount: m.paidAmt, count: m.paidCount, icon: CheckCircle2 },
+          ].map(({ label, amount, count, icon: Icon }) => (
+            <div className="db__summary-item" key={label}>
+              <dt><Icon size={16} aria-hidden="true" />{label}</dt>
+              <dd className="db__summary-amount">{fmt(amount)}</dd>
+              <dd>{count} {count === 1 ? 'bill' : 'bills'}</dd>
+            </div>
+          ))}
+        </dl>
 
         {/* ── Chart row ── */}
         <div className="db__row db__analytics-row db__analytics-row--primary">
@@ -687,6 +700,7 @@ export default function DashboardPage({
         )}
 
         {/* ── Recent Bills ── */}
+        <SpendProgression bills={bills} companyId={user?.company_id} />
         <div className="db__card">
           <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
             <div>
@@ -750,8 +764,43 @@ export default function DashboardPage({
 
         /* header */
         .db__hdr { display:flex; align-items:flex-start; justify-content:space-between; padding-bottom:4px; }
-        .db__title { font-size: var(--fs-2xl); font-weight: var(--fw-bold); color: var(--ink-900); letter-spacing:-0.02em; }
+        .db__title { margin: 0; font-size: var(--fs-3xl); font-weight: var(--fw-bold); color: var(--ink-900); letter-spacing:-0.03em; }
         .db__sub   { font-size: var(--fs-sm); color: var(--ink-500); margin-top: 4px; }
+
+        .db__summary {
+          display: grid;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          margin: 0;
+          background: var(--surface-0);
+          border: 1px solid var(--line-200);
+          border-radius: var(--r-lg);
+        }
+        .db__summary-item { min-width: 0; padding: var(--sp-4); }
+        .db__summary-item + .db__summary-item { border-left: 1px solid var(--line-200); }
+        .db__summary dt {
+          display: flex;
+          align-items: center;
+          gap: var(--sp-2);
+          font-size: var(--fs-md);
+          font-weight: var(--fw-medium);
+          color: var(--ink-700);
+        }
+        .db__summary dt svg { flex-shrink: 0; color: var(--brand-500); }
+        .db__summary dd { margin: 0; color: var(--ink-600); font-size: var(--fs-sm); }
+        .db__summary .db__summary-amount {
+          margin: var(--sp-2) 0 var(--sp-1);
+          color: var(--brand-900);
+          font-size: clamp(1.125rem, 2.3vw, 1.625rem);
+          font-weight: var(--fw-bold);
+          font-variant-numeric: tabular-nums;
+          overflow-wrap: anywhere;
+        }
+
+        @media (max-width: 920px) {
+          .db__summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+          .db__summary-item:nth-child(3) { border-left: 0; }
+          .db__summary-item:nth-child(n+3) { border-top: 1px solid var(--line-200); }
+        }
 
         .db__btn {
           display:flex; align-items:center; gap:6px; padding:8px 16px;

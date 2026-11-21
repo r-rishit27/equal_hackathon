@@ -6,18 +6,15 @@
   display: flex;
   flex-direction: column;
   width: var(--sidebar-w-collapsed);
-  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   background: var(--surface-0);
   border-right: 1px solid var(--line-200);
-  transition:
-    width var(--dur-slow) var(--ease),
-    box-shadow var(--dur-slow) var(--ease);
+  transition: width var(--dur-slow) var(--ease);
 }
 
 .sb--open {
   width: var(--sidebar-w-expanded);
-  box-shadow: var(--e-3);
 }
 
 /* ── Logo ───────────────────────────────────────────────────────────────── */
@@ -33,7 +30,8 @@
 
 .sb__logo-mark {
   position: absolute;
-  inset: 0 auto 0 0;
+  inset: 0 auto auto 0;
+  height: var(--topbar-h);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -66,6 +64,7 @@
 }
 
 .sb--open .sb__logo-mark {
+  visibility: hidden;
   opacity: 0;
   transform: translateX(-8px) rotate(-150deg) scale(.72);
 }
@@ -77,15 +76,43 @@
   .sb--open .sb__logo-mark { transform: none; }
 }
 
-.sb__logo-dot {
-  color: var(--accent-600);
-}
-
 /* ── Nav ────────────────────────────────────────────────────────────────── */
 .sb__nav {
   flex: 1;
   padding: 8px 8px 12px;
   overflow: hidden auto;
+}
+
+.sb__search {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  margin: var(--sp-3) var(--sp-3) 0;
+  padding: 0 var(--sp-2);
+  min-height: 36px;
+  color: var(--ink-600);
+  background: var(--surface-1);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-md);
+}
+
+.sb__search svg {
+  flex-shrink: 0;
+}
+
+.sb__search input {
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--ink-900);
+  font: inherit;
+}
+
+.sb__no-results {
+  padding: var(--sp-2);
+  color: var(--ink-600);
+  font-size: var(--fs-sm);
 }
 
 .sb__group {
@@ -94,91 +121,26 @@
   gap: 1px;
 }
 
-.sb__group + .sb__group {
-  margin-top: 2px;
-  padding-top: 0;
-  border-top: none;
-  transition:
-    margin-top var(--dur-base) var(--ease),
-    padding-top var(--dur-base) var(--ease),
-    opacity var(--dur-base) var(--ease);
-}
-
 .sb--open .sb__group + .sb__group {
-  margin-top: 4px;
-}
-
-.sb:not(.sb--open) .sb__group + .sb__group {
-  margin-top: 0;
-  padding-top: 0;
-  border-top: none;
+  margin-top: var(--sp-3);
 }
 
 .sb__group-title {
-  display: inline-flex;
+  display: none;
   align-items: center;
-  width: fit-content;
-  max-width: calc(var(--sidebar-w-expanded) - 46px);
-  height: 14px;
-  padding: 0 6px;
-  margin: 0;
-  font-size: 9px;
-  font-weight: var(--fw-bold);
+  min-height: 22px;
+  padding-inline: var(--sp-2);
+  margin-left: var(--sp-1);
+  color: var(--ink-600);
+  font-size: var(--fs-2xs);
+  font-weight: var(--fw-semibold);
   text-transform: uppercase;
-  letter-spacing: 0.09em;
-  color: var(--ink-400);
+  letter-spacing: 0.07em;
   white-space: nowrap;
-  opacity: 0;
-  transform: translateY(-4px);
-  max-height: 14px;
-  overflow: hidden;
-  visibility: hidden;
-  background: linear-gradient(90deg, rgba(148, 163, 184, 0.08), rgba(148, 163, 184, 0.18), rgba(148, 163, 184, 0.08));
-  background-size: 200% 100%;
-  background-position: 200% 0;
-  border-radius: 4px;
-  transition:
-    opacity var(--dur-base) var(--ease),
-    transform var(--dur-base) var(--ease),
-    max-height var(--dur-base) var(--ease),
-    height var(--dur-base) var(--ease),
-    padding var(--dur-base) var(--ease),
-    margin var(--dur-base) var(--ease),
-    visibility 0s linear var(--dur-base),
-    background-position 240ms ease-out;
-}
-
-.sb:not(.sb--open) .sb__group-title {
-  max-height: 14px;
-  height: 14px;
-  padding: 0 6px;
-  margin: 0;
-  opacity: 0;
-  visibility: hidden;
-  transform: translateY(-4px);
 }
 
 .sb--open .sb__group-title {
-  max-height: 24px;
-  height: 14px;
-  opacity: 1;
-  visibility: visible;
-  transform: translateY(0);
-  background-position: 0 0;
-  animation: sb__title-spawn 180ms ease-out both;
-}
-
-@keyframes sb__title-spawn {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-    background-position: 200% 0;
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-    background-position: 0 0;
-  }
+  display: flex;
 }
 
 .sb__list {
@@ -194,10 +156,10 @@
   display: flex;
   align-items: center;
   width: 100%;
-  height: 32px;
+  height: 36px;
   padding: 0;
   font-family: var(--font-sans);
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
   font-weight: var(--fw-medium);
   color: var(--ink-600);
   text-align: left;
@@ -218,14 +180,14 @@
 }
 
 .sb__item--active {
-  background: var(--brand-600);
-  color: var(--surface-0);
+  background: var(--brand-100);
+  color: var(--brand-700);
   font-weight: var(--fw-semibold);
 }
 
 .sb__item--active:hover {
-  background: var(--brand-700);
-  color: var(--surface-0);
+  background: var(--info-100);
+  color: var(--brand-800);
 }
 
 .sb__item-icon {
@@ -376,15 +338,21 @@
 }
 
 .sb__pin {
+  position: absolute;
+  right: var(--sp-2);
+  bottom: var(--sp-2);
   display: flex;
   justify-content: center;
   align-items: center;
-  width: 100%;
-  margin-top: var(--sp-1);
-  padding: 4px 0 2px;
-  opacity: 1;
-  pointer-events: auto;
-  transition: opacity var(--dur-base) var(--ease);
+}
+
+.sb--open .sb__pin {
+  bottom: 50%;
+  transform: translateY(50%);
+}
+
+.sb:not(.sb--open) .sb__logo {
+  height: calc(var(--topbar-h) + 40px);
 }
 
 .sb__pin .u-iconbtn {
@@ -392,18 +360,13 @@
   height: 32px;
   border: 1px solid var(--line-200);
   background: var(--surface-0);
-  border-radius: 10px;
-  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  border-radius: var(--r-md);
 }
 
 .sb__pin .u-iconbtn:hover:not(:disabled) {
   background: var(--brand-50);
-  border-color: var(--brand-200);
+  border-color: var(--line-300);
   color: var(--brand-700);
-}
-
-.sb--open .sb__pin {
-  opacity: 1;
 }
 
 /* Below the tablet breakpoint the rail becomes a bottom bar handled by the
@@ -416,8 +379,7 @@
 
 /* ── Payables ⇄ Receivables switch ───────────────────────────────────────────
    Open: a two-way segmented control. Collapsed rail: only the active side's
-   arrow shows (↗ we pay, ↙ we collect), so the rail still says which books
-   it is showing; hovering opens the rail and reveals the other side. */
+   arrow shows (↗ we pay, ↙ we collect). Expanding reveals both sides. */
 .sb__ledger {
   display: flex;
   gap: 2px;
@@ -433,10 +395,10 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  gap: 4px;
   min-width: 0;
   height: 28px;
-  padding: 0 8px;
+  padding: 0 4px;
   font-family: var(--font-sans);
   font-size: var(--fs-xs);
   font-weight: var(--fw-medium);
@@ -451,6 +413,10 @@
 
 .sb__ledger-btn:hover {
   color: var(--brand-700);
+}
+
+.sb__ledger-btn svg {
+  flex-shrink: 0;
 }
 
 .sb__ledger-btn:focus-visible {

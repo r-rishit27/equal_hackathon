@@ -2,10 +2,19 @@
    `calc(100vh - 54px)` magic numbers that duplicated component internals. */
 
 .shell {
+  --sidebar-w-expanded: 232px;
+  --topbar-h: 60px;
+  --canvas: #f4f8ff;
+  --surface-1: #f7faff;
+  --surface-2: #edf4ff;
+  --line-100: #eaf1fb;
+  --line-200: #dce7f7;
+  --line-300: #c1d3ed;
   display: flex;
   height: 100vh;
   height: 100dvh; /* phones: excludes the browser's own toolbars */
   overflow: hidden;
+  background: var(--canvas);
 }
 
 .shell__main {
@@ -32,6 +41,57 @@
 
 .shell__content--scroll {
   overflow-y: auto;
+}
+
+.shell .tb {
+  position: relative;
+}
+
+.tb .wc-launcher {
+  position: static;
+  /* The launcher is a flex item, so a numeric z-index traps the panel below sticky tables. */
+  z-index: auto;
+  display: flex;
+  margin-right: var(--sp-2);
+}
+
+.tb .wc-launcher .wc-launch {
+  min-height: 36px;
+  padding: 4px 10px;
+  color: var(--brand-700);
+  background: var(--brand-50);
+  border-color: var(--line-300);
+  border-radius: var(--r-md);
+  box-shadow: none;
+  font-size: var(--fs-md);
+}
+
+.tb .wc-launch:hover,
+.tb .wc-launch[aria-expanded="true"] {
+  background: var(--info-100);
+}
+
+.tb .wc-panel {
+  position: absolute;
+  z-index: var(--z-dropdown);
+  top: calc(100% + var(--sp-2));
+  right: var(--sp-3);
+  max-height: min(75dvh, calc(100dvh - var(--topbar-h) - var(--sp-6) - env(safe-area-inset-bottom)));
+}
+
+.tb .wc-panel > header {
+  flex-shrink: 0;
+}
+
+.tb .wc-panel .wc-feed {
+  min-height: 0;
+  overscroll-behavior: contain;
+}
+
+@media (width <= 540px) {
+  .tb .wc-launch span {
+    display: none;
+  }
 }
 
 /* ── Mobile bottom nav ──────────────────────────────────────────────────── */

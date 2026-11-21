@@ -67,7 +67,7 @@
 
 .bp__sub {
   margin: 0;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
   line-height: var(--lh-normal);
   color: var(--ink-500);
 }
@@ -159,6 +159,43 @@
   padding: 0 2px var(--sp-3);
 }
 
+.bp__tabs {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-1);
+  flex-shrink: 0;
+  overflow-x: auto;
+  margin-bottom: var(--sp-2);
+  padding: var(--sp-2);
+  background: var(--surface-0);
+  border: 1px solid var(--line-200);
+  border-radius: var(--r-lg);
+}
+
+.bp__tabs > button {
+  flex-shrink: 0;
+  min-height: 34px;
+  padding: 0 var(--sp-3);
+  white-space: nowrap;
+  color: var(--ink-700);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--r-md);
+  font: var(--fw-medium) var(--fs-md) var(--font-sans);
+  cursor: pointer;
+}
+
+.bp__tabs > button:hover {
+  background: var(--surface-1);
+}
+
+.bp__tabs > button[aria-pressed="true"] {
+  color: var(--brand-700);
+  background: var(--brand-100);
+  border-color: var(--line-300);
+  font-weight: var(--fw-semibold);
+}
+
 .bp__wrap {
   flex: 1;
   overflow: auto;
@@ -191,44 +228,23 @@
   width: 100%;
   border-collapse: separate;
   border-spacing: 0;
-  font-size: var(--fs-sm);
+  font-size: var(--fs-md);
 }
 
-/* The head is a material, not a bar: rows pass beneath it and stay faintly
-   readable through it, which is what tells you the table is still scrolling. */
 .bp__table th {
   position: sticky;
   top: 0;
   z-index: var(--z-sticky);
   padding: var(--sp-3) var(--sp-4);
 
-  /* Solid, not a backdrop blur: blurring the rows scrolling beneath a sticky
-     header has to be redone every frame, and on a high-DPI screen the browser
-     fell behind and flashed white while the table scrolled. */
-  background: rgb(248 250 252);
+  background: var(--surface-2);
   text-align: left;
   white-space: nowrap;
-  font-size: var(--fs-2xs);
+  font-size: var(--fs-sm);
   font-weight: var(--fw-semibold);
   line-height: 1.2;
-
-  /* Positive tracking: small caps need the air that display type does not. */
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-
-  /* Vibrancy — over a translucent surface, flat grey loses too much. */
-  color: var(--ink-600);
-}
-
-/* Scroll edge, not a divider. The fade only exists where the floating head
-   actually overlaps content, so a short table shows no line at all. */
-.bp__table th::after {
-  content: "";
-  position: absolute;
-  inset: 100% 0 auto;
-  height: 8px;
-  background: linear-gradient(to bottom, rgb(15 23 42 / 7%), rgb(15 23 42 / 0%));
-  pointer-events: none;
+  color: var(--brand-800);
+  border-bottom: 1px solid var(--line-200);
 }
 
 .bp__table td {

@@ -12,6 +12,7 @@ import { useReviewCounts } from '../pages/review/useReviewStore'
 import { findingPath, reviewPath } from '../routes/paths'
 import { formatMoneyCompact } from '../ui'
 import ProfileSettingsModal from './ProfileSettingsModal'
+import { CopilotLauncher } from '../pages/WorkspaceChat'
 
 const API_BASE = import.meta.env.VITE_API_URL ?? ''
 
@@ -168,6 +169,7 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
         </div>
 
         <div className="tb__right">
+          <CopilotLauncher />
           <button className="tb__help">
             <HelpCircle size={16} />
             <span>Help</span>
@@ -292,15 +294,15 @@ export default function TopBar({ onGoToBills, onGoToBill }: Props) {
 
       <style>{`
         .tb {
-          height: 54px; background: white; border-bottom: 1px solid #e2e8f0;
+          height: var(--topbar-h); background: var(--surface-0); border-bottom: 1px solid var(--line-200);
           display: flex; align-items: center; justify-content: space-between;
           padding: 0 24px; flex-shrink: 0;
           font-family: 'Inter', sans-serif;
         }
         .tb__right { display: flex; align-items: center; gap: 4px; }
         .tb__client { display: flex; align-items: center; gap: 10px; }
-        .tb__client-logo { height: 42px; width: auto; object-fit: contain; border-radius: 6px; background: white; padding: 2px 4px; }
-        .tb__client-name { font-size: 13px; font-weight: 600; color: #0b1c30; font-family: 'Inter', sans-serif; }
+        .tb__client-logo { height: 32px; width: 32px; object-fit: contain; border: 1px solid var(--line-200); border-radius: var(--r-md); padding: 3px; }
+        .tb__client-name { font-size: var(--fs-md); font-weight: var(--fw-semibold); color: var(--ink-900); }
 
         /* Brand switcher */
         .tb__brand-wrap { position: relative; }

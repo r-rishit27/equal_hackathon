@@ -3913,28 +3913,23 @@ export default function BillsPage({ initialBillId, onBillOpened, onReviewDraft }
         </div>
 
         {/* Tabs */}
-        <div className="bp__tabs" style={{ display: 'flex', gap: 0, borderBottom: '1px solid #e5e7eb', marginBottom: 0, background: 'rgba(255,255,255,0.12)' }}>
+        <div className="bp__tabs" role="group" aria-label="Bill views">
           {([
-            { key: 'all',         label: 'All Bills',     color: '#111827' },
-            { key: 'my_approval', label: 'My Approvals',  color: '#111827' },
-            { key: 'my_uploaded', label: 'My Uploaded',   color: '#111827' },
-            { key: 'approved',    label: 'All Approved',  color: '#111827' },
+            { key: 'all',         label: 'All Bills' },
+            { key: 'my_approval', label: 'My Approvals' },
+            { key: 'my_uploaded', label: 'My Uploaded' },
+            { key: 'approved',    label: 'All Approved' },
             ...(user?.role === 'admin' ? [
-              { key: 'on_hold',   label: 'On Hold',       color: '#b45309' },
-              { key: 'deleted',   label: 'Deleted',       color: '#b42318' },
+              { key: 'on_hold',   label: 'On Hold' },
+              { key: 'deleted',   label: 'Deleted' },
             ] : []),
-            { key: 'draft',       label: 'Draft',         color: '#5b5bd6' },
+            { key: 'draft',       label: 'Draft' },
           ] as const).map(tab => (
             <button
               key={tab.key}
+              type="button"
+              aria-pressed={activeTab === tab.key}
               onClick={() => setActiveTab(tab.key as typeof activeTab)}
-              style={{
-                padding: '14px 18px 12px', fontSize: 14, fontWeight: 600, border: 'none', background: 'none', cursor: 'pointer',
-                color: activeTab === tab.key ? tab.color : '#6b7280',
-                borderBottom: activeTab === tab.key ? `3px solid ${activeTab === tab.key && (tab.key === 'on_hold' || tab.key === 'deleted' || tab.key === 'draft') ? (tab.key === 'on_hold' ? '#d97706' : tab.key === 'deleted' ? '#ef4444' : '#7c3aed') : '#111827'}` : '3px solid transparent',
-                marginBottom: -1, transition: 'color 0.15s, border-color 0.15s',
-                fontFamily: 'Inter, sans-serif',
-              }}
             >
               {tab.label}
             </button>

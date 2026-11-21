@@ -83,6 +83,10 @@ function ChatView({ turns,text,setText,file,setFile,busy,notice,setNotice,reset,
   useEffect(() => {
     const feed = scroll.current
     if (!feed) return
+    if (!turns.length && !busy) {
+      feed.scrollTop = 0
+      return
+    }
     const latest = feed.querySelector<HTMLElement>('.wc-turn:last-of-type .wc-answer')
     feed.scrollTop = latest && !busy
       ? feed.scrollTop + latest.getBoundingClientRect().top - feed.getBoundingClientRect().top - 8
@@ -138,9 +142,9 @@ export function CopilotLauncher() {
   },[open])
   if(!user||readImpersonation()||user.role==='member'||!has('fact_graph')||pathname==='/finance-desk/copilot')return null
   return <aside className="wc-launcher">{open && <section className="wc-panel" aria-label="Reckon Copilot chat">
-    <header><img src="/favicon.svg" alt=""/><strong>Reckon Copilot</strong><Link to="/finance-desk/copilot" aria-label="Open full chat"><Maximize2 size={16}/></Link>
+    <header><img src="/brand/reckon-mark.svg" alt=""/><strong>Reckon Copilot</strong><Link to="/finance-desk/copilot" aria-label="Open full chat"><Maximize2 size={16}/></Link>
       <button onClick={()=>setOpen(false)} aria-label="Close chat"><X size={18}/></button></header>
     <WorkspaceChat key={[user.company_id,user.username,user.role].join('/')} /></section>}
-    <button className="wc-launch" aria-expanded={open} aria-label="Toggle Reckon Copilot" onClick={()=>setOpen(!open)}><img src="/favicon.svg" alt=""/> Copilot</button>
+    <button className="wc-launch" aria-expanded={open} aria-label="Toggle Reckon Copilot" onClick={()=>setOpen(!open)}><img src="/brand/reckon-mark.svg" alt=""/> <span>Ask Copilot</span></button>
   </aside>
 }

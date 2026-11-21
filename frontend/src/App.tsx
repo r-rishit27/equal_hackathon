@@ -16,7 +16,7 @@ import { EntitlementsProvider } from './auth/EntitlementsContext'
 import { RequireRole, RequireService } from './auth/guards'
 import { can } from './auth/permissions'
 import Sidebar from './components/Sidebar'
-import { CopilotLauncher, ConversationProvider } from './pages/WorkspaceChat'
+import { ConversationProvider } from './pages/WorkspaceChat'
 import MobileNav from './components/MobileNav'
 import TopBar from './components/TopBar'
 import RecordCardHost from './components/records/RecordCardHost'
@@ -468,7 +468,6 @@ function AppShell() {
       {/* Bill and vendor cards opened by id from any page. */}
       <RecordCardHost />
       <MobileNav pendingCount={pendingCount} />
-      <CopilotLauncher />
     </div></ConversationProvider>
   )
 }

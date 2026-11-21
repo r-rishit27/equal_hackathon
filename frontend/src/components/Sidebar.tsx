@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import {
   LayoutDashboard,
@@ -22,6 +22,7 @@ import {
   ArrowDownLeft,
   HandCoins,
   Receipt,
+  Search,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useReviewCounts } from '../pages/review/useReviewStore'
@@ -144,7 +145,7 @@ function rememberedLedger(): Ledger {
   }
 }
 
-const PIN_KEY = 'onsum_sidebar_pinned'
+const SIDEBAR_KEY = 'reckon_sidebar_expanded'
 const SUPPORT_URL = 'mailto:support@onsumm.ai?subject=Reckon.ai%20support%20request'
 
 export interface SidebarProps {
@@ -163,21 +164,12 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
   const location = useLocation()
   const activePage = pageForPath(location.pathname)
 
-  // Pinning is remembered. The audit's finding was that hover-only labels leave
-  // a fortnightly approver staring at ten unlabelled glyphs, and that hover
-  // never fires on touch at all.
-  const [pinned, setPinned] = useState(() => localStorage.getItem(PIN_KEY) === '1')
-  const [hovered, setHovered] = useState(false)
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const open = pinned || hovered
+  const [open, setOpen] = useState(() => localStorage.getItem(SIDEBAR_KEY) !== '0')
+  const [query, setQuery] = useState('')
 
   useEffect(() => {
-    localStorage.setItem(PIN_KEY, pinned ? '1' : '0')
-  }, [pinned])
-
-  useEffect(() => () => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current)
-  }, [])
+    localStorage.setItem(SIDEBAR_KEY, open ? '1' : '0')
+  }, [open])
 
   const isVisible = (item: NavItem) => {
     // has() is false while entitlements are still loading, so a licensed-only item
@@ -198,31 +190,15 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
   }, [ledger])
 
   const nav = ledger === 'receivable' ? RECEIVABLE_NAV : NAV
-  const groups = nav.map(g => ({ ...g, items: g.items.filter(isVisible) })).filter(g => g.items.length > 0)
-
-  const onEnter = () => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current)
-    setHovered(true)
-  }
-  const onLeave = () => {
-    leaveTimer.current = setTimeout(() => setHovered(false), 120)
-  }
+  const search = query.trim().toLowerCase()
+  const groups = nav.map(group => ({
+    ...group,
+    items: group.items.filter(item => isVisible(item) && item.label.toLowerCase().includes(search)),
+  })).filter(group => group.items.length > 0)
 
   return (
-    // The landmark itself is not a control: these handlers only widen the rail.
-    // Every actionable item inside is a real <button>, and the rail is fully
-    // usable (labels visible) without any pointer interaction once pinned.
-    // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions -- widens the rail only; all controls inside are real buttons
     <aside
       className={`sb${open ? ' sb--open' : ''}`}
-      onMouseEnter={onEnter}
-      onMouseLeave={onLeave}
-      // Expand while anything inside has keyboard focus, so a Tab user can read
-      // the labels they are moving through.
-      onFocus={() => setHovered(true)}
-      onBlur={e => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setHovered(false)
-      }}
       aria-label="Main"
     >
       <div className="sb__logo">
@@ -232,6 +208,14 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
         <span className="sb__logo-word">
           <img src="/brand/reckon-wordmark-dark.svg" alt="Reckon.ai" />
         </span>
+        <div className="sb__pin">
+          <IconButton
+            label={open ? 'Collapse navigation' : 'Expand navigation'}
+            icon={open ? <PanelLeftClose size={16} /> : <PanelLeftOpen size={16} />}
+            size="sm"
+            onClick={() => { setOpen(!open); setQuery('') }}
+          />
+        </div>
       </div>
 
       {arLicensed && (
@@ -256,7 +240,20 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
         </div>
       )}
 
-      <nav className="sb__nav">
+      {open && (
+        <label className="sb__search">
+          <Search size={16} aria-hidden="true" />
+          <input
+            type="search"
+            aria-label="Filter workspace pages"
+            placeholder="Find a page"
+            value={query}
+            onChange={event => setQuery(event.target.value)}
+          />
+        </label>
+      )}
+      <nav className="sb__nav" aria-label="Workspace pages">
+        {groups.length === 0 && search && <p className="sb__no-results" role="status">No matching pages</p>}
         {groups.map(group => (
           <div className="sb__group" key={group.title}>
             <div className="sb__group-title" aria-hidden="true">
@@ -275,7 +272,8 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
                   <li key={page}>
                     <button
                       className={`sb__item${active ? ' sb__item--active' : ''}`}
-                      onClick={() => navigate(PATHS[page])}
+                      onClick={() => { setQuery(''); navigate(PATHS[page]) }}
+                      title={open ? undefined : label}
                       aria-current={active ? 'page' : undefined}
                     >
                       <span className="sb__item-icon">
@@ -315,18 +313,10 @@ export default function Sidebar({ pendingCount = 0 }: SidebarProps) {
               <div className="sb__user-name">{user.name}</div>
               <div className="sb__user-role">{ROLE_LABELS[user.role]}</div>
             </div>
-            <IconButton label="Sign out" icon={<LogOut size={14} />} size="sm" tone="danger" onClick={logout} />
+            {open && <IconButton label="Sign out" icon={<LogOut size={14} />} size="sm" tone="danger" onClick={logout} />}
           </div>
         )}
 
-        <div className="sb__pin">
-          <IconButton
-            label={pinned ? 'Unpin navigation' : 'Keep navigation open'}
-            icon={pinned ? <PanelLeftClose size={15} /> : <PanelLeftOpen size={15} />}
-            size="sm"
-            onClick={() => setPinned(p => !p)}
-          />
-        </div>
       </div>
     </aside>
   )
