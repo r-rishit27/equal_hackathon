@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { useAuth } from '../auth/AuthContext'
 import { Building2, ClipboardList, Package, SlidersHorizontal, ChevronRight, TrendingUp, Activity, Boxes } from 'lucide-react'
+import InventoryVendorPicker from './InventoryVendorPicker'
 import './inventory.css'
 
 interface Price {
@@ -48,7 +49,7 @@ function Planner() {
     return () => controller.abort()
   }, [request])
   const vendors = [...new Map(prices.map(p => [p.supplier_id, p.supplier])).entries()]
-    .sort((a, b) => a[1].localeCompare(b[1]))
+    .sort((a, b) => a[1].trim().localeCompare(b[1].trim(), 'en-IN', { sensitivity: 'base', numeric: true }) || a[0].localeCompare(b[0]))
   const lines = prices.filter(p => p.supplier_id === vendor)
   const price = lines.find(p => p.id === selected)
 
@@ -107,10 +108,7 @@ function Planner() {
     {prices.length > 0 && <div className="inventory-overview"><section className="inventory-card">
       <h2><Building2 size={19} /> Select a purchase</h2>
       <div className="inventory-pickers">
-        <label>Vendor<select value={vendor} onChange={e => { setVendor(e.target.value); selectLine('') }}>
-          <option value="">Choose a vendor</option>
-          {vendors.map(([id, name]) => <option key={id} value={id}>{name}</option>)}
-        </select></label>
+        <InventoryVendorPicker vendors={vendors} selected={vendor} onSelect={id => { setVendor(id); selectLine('') }} />
         <label>Invoice line item<select value={selected} disabled={!vendor} onChange={e => selectLine(e.target.value)}>
           <option value="">{vendor ? 'Choose an invoice line' : 'Select a vendor first'}</option>
           {lines.map(p => <option key={p.id} value={p.id}>{p.item} · {p.bill_number || p.bill_date} · {money(Number(p.price))}/{p.unit}</option>)}
