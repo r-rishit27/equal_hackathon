@@ -22,6 +22,7 @@ import {
   ArrowDownLeft,
   HandCoins,
   Receipt,
+  LineChart,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useReviewCounts } from '../pages/review/useReviewStore'
@@ -85,6 +86,7 @@ const NAV: NavGroup[] = [
     items: [
       { icon: Bot, label: 'Reckon Copilot', page: 'copilot', requiredService: 'fact_graph' },
       { icon: Package, label: 'Inventory optimization', page: 'inventory', requiredPermission: 'payables.view', requiredService: 'reports' },
+      { icon: LineChart, label: 'Cash flow forecast', page: 'cash-forecast', requiredPermission: 'accounting.view', requiredService: 'cash_forecast' },
       { icon: BarChart2, label: 'Reports', page: 'reports', requiredPermission: 'payables.view' },
       {
         icon: Database, label: 'Data Extraction', page: 'data-extraction',

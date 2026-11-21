@@ -1,0 +1,41 @@
+[
+  {
+    "bank_account_id": "733058b9-e15c-5231-948d-e43190dd983b",
+    "account_name": "HDFC Current - Operations",
+    "bank_name": "HDFC Bank",
+    "ifsc_code": "HDFC0000123",
+    "account_mask": "XXXXXX4821",
+    "account_type": "CURRENT",
+    "currency_code": "INR",
+    "is_primary": true,
+    "is_active": true,
+    "include_in_forecast": true,
+    "od_limit_paise": 0
+  },
+  {
+    "bank_account_id": "497a6b94-8336-5fe6-9495-75cd1353d1a2",
+    "account_name": "SBI Current - Collections",
+    "bank_name": "State Bank of India",
+    "ifsc_code": "SBIN0004567",
+    "account_mask": "XXXXXXX0937",
+    "account_type": "CURRENT",
+    "currency_code": "INR",
+    "is_primary": false,
+    "is_active": true,
+    "include_in_forecast": true,
+    "od_limit_paise": 0
+  },
+  {
+    "bank_account_id": "7f35391e-8d29-5c33-86dc-fd1fe922774a",
+    "account_name": "SBI Cash Credit (OD)",
+    "bank_name": "State Bank of India",
+    "ifsc_code": "SBIN0004567",
+    "account_mask": "XXXXXXX5512",
+    "account_type": "OVERDRAFT",
+    "currency_code": "INR",
+    "is_primary": false,
+    "is_active": true,
+    "include_in_forecast": false,
+    "od_limit_paise": 400000000
+  }
+]

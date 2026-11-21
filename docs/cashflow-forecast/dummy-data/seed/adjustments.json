@@ -1,0 +1,38 @@
+[
+  {
+    "id": "d40e6efc-1d06-5d5e-bf78-9665b7c797ed",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Annual insurance renewal - stock and fleet",
+    "category": "insurance",
+    "direction": "out",
+    "amount_paise": 68500000,
+    "date": "2026-11-30",
+    "confidence": "committed",
+    "note": "Policy renews 1 Dec; broker debit note received 12 Nov.",
+    "created_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135"
+  },
+  {
+    "id": "41073add-1ca4-507c-8e95-f32c5fc6c991",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Down payment - new forklift",
+    "category": "capex",
+    "direction": "out",
+    "amount_paise": 45000000,
+    "date": "2026-12-09",
+    "confidence": "committed",
+    "note": "Signed purchase order with Pune Hydraulics; balance financed.",
+    "created_by": "a6274c91-7aba-59a3-a486-821065970e0f"
+  },
+  {
+    "id": "58c56f32-0d48-5282-92f4-8c06cb4f72f9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "GST refund (inverted duty) - expected",
+    "category": "refund",
+    "direction": "in",
+    "amount_paise": 14200000,
+    "date": "2026-12-16",
+    "confidence": "estimated",
+    "note": "RFD-01 filed 28 Oct. Timing uncertain; excluded from downside.",
+    "created_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135"
+  }
+]

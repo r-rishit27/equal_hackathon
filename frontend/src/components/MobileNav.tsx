@@ -22,6 +22,7 @@ const OVERFLOW: { label: string; page: NavPage; perm: string | string[]; service
   { label: 'Payment Hub', page: 'payments', perm: ['payables.view', 'payables.approve'], service: 'disbursement' },
   { label: 'Reckon Copilot', page: 'copilot', perm: ['payables.view', 'payables.approve'], service: 'fact_graph' },
   { label: 'Inventory optimization', page: 'inventory', perm: 'payables.view', service: 'reports' },
+  { label: 'Cash flow forecast', page: 'cash-forecast', perm: 'accounting.view', service: 'cash_forecast' },
   { label: 'Reports', page: 'reports', perm: 'payables.view' },
   { label: 'Data Extraction', page: 'data-extraction', perm: 'payables.view', service: 'data_extraction' },
   { label: 'Agent Hub', page: 'agent-hub', perm: 'payables.view', service: 'agent_hub' },

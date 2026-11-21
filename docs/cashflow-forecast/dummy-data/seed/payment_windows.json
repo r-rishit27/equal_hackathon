@@ -1,0 +1,35 @@
+[
+  {
+    "id": "a3e550be-9b26-522c-bf8f-e4cd381ef692",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "invoice_id": "3b7d84f1-66e3-5fd6-b13f-3f2d0d4d2152",
+    "earliest_date": "2026-11-25",
+    "latest_date": "2026-12-04",
+    "agreed_with": "Ankur Corrugators Pvt Ltd",
+    "evidence": "Email from supplier accounts, 17 Nov",
+    "recorded_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135",
+    "recorded_at": "2026-11-18T11:00:00+05:30"
+  },
+  {
+    "id": "25cf48eb-2ad8-566d-b4f4-d5541a5a9241",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "invoice_id": "09e98d93-ca0d-5e12-b3bd-07453be2962b",
+    "earliest_date": "2026-11-26",
+    "latest_date": "2026-12-03",
+    "agreed_with": "Indus Strapping Solutions",
+    "evidence": "Email thread, 18 Nov",
+    "recorded_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135",
+    "recorded_at": "2026-11-18T11:00:00+05:30"
+  },
+  {
+    "id": "68318f2e-0b08-512a-b05a-723a39fde277",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "invoice_id": "d22199b3-9583-5c37-a4b8-da2cf8256702",
+    "earliest_date": "2026-11-29",
+    "latest_date": "2026-12-02",
+    "agreed_with": "Raigad Kraft Paper Mills",
+    "evidence": "WhatsApp confirmation filed as attachment",
+    "recorded_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135",
+    "recorded_at": "2026-11-18T11:00:00+05:30"
+  }
+]

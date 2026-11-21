@@ -1,0 +1,42 @@
+{
+  "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+  "reserve_paise": 150000000,
+  "horizon_days": 30,
+  "timezone": "Asia/Kolkata",
+  "default_view": "expected",
+  "include_pending_approval_ap": true,
+  "overdue_fallback_days": 5,
+  "downside_exclude_overdue_after_days": 60,
+  "min_customer_history": 3,
+  "vendor_payment_roll": "next_banking_day",
+  "statutory_payment_roll": "previous_banking_day",
+  "receipt_roll": "next_banking_day",
+  "show_od_headroom": true,
+  "holiday_calendar": [
+    {
+      "date": "2026-10-02",
+      "name": "Gandhi Jayanti"
+    },
+    {
+      "date": "2026-10-20",
+      "name": "Dussehra"
+    },
+    {
+      "date": "2026-11-09",
+      "name": "Diwali (Lakshmi Puja)"
+    },
+    {
+      "date": "2026-11-10",
+      "name": "Diwali (Balipratipada)"
+    },
+    {
+      "date": "2026-11-24",
+      "name": "Guru Nanak Jayanti"
+    },
+    {
+      "date": "2026-12-25",
+      "name": "Christmas"
+    }
+  ],
+  "updated_by": "a6274c91-7aba-59a3-a486-821065970e0f"
+}

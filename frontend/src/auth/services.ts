@@ -22,7 +22,7 @@ export type ServiceKey =
   // payments
   | 'disbursement' | 'nova_billing' | 'demo_payments' | 'receivables'
   // ai
-  | 'agent_hub' | 'fact_graph' | 'anomaly_ai' | 'playground' | 'sap_matching'
+  | 'agent_hub' | 'fact_graph' | 'anomaly_ai' | 'playground' | 'sap_matching' | 'cash_forecast'
   // integrations
   | 'data_extraction' | 'tally_connector' | 'accounting_api_sync' | 'email_sending'
 
@@ -48,6 +48,7 @@ export const SERVICE_LABELS: Record<ServiceKey, string> = {
   review_hub: 'Review Hub',
   agent_hub: 'Agent Hub',
   fact_graph: 'Fact Graph',
+  cash_forecast: 'Cash Flow Forecast',
   anomaly_ai: 'Anomaly & Duplicate Detection',
   playground: 'Agentic Playground',
   sap_matching: 'SAP Item-Code Matching',
@@ -79,6 +80,7 @@ export const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   review_hub: 'One queue for everything that needs correcting, with a link to the root of each problem.',
   agent_hub: 'The email-to-bill agent: watches a mailbox and drafts bills.',
   fact_graph: 'Knowledge graph over vendors, bills and payments.',
+  cash_forecast: 'Daily 30-day bank-cash forecast with what-if scenarios and owner-approved cash plans. Never moves money.',
   anomaly_ai: 'Duplicate-bill detection, risk scores and payment predictions.',
   playground: "A drag-and-drop canvas wiring a vendor's contracts, rate cards and bills through "
     + 'formulas, a model or an MCP server into a report, an email or an amended spreadsheet.',
@@ -97,7 +99,7 @@ export const SERVICE_CATEGORIES: { label: string; services: ServiceKey[] }[] = [
   },
   { label: 'Tax & Compliance', services: ['tds', 'fx', 'recon', 'gst_tax_verification', 'kyc_verification'] },
   { label: 'Payments', services: ['disbursement', 'nova_billing', 'demo_payments', 'receivables'] },
-  { label: 'AI & Automation', services: ['agent_hub', 'fact_graph', 'anomaly_ai', 'playground', 'sap_matching'] },
+  { label: 'AI & Automation', services: ['agent_hub', 'fact_graph', 'cash_forecast', 'anomaly_ai', 'playground', 'sap_matching'] },
   { label: 'Integrations', services: ['data_extraction', 'tally_connector', 'accounting_api_sync', 'email_sending'] },
 ]
 

@@ -1,0 +1,16 @@
+[
+  {
+    "schedule_id": "258f1aec-2167-5302-a294-add8119f1fbe",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "cycle_type": "PAYABLE",
+    "stg_bill_id": "8b4c7f5c-7fa8-5f25-b47c-abf70e59bcb6",
+    "supplier_id": "0f596dff-4401-5683-a1e1-7f068afb97ef",
+    "installment_number": 2,
+    "due_date": "2026-12-08",
+    "scheduled_amount_paise": 21580000,
+    "paid_amount_paise": 0,
+    "payment_term_days": 30,
+    "currency_code": "INR",
+    "status": "PENDING"
+  }
+]
