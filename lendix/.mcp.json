@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "lendix-docs": {
+      "command": "node",
+      "args": [
+        "C:\\Users\\Rishit Rastogi\\lendix\\mcp-servers\\lendix-docs\\index.js"
+      ],
+      "env": {
+        "LENDIX_DOCS_BASE_URL": "https://docs.lendix.ai/nova"
+      }
+    }
+  }
+}
