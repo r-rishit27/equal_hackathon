@@ -1,208 +1,100 @@
-"""Regenerates docs/full_database_schema.md from the live Postgres schema.
+"""Refresh the public schema reference from the project's default development database."""
 
-Introspects public enums, tables/columns, primary keys, foreign keys, unique
-constraints, and indexes, and writes them in the same format the doc already
-uses (see docs/full_database_schema.md), so downstream readers/tools don't
-need to change how they parse it.
-"""
 import os
-import sys
+from collections import defaultdict
+from datetime import date
+from pathlib import Path
 
 import psycopg2
-import psycopg2.extras
 from dotenv import load_dotenv
 
-load_dotenv()
+ROOT = Path(__file__).resolve().parents[1]
+DOCUMENT = ROOT / "docs/full_database_schema.md"
+APPENDIX = "## Appendix scope"
 
-OUT_PATH = os.path.join(os.path.dirname(__file__), "..", "docs", "full_database_schema.md")
+
+def code(value):
+    return "`" + str(value).replace("|", r"\|") + "`"
+
+
+def grouped(cursor, query):
+    cursor.execute(query)
+    groups = defaultdict(list)
+    for key, *values in cursor.fetchall():
+        groups[key].append(values)
+    return groups
 
 
 def main():
-    conn = psycopg2.connect(os.environ["DB_URL"])
-    cur = conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor)
+    load_dotenv(ROOT / ".env")
+    previous = DOCUMENT.read_text(encoding="utf-8")
+    _, marker, appendix = previous.partition("\n" + APPENDIX + "\n")
+    if not marker:
+        raise ValueError("Missing licensing appendix boundary")
 
-    lines = []
-    lines.append("# Full Database Schema Documentation")
-    lines.append("")
-    lines.append("## Documentation Objective")
-    lines.append(
-        "This document reflects the live PostgreSQL (AWS RDS) schema as of the last "
-        "schema pull. It covers all public tables, enum types, columns, keys, "
-        "constraints, and indexes."
-    )
-    lines.append("")
-    lines.append("---")
-    lines.append("")
-    lines.append("## Enum Types")
-    lines.append("")
+    with psycopg2.connect(os.environ["DEV_DB_URL"], connect_timeout=10) as db:
+        db.set_session(readonly=True, isolation_level="REPEATABLE READ")
+        with db.cursor() as cur:
+            cur.execute("SELECT current_database(), current_setting('server_version')")
+            database, version = cur.fetchone()
+            if database != "onsumm_db":
+                raise ValueError("DEV_DB_URL must point to onsumm_db for this reference")
+            cur.execute("""
+                SELECT oid, relname FROM pg_class
+                WHERE relnamespace = 'public'::regnamespace AND relkind IN ('r', 'p')
+                ORDER BY relname
+            """)
+            tables = cur.fetchall()
+            enums = grouped(cur, """
+                SELECT typname, enumlabel FROM pg_enum JOIN pg_type ON pg_type.oid = enumtypid
+                WHERE typnamespace = 'public'::regnamespace ORDER BY typname, enumsortorder
+            """)
+            columns = grouped(cur, """
+                SELECT c.oid, a.attname, format_type(a.atttypid, a.atttypmod), a.attnotnull,
+                       pg_get_expr(d.adbin, d.adrelid), a.attidentity, a.attgenerated
+                FROM pg_class c JOIN pg_attribute a ON a.attrelid = c.oid
+                LEFT JOIN pg_attrdef d ON d.adrelid = c.oid AND d.adnum = a.attnum
+                WHERE c.relnamespace = 'public'::regnamespace AND c.relkind IN ('r', 'p')
+                  AND a.attnum > 0 AND NOT a.attisdropped ORDER BY c.oid, a.attnum
+            """)
+            constraints = grouped(cur, """
+                SELECT conrelid, conname, pg_get_constraintdef(oid) FROM pg_constraint
+                WHERE connamespace = 'public'::regnamespace ORDER BY conrelid, conname
+            """)
+            indexes = grouped(cur, """
+                SELECT i.indrelid, c.relname, pg_get_indexdef(c.oid)
+                FROM pg_index i JOIN pg_class c ON c.oid = i.indexrelid
+                WHERE c.relnamespace = 'public'::regnamespace ORDER BY i.indrelid, c.relname
+            """)
 
-    # ── Enums ────────────────────────────────────────────────────────────────
-    cur.execute(
-        """
-        SELECT t.typname AS enum_name, e.enumlabel AS value
-        FROM pg_type t
-        JOIN pg_enum e ON t.oid = e.enumtypid
-        JOIN pg_namespace n ON n.oid = t.typnamespace
-        WHERE n.nspname = 'public'
-        ORDER BY t.typname, e.enumsortorder
-        """
-    )
-    enums = {}
-    for row in cur.fetchall():
-        enums.setdefault(row["enum_name"], []).append(row["value"])
+    out = ["# Full Database Schema Documentation", "",
+           f"Snapshot of the `public` schema in `{database}` on {date.today():%d %B %Y} "
+           f"(PostgreSQL {version}). The schema contains {len(tables)} tables and "
+           f"{len(enums)} enum types. The default development connection is `DEV_DB_URL`.",
+           "", "## Enum Types", ""]
+    for name, labels in enums.items():
+        out.extend([f"### {code(name)}", "", ", ".join(code(label) for label, in labels), ""])
+    for oid, name in tables:
+        out.extend([f"## Table: {code(name)}", "", "### Columns", "",
+                    "| Column | Type | Nullable | Default or generation expression |",
+                    "|---|---|---|---|"])
+        for col, typ, required, expr, identity, generated in columns[oid]:
+            if identity:
+                mode = "ALWAYS" if identity == "a" else "BY DEFAULT"
+                expr = f"GENERATED {mode} AS IDENTITY"
+            elif generated:
+                storage = "STORED" if generated == "s" else "VIRTUAL"
+                expr = f"GENERATED ALWAYS AS ({expr}) {storage}"
+            out.append(f"| {code(col)} | {code(typ)} | {'NO' if required else 'YES'} | "
+                       f"{code(expr) if expr is not None else 'None'} |")
+        for title, records in [("Keys and Constraints", constraints[oid]), ("Indexes", indexes[oid])]:
+            out.extend(["", f"### {title}", ""])
+            out.extend([f"- {code(key)} - {code(definition)}" for key, definition in records] or ["None."])
+        out.extend(["", "---", ""])
 
-    for enum_name in sorted(enums):
-        lines.append(f"### `{enum_name}`")
-        lines.append("Allowed values:")
-        for v in enums[enum_name]:
-            lines.append(f"- `{v}`")
-        lines.append("")
-
-    lines.append("---")
-    lines.append("")
-
-    # ── Tables ───────────────────────────────────────────────────────────────
-    cur.execute(
-        """
-        SELECT table_name FROM information_schema.tables
-        WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
-        ORDER BY table_name
-        """
-    )
-    tables = [r["table_name"] for r in cur.fetchall()]
-
-    for table in tables:
-        lines.append(f"## Table: `{table}`")
-        lines.append("")
-        lines.append("### Columns")
-        lines.append("| Column | Type | Nullable | Default |")
-        lines.append("|---|---|---|---|")
-
-        cur.execute(
-            """
-            SELECT column_name, data_type, udt_name, is_nullable, column_default
-            FROM information_schema.columns
-            WHERE table_schema = 'public' AND table_name = %s
-            ORDER BY ordinal_position
-            """,
-            (table,),
-        )
-        for col in cur.fetchall():
-            dtype = col["udt_name"] if col["data_type"] == "USER-DEFINED" else col["data_type"]
-            dtype = {
-                "int4": "int4", "int8": "int8", "varchar": "varchar",
-                "timestamptz": "timestamptz", "bool": "bool",
-            }.get(dtype, dtype)
-            default = col["column_default"] if col["column_default"] is not None else "NULL"
-            lines.append(
-                f"| `{col['column_name']}` | `{dtype}` | `{col['is_nullable']}` | `{default}` |"
-            )
-        lines.append("")
-
-        lines.append("### Keys and Constraints")
-
-        # Primary key
-        cur.execute(
-            """
-            SELECT kcu.column_name
-            FROM information_schema.table_constraints tc
-            JOIN information_schema.key_column_usage kcu
-              ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-            WHERE tc.table_schema = 'public' AND tc.table_name = %s
-              AND tc.constraint_type = 'PRIMARY KEY'
-            ORDER BY kcu.ordinal_position
-            """,
-            (table,),
-        )
-        pk_cols = [r["column_name"] for r in cur.fetchall()]
-        lines.append(f"**Primary keys:** {', '.join(f'`{c}`' for c in pk_cols) if pk_cols else 'none'}")
-
-        # Foreign keys
-        cur.execute(
-            """
-            SELECT
-                kcu.column_name,
-                ccu.table_name AS ref_table,
-                ccu.column_name AS ref_column,
-                rc.delete_rule
-            FROM information_schema.table_constraints tc
-            JOIN information_schema.key_column_usage kcu
-              ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-            JOIN information_schema.referential_constraints rc
-              ON tc.constraint_name = rc.constraint_name AND tc.table_schema = rc.constraint_schema
-            JOIN information_schema.constraint_column_usage ccu
-              ON rc.unique_constraint_name = ccu.constraint_name AND rc.unique_constraint_schema = ccu.table_schema
-            WHERE tc.table_schema = 'public' AND tc.table_name = %s
-              AND tc.constraint_type = 'FOREIGN KEY'
-            ORDER BY kcu.column_name
-            """,
-            (table,),
-        )
-        fks = cur.fetchall()
-        lines.append("**Foreign keys:**")
-        if fks:
-            for fk in fks:
-                rule = fk["delete_rule"].replace("_", " ")
-                lines.append(
-                    f"- `{fk['column_name']}` -> `{fk['ref_table']}.{fk['ref_column']}` (ON DELETE {rule})"
-                )
-        else:
-            lines.append("none")
-
-        # Unique constraints (excluding PK)
-        cur.execute(
-            """
-            SELECT tc.constraint_name, array_agg(kcu.column_name ORDER BY kcu.ordinal_position) AS cols
-            FROM information_schema.table_constraints tc
-            JOIN information_schema.key_column_usage kcu
-              ON tc.constraint_name = kcu.constraint_name AND tc.table_schema = kcu.table_schema
-            WHERE tc.table_schema = 'public' AND tc.table_name = %s
-              AND tc.constraint_type = 'UNIQUE'
-            GROUP BY tc.constraint_name
-            ORDER BY tc.constraint_name
-            """,
-            (table,),
-        )
-        uniques = cur.fetchall()
-        if uniques:
-            lines.append("**Unique constraints:**")
-            for u in uniques:
-                col_list = u["cols"]
-                if isinstance(col_list, str):
-                    col_list = col_list.strip("{}").split(",")
-                cols = ", ".join(f"`{c}`" for c in col_list)
-                lines.append(f"- `{u['constraint_name']}`: ({cols})")
-        else:
-            lines.append("**Unique constraints:** none")
-
-        # Indexes
-        cur.execute(
-            """
-            SELECT indexname, indexdef FROM pg_indexes
-            WHERE schemaname = 'public' AND tablename = %s
-            ORDER BY indexname
-            """,
-            (table,),
-        )
-        idxs = cur.fetchall()
-        lines.append("**Indexes:**")
-        if idxs:
-            for idx in idxs:
-                lines.append(f"- `{idx['indexname']}`: `{idx['indexdef']}`")
-        else:
-            lines.append("- none")
-
-        lines.append("")
-        lines.append("---")
-        lines.append("")
-
-    with open(OUT_PATH, "w", encoding="utf-8") as f:
-        f.write("\n".join(lines).rstrip() + "\n")
-
-    print(f"Wrote {len(tables)} tables, {len(enums)} enums -> {OUT_PATH}")
-    cur.close()
-    conn.close()
+    DOCUMENT.write_text("\n".join(out) + marker + appendix, encoding="utf-8")
+    print(f"Documented {len(tables)} tables and {len(enums)} enum types from {database}")
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
