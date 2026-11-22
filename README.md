@@ -123,7 +123,7 @@ The React workspace calls FastAPI over REST and multipart uploads. FastAPI and a
 
 ### Application architecture
 
-![Onsumm application architecture showing payables, reconciliation, cash application, Twilio WhatsApp intake and the cash flow forecast](docs/aws-deploy/system-architecture.png)
+<img width="1582" height="886" alt="image" src="https://github.com/user-attachments/assets/e7248e67-6032-4908-9f07-9037ecfdbb72" />
 
 [Open the interactive application diagram](docs/aws-deploy/system-architecture.html) to highlight a workflow, inspect its steps, or pause the animation.
 
