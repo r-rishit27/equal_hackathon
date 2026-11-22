@@ -10,6 +10,7 @@ import { AlertTriangle, CheckCircle2, Download, LineChart, RefreshCw, SlidersHor
 import { Badge, Button, EmptyState, ErrorState, Skeleton } from '../../ui'
 import { api, ApiError } from './api'
 import ForecastChart from './ForecastChart'
+import CashFlowMap from './CashFlowMap'
 import { DayDrawer, ExclusionsDrawer } from './Drawers'
 import InputsDrawer, { BalanceForm, type InputsTab } from './InputsDrawer'
 import ScenarioPanel from './ScenarioPanel'
@@ -396,6 +397,8 @@ export default function CashForecastPage() {
           )}
         </div>
       </section>
+
+      <CashFlowMap result={shown!} snapshot={snapshot} scenario={!!preview} />
 
       <section className="cf-kpis" aria-label="Key figures">
         <Kpi label="Cash today" value={compact(forecast.opening_paise)} spokenValue={spoken(forecast.opening_paise)} sub={stamp(snapshot.as_of)} />
