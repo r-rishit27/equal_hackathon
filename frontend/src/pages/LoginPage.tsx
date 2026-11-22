@@ -43,6 +43,14 @@ function MicrosoftMark() {
   )
 }
 
+/** Public hackathon demo accounts, so judges can sign in with one click. */
+const DEMO_PASSWORDS: Record<string, string> = {
+  vibhanshu: 'vibhanshu123',
+  ravi: 'ravi123',
+  arjun: 'arjun123',
+  finance: 'finance123',
+}
+
 export default function LoginPage({ login, loginWithSso }: Pick<ReturnType<typeof useAuth>, 'login' | 'loginWithSso'>) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -234,18 +242,18 @@ export default function LoginPage({ login, loginWithSso }: Pick<ReturnType<typeo
               <form className="lp__form" onSubmit={e => { e.preventDefault(); handleLogin() }}>
                 <div className="lp__field">
                   <label className="lp__lbl" htmlFor="demo-account">Demo account</label>
-                  <select id="demo-account" className="lp__inp" value={['vibhanshu', 'ravi', 'arjun', 'finance'].includes(username) ? username : ''} disabled={loading}
+                  <select id="demo-account" className="lp__inp" value={username in DEMO_PASSWORDS ? username : ''} disabled={loading}
                     onChange={event => {
+                      // Hackathon demo: picking a role signs straight in, no password to type.
                       const selected = event.target.value
+                      const pw = DEMO_PASSWORDS[selected] ?? ''
                       setUsername(selected)
-                      const localPasswords: Record<string, string> = import.meta.env.DEV
-                        ? { vibhanshu: 'vibhanshu123', ravi: 'ravi123', arjun: 'arjun123', finance: 'finance123' }
-                        : {}
-                      setPassword(localPasswords[selected] ?? '')
+                      setPassword(pw)
                       setShow(false)
                       setError('')
+                      if (pw) void handleLogin(selected, pw)
                     }}>
-                    <option value="">Choose a demo role</option>
+                    <option value="">Choose a role to sign in instantly</option>
                     <option value="vibhanshu">Admin (vibhanshu)</option>
                     <option value="ravi">Member (ravi)</option>
                     <option value="arjun">Approver (arjun)</option>
