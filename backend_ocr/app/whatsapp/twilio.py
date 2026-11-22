@@ -137,6 +137,14 @@ def _host_allowed(url: str) -> bool:
 def fetch_media(url: str, account_sid: str, auth_token: str, max_bytes: int = MEDIA_MAX_BYTES) -> FetchedMedia:
     if not _host_allowed(url):
         raise MediaError("MEDIA_HOST_BLOCKED", False, f"media host not allowed: {urlparse(url).hostname}")
+    # Twilio's trial "Try out WhatsApp" sender is owned by a Twilio account, so its
+    # MediaUrl points there and our credentials get 401 forever. Fail fast, clearly.
+    owner = re.search(r"/Accounts/(AC[0-9a-fA-F]{32})/", urlparse(url).path or "")
+    if owner and account_sid and owner.group(1) != account_sid:
+        raise MediaError("MEDIA_FOREIGN_ACCOUNT", False,
+                         "Twilio stores this attachment under a different account (the trial "
+                         "'Try out WhatsApp' number), so it can't be downloaded. Use the classic "
+                         "WhatsApp Sandbox or your own WhatsApp sender.")
     current = url
     with httpx.Client(timeout=MEDIA_TIMEOUT_S, follow_redirects=False) as client:
         for _ in range(4):

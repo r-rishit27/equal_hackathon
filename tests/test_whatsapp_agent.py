@@ -112,6 +112,14 @@ def test_fetch_media_blocks_disallowed_host_without_network():
     assert e.value.code == "MEDIA_HOST_BLOCKED" and not e.value.retryable
 
 
+def test_fetch_media_rejects_media_owned_by_another_account_without_network():
+    ours, theirs = "AC" + "a" * 32, "AC" + "b" * 32
+    url = f"https://api.twilio.com/2010-04-01/Accounts/{theirs}/Messages/MMx/Media/MEx"
+    with pytest.raises(tw.MediaError) as e:
+        tw.fetch_media(url, ours, "tok")
+    assert e.value.code == "MEDIA_FOREIGN_ACCOUNT" and not e.value.retryable
+
+
 def test_is_pdf():
     assert tw.is_pdf(b"%PDF-1.7\n...")
     assert not tw.is_pdf(b"MZ\x90\x00 fake exe")                  # C3
