@@ -217,3 +217,29 @@ def test_impersonated_session_is_read_only(monkeypatch):
 def test_csv_cells_are_formula_safe():
     from backend_ocr.app.routers.cash_forecast import _cell
     assert _cell("=HYPERLINK(1)") == "'=HYPERLINK(1)" and _cell("-1500.00") == "-1500.00" and _cell("Ankur") == "Ankur"
+
+
+def test_demo_collections_keep_a_demo_workspace_positive():
+    """A workspace with a pile of overdue bills and no sales ledger: the demo
+    receivables keep the expected and downside lines above zero, and the
+    'no new collections' stress view still shows the hole."""
+    from backend_ocr.app.cashflow.sources import add_demo_collections
+
+    today = date(2026, 11, 22)
+    acct = "11111111-1111-4111-8111-111111111111"
+    data = SourceData()
+    data.accounts = [dict(bank_account_id=acct, account_name="ICICI (Demo)", account_mask="XX1000",
+                          account_type="CURRENT", include=True, od_limit_paise=0)]
+    data.balances = [dict(bank_account_id=acct, balance_paise=to_paise(1_38_00_000),
+                          as_of=datetime(2026, 11, 22, 6, 0, tzinfo=timezone.utc), source="payment_hub")]
+    data.bills = [dict(invoice_id=f"b{i}", stg_bill_id=None, supplier_id="s", supplier_name="Supplier", bill_number=f"B{i}",
+                       due_date=date(2026, 10, 1), status="APPROVED", payment_status="unpaid", validation_flag="OK",
+                       soft_status="active", currency="INR", outstanding_paise=to_paise(1_00_00_000),
+                       amount_paid_paise=0, tds_paise=0, net_payable_paise=to_paise(1_00_00_000)) for i in range(20)]
+    add_demo_collections(data, today)
+
+    assert all("(demo)" in i["customer_name"] for i in data.ar_open)
+    snap = assemble(data, Settings(), today)
+    for view in ("expected", "downside"):
+        assert min(d.closing_paise for d in engine.project(snap, view).days) > 0, view
+    assert min(d.closing_paise for d in engine.project(snap, "no_collections").days) < 0

@@ -33,6 +33,87 @@ def fixture_tenants() -> set[str]:
     return {t.strip() for t in os.getenv(FIXTURE_ENV, "").split(",") if t.strip()}
 
 
+# Tenants whose *live* forecast also gets the seed's synthetic receivables, so a
+# demo workspace with real bills but no sales ledger still shows collections and
+# the collection model's predicted payment dates. Never set for a real customer.
+DEMO_COLLECTIONS_ENV = "CASH_FORECAST_DEMO_COLLECTIONS_TENANTS"
+
+
+def demo_collection_tenants() -> set[str]:
+    return {t.strip() for t in os.getenv(DEMO_COLLECTIONS_ENV, "").split(",") if t.strip()}
+
+
+def add_demo_collections(data: SourceData, today: date, seed_dir=SEED_DIR) -> None:
+    """Give a demo workspace believable money coming in, on top of its real books.
+
+    Three parts, all labelled "(demo)" and all in memory only — nothing is
+    written to the database, so switching the tenant off removes every trace:
+
+    1. **Receipts clearing on the first banking day**, sized to the bills
+       already overdue (the forecast pays those on day one) less the opening
+       cash, plus about today's cash again — so day one does not start in a hole.
+    2. **The seed's customers' invoices**, dates moved by (today − the seed's own
+       today) so each keeps its place relative to now, amounts scaled to the
+       workspace; their paid history teaches the collection model each
+       customer's habits, which is what dates the expected/downside receipts.
+    3. **The seed's recurring costs** (payroll, GST, rent, …) at the same scale,
+       so the line dips and recovers rather than only climbing.
+    """
+    shift = today - fixture_today(seed_dir)
+    start = today + timedelta(days=1)
+    customers = {c["id"]: c for c in _seed("customers.json", seed_dir)}
+    ar = _seed("ar_invoices.json", seed_dir)
+    open_ar = [i for i in ar if i["status"] in ("open", "partially_paid", "disputed")]
+    seed_open = sum(int(i["outstanding_paise"]) for i in open_ar) or 1
+
+    live_bills = [b for b in data.bills
+                  if b.get("payment_status") != "paid" and b.get("soft_status", "active") == "active"
+                  and b.get("status") not in ("DRAFT", "REJECTED", "VOID", "CANCELLED")
+                  and b.get("validation_flag") != "DUPLICATE" and (b.get("currency") or "INR") == "INR"]
+    payables = sum(max(0, int(b.get("outstanding_paise") or 0)) for b in live_bills)
+    overdue = sum(max(0, int(b.get("outstanding_paise") or 0)) for b in live_bills
+                  if b.get("due_date") is not None and b["due_date"] < start)
+    inflight = sum(int(d.get("amount_paise") or 0) for d in data.disbursements
+                   if d.get("status") in ("PENDING", "PENDING_OTP", "PROCESSING", "INITIATED"))
+    included = {str(a["bank_account_id"]) for a in data.accounts if a.get("include")}
+    opening = sum(int(b["balance_paise"]) for b in data.balances if str(b["bank_account_id"]) in included)
+
+    # Receivables sized to the workspace: the bills not already covered by (1),
+    # and never smaller than the seed itself.
+    scale = max(1.0, (payables - overdue) * 1.5 / seed_open, opening * 0.5 / seed_open)
+
+    def amt(p):
+        return int(int(p or 0) * scale) // 100 * 100   # whole rupees
+
+    # (1) as a receivable from a customer who always pays on the due date, so
+    # the collection model lands it on day one in the expected and downside
+    # views while "no new collections" stays the honest stress case it is.
+    cushion = max(50_00_000_00, opening)                 # start the month near today's cash
+    clearing = (max(0, overdue + inflight - opening) + cushion) // 100 * 100
+    payer = "00000000-0000-4000-8000-00000000d3e1"
+    data.ar_open.append(dict(
+        id="00000000-0000-4000-8000-00000000d3e0", customer_id=payer, customer_name="Receipts clearing (demo)",
+        invoice_number="DEMO-CLEARING", due_date=start, status="open", currency="INR",
+        taxable_paise=0, tds_paise=0, outstanding_paise=clearing, tds_rate_hint=None))
+    data.ar_history.extend((payer, start - timedelta(days=30 * k), start - timedelta(days=30 * k)) for k in range(1, 13))
+
+    for i in open_ar:
+        data.ar_open.append(dict(
+            id=i["id"], customer_id=i["customer_id"], customer_name=f"{i['customer_name']} (demo)",
+            invoice_number=i["invoice_number"], due_date=_d(i["due_date"]) + shift, status=i["status"],
+            currency=i["currency"], taxable_paise=amt(i["taxable_amount_paise"]), tds_paise=amt(i["tds_amount_paise"]),
+            outstanding_paise=amt(i["outstanding_paise"]), tds_rate_hint=customers[i["customer_id"]]["tds_rate_hint"]))
+    data.ar_history.extend((i["customer_id"], _d(i["due_date"]) + shift, _d(i["paid_at"]) + shift)
+                           for i in ar if i["status"] == "paid" and i["paid_at"])
+
+    have = {str(r.get("id")) for r in data.recurring}
+    for r in _seed("recurring_items.json", seed_dir):
+        if str(r["id"]) in have:
+            continue
+        data.recurring.append(dict(r, name=f"{r['name']} (demo)", amount_paise=amt(r["amount_paise"]),
+                                   start_date=_d(r["start_date"]), end_date=_d(r["end_date"]), active=True))
+
+
 def uses_fixture(tenant_id: str) -> bool:
     """Synthetic-demo tenants read their *books* from the seed files (inputs stay in cf_*)."""
     return str(tenant_id) in fixture_tenants() and SEED_DIR.exists()
@@ -286,4 +367,6 @@ def load_inputs(cur, tenant_id: str, data: SourceData) -> Settings:
     cur.execute("""SELECT id::text, name, category, direction, amount_paise, on_date, confidence, active
                    FROM cf_adjustments WHERE tenant_id = %s AND active""", (tenant_id,))
     data.adjustments = [dict(r) for r in cur.fetchall()]
+    if str(tenant_id) in demo_collection_tenants() and SEED_DIR.exists():
+        add_demo_collections(data, datetime.now(ZoneInfo(settings.timezone)).date())
     return settings
