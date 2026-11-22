@@ -1,0 +1,49 @@
+[
+  {
+    "id": "7187a4a5-6d40-590c-91af-bf9499d74338",
+    "name": "Baseline",
+    "view": "expected",
+    "overrides": [],
+    "description": "No changes."
+  },
+  {
+    "id": "429137d9-c743-5df6-8164-64bb1d2fd708",
+    "name": "Defer three windowed supplier payments",
+    "view": "expected",
+    "description": "Use the agreed payment windows for Ankur, Indus and Raigad.",
+    "overrides": [
+      {
+        "op": "shift_event",
+        "event_key": "bill:3b7d84f1-66e3-5fd6-b13f-3f2d0d4d2152",
+        "to_date": "2026-12-04",
+        "reason": "Within supplier-agreed window"
+      },
+      {
+        "op": "shift_event",
+        "event_key": "bill:09e98d93-ca0d-5e12-b3bd-07453be2962b",
+        "to_date": "2026-12-03",
+        "reason": "Within supplier-agreed window"
+      },
+      {
+        "op": "shift_event",
+        "event_key": "bill:d22199b3-9583-5c37-a4b8-da2cf8256702",
+        "to_date": "2026-12-02",
+        "reason": "Within supplier-agreed window"
+      }
+    ]
+  },
+  {
+    "id": "45e87fc4-5d7d-50af-94d9-17ccaf50d2f8",
+    "name": "Sahyadri pays 10 days later than expected",
+    "view": "expected",
+    "description": "Stress the single largest receivable.",
+    "overrides": [
+      {
+        "op": "shift_event",
+        "event_key": "ar:8071106c-3264-5c5e-9d7b-9464a238d80c",
+        "to_date": "2026-12-29",
+        "reason": "Collections stress test"
+      }
+    ]
+  }
+]

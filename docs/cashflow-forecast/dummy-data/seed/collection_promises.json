@@ -1,0 +1,13 @@
+[
+  {
+    "id": "efd88554-5fd5-5873-9966-5d410a5c8ba6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "invoice_id": "a4132dd8-acb8-515a-928c-763a3f5e3c8a",
+    "promised_date": "2026-11-26",
+    "promised_amount_paise": 73160000,
+    "source": "call",
+    "recorded_by": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135",
+    "recorded_at": "2026-11-19T12:10:00+05:30",
+    "note": "Spoke to AP head; payment run on Thursday."
+  }
+]

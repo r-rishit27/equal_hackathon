@@ -1110,6 +1110,35 @@ async def _ensure_receivables_tables():
         conn.close()
 
 
+async def _ensure_cash_forecast_tables():
+    """Cash Flow Forecast (docs/cashflow-forecast/). DDL lives in cashflow/schema.py.
+    The fact_cashflow_daily publish key is optional: a table with legacy duplicate
+    rows keeps working and the forecast simply isn't published for it."""
+    from .cashflow.schema import DDL, PUBLISH_INDEX
+    import logging as _lg
+    conn = _safe_connect()
+    if conn is None:
+        return
+    try:
+        with conn.cursor() as cur:
+            for stmt in DDL:
+                cur.execute(stmt)
+        conn.commit()
+        try:
+            with conn.cursor() as cur:
+                cur.execute(PUBLISH_INDEX)
+            conn.commit()
+        except Exception as exc:
+            conn.rollback()
+            _lg.warning("[migrate] fact_cashflow_daily publish key skipped: %s", exc)
+    except Exception as exc:
+        conn.rollback()
+        _lg.error("[migrate] cash forecast tables failed: %s", exc)
+        raise
+    finally:
+        conn.close()
+
+
 async def _ensure_recon_tables():
     """Recon: PO ↔ invoice ↔ on-ground evidence (docs/bata-recon/). DDL lives in
     recon/schema.py so the schema and the code that queries it stay side by side."""
@@ -1173,6 +1202,7 @@ MIGRATION_STEPS = (
     _ensure_vendor_doc_tables,
     _ensure_recon_tables,
     _ensure_receivables_tables,
+    _ensure_cash_forecast_tables,
     _ensure_vendor_logos_table,
     _migrate_supplier_gstins,
     _migrate_brands,

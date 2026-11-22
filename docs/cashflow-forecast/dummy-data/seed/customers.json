@@ -1,0 +1,182 @@
+[
+  {
+    "id": "8d6fc2d8-660e-51c3-a50a-6ac9d9a3381b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Sahyadri Agro Foods Pvt Ltd",
+    "gstin": "27CAFCF6924L1Z6",
+    "pan": "CAFCF6924L",
+    "email": "payables@sahyadri.example",
+    "payment_terms_days": 45,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "dce6c310-9483-5823-9266-6e486db838e7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Malabar Fresh Mart LLP",
+    "gstin": "32FFTFL7449L1Z6",
+    "pan": "FFTFL7449L",
+    "email": "payables@malabar.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "1f75a4e1-6833-56b2-b8a8-63f25593ee01",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Trinetra Pharma Distributors",
+    "gstin": "36LTDFH7701C1ZF",
+    "pan": "LTDFH7701C",
+    "email": "payables@trinetra.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "b14a6d65-1eaa-5b8e-869d-9572b2a8059b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Kalinga Home Essentials Pvt Ltd",
+    "gstin": "21PCKCE2506H1ZK",
+    "pan": "PCKCE2506H",
+    "email": "payables@kalinga.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 0.1
+  },
+  {
+    "id": "4a172782-5494-5f42-8a9d-b6096560c3f6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Narmada Dairy Products Ltd",
+    "gstin": "24VGLCA6755Q1Z1",
+    "pan": "VGLCA6755Q",
+    "email": "payables@narmada.example",
+    "payment_terms_days": 45,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "30cd9185-6ef2-5cd0-a342-d9e820dd2815",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Konkan Spices & Masala Co",
+    "gstin": "27YUNFA4561G1ZK",
+    "pan": "YUNFA4561G",
+    "email": "payables@konkan.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 0.1
+  },
+  {
+    "id": "ad2a0922-00b0-5186-a455-4be98925e7bb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Brahmaputra Tea Traders",
+    "gstin": "18TFEFI7072L1Z5",
+    "pan": "TFEFI7072L",
+    "email": "payables@brahmaputra.example",
+    "payment_terms_days": 60,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "592b19f7-dfe1-571d-8db0-34372061e849",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Vindhya E-Commerce Fulfilment LLP",
+    "gstin": "23MNSFV8524N1ZA",
+    "pan": "MNSFV8524N",
+    "email": "payables@vindhya.example",
+    "payment_terms_days": 15,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "ecb5106e-bc2f-5a98-b187-758cc054660f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Godavari Pharma Labs Pvt Ltd",
+    "gstin": "37IQACH4999O1ZK",
+    "pan": "IQACH4999O",
+    "email": "payables@godavari.example",
+    "payment_terms_days": 45,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "0fcc9e5e-df9b-55e7-9ce3-40eb14444cd9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Chambal Cement Products",
+    "gstin": "08WQPFM8903O1ZX",
+    "pan": "WQPFM8903O",
+    "email": "payables@chambal.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 0.1
+  },
+  {
+    "id": "b020254a-707c-5e33-a608-e29c382f5479",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Thar Handicraft Exports",
+    "gstin": "08DVPFS6935Z1ZA",
+    "pan": "DVPFS6935Z",
+    "email": "payables@thar.example",
+    "payment_terms_days": 60,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "035dc3e3-4bb2-5241-88ae-148d620af233",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Nilgiri Bakery Chain Pvt Ltd",
+    "gstin": "33YWCCM2931O1ZH",
+    "pan": "YWCCM2931O",
+    "email": "payables@nilgiri.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 0.1
+  },
+  {
+    "id": "c4f5bf1a-e7f8-51f6-9803-ce1e2fa60566",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Saraswati Stationery Mart",
+    "gstin": "09KJDFF6034G1ZR",
+    "pan": "KJDFF6034G",
+    "email": "payables@saraswati.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "47ac4727-709a-5e10-b71f-fc5ba61a791e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Mandovi Seafood Exporters",
+    "gstin": "30IASFM7132P1ZL",
+    "pan": "IASFM7132P",
+    "email": "payables@mandovi.example",
+    "payment_terms_days": 45,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "d5892d99-e624-5228-8ca2-90d7b918cddb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Pench Organic Farms LLP",
+    "gstin": "23ZXJFK1500P1ZF",
+    "pan": "ZXJFK1500P",
+    "email": "payables@pench.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": null
+  },
+  {
+    "id": "3381f36d-d52f-551a-9d0d-f23dbe621315",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Aravalli Auto Components Ltd",
+    "gstin": "06VRECN3094Q1ZC",
+    "pan": "VRECN3094Q",
+    "email": "payables@aravalli.example",
+    "payment_terms_days": 45,
+    "tds_rate_hint": 2.0
+  },
+  {
+    "id": "f93ee02f-3126-5a83-ae8b-ed272083dfa0",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Kosi Garments Pvt Ltd",
+    "gstin": "10YVVCR9419P1ZO",
+    "pan": "YVVCR9419P",
+    "email": "payables@kosi.example",
+    "payment_terms_days": 30,
+    "tds_rate_hint": 0.1
+  },
+  {
+    "id": "329e009e-b15c-5afc-9944-6f8b15994a2b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "name": "Tapi Textile Mills",
+    "gstin": "24HPDFY6633C1ZA",
+    "pan": "HPDFY6633C",
+    "email": "payables@tapi.example",
+    "payment_terms_days": 60,
+    "tds_rate_hint": 2.0
+  }
+]

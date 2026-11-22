@@ -42,6 +42,7 @@ const SettingsPage = lazy(() => import('./pages/SettingsPage'))
 const DashboardPage = lazy(() => import('./pages/DashboardPage'))
 const CopilotPage = lazy(() => import('./pages/CopilotPage'))
 const InventoryPage = lazy(() => import('./pages/InventoryPage'))
+const CashForecastPage = lazy(() => import('./pages/cashforecast/CashForecastPage'))
 const ReportsPage = lazy(() => import('./pages/ReportsPage'))
 const DataExtractionPage = lazy(() => import('./pages/DataExtractionPage'))
 const IntegrationsPage = lazy(() => import('./pages/IntegrationsPage'))
@@ -290,6 +291,7 @@ function AppShell() {
               />
               <Route path={PATHS.copilot} element={<RequireService service="fact_graph"><RequireRole roles={COPILOT_ROLES}><CopilotPage /></RequireRole></RequireService>} />
               <Route path={PATHS.inventory} element={<RequireService service="reports"><InventoryPage /></RequireService>} />
+              <Route path={PATHS['cash-forecast']} element={<RequireService service="cash_forecast"><RequireRole roles={['admin','finance_controller','accountant','auditor']}><CashForecastPage /></RequireRole></RequireService>} />
               <Route path={PATHS.reports} element={<RequireService service="reports"><ReportsPage /></RequireService>} />
               <Route
                 path={PATHS['data-extraction']}

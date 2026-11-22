@@ -107,6 +107,9 @@ SERVICES: tuple[ServiceDef, ...] = (
                "classification, OCR and cross-channel duplicate checks, plus vendor replies."),
     ServiceDef("fact_graph", "Fact Graph", "ai", False, False, None,
                "Per-tenant knowledge graph over vendors, bills and payments."),
+    ServiceDef("cash_forecast", "Cash Flow Forecast", "ai", False, False, None,
+               "Daily 30-day bank-cash forecast from bills, payouts, receivables and bank balances, "
+               "with what-if scenarios and owner-approved cash plans. Never moves money."),
     ServiceDef("anomaly_ai", "Anomaly & Duplicate Detection", "ai", False, False, None,
                "Duplicate-bill detection, risk scores and payment predictions."),
     ServiceDef("playground", "Agentic Playground", "ai", False, False, "runs",

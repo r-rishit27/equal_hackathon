@@ -1,6 +1,6 @@
 import {
   LayoutDashboard, Upload, FileText, Users, Package, BarChart2, Database,
-  Zap, Settings, ShieldAlert, ListChecks, Workflow, Bot, Banknote, HandCoins, Receipt,
+  Zap, Settings, ShieldAlert, ListChecks, Workflow, Bot, Banknote, HandCoins, Receipt, LineChart,
 } from 'lucide-react'
 import { can, type Permission, type Role } from '../auth/permissions'
 import type { ServiceKey } from '../auth/services'
@@ -67,6 +67,8 @@ const NAV: NavGroup[] = [
     items: [
       { icon: Bot, label: 'Reckon Copilot', page: 'copilot', requiredService: 'fact_graph', requiredRoles: COPILOT_ROLES },
       { icon: Package, label: 'Inventory planning', page: 'inventory', requiredPermission: 'payables.view', requiredService: 'reports' },
+      { icon: LineChart, label: 'Cash flow forecast', page: 'cash-forecast', requiredPermission: 'accounting.view',
+        requiredService: 'cash_forecast', requiredRoles: ['admin', 'finance_controller', 'accountant', 'auditor'] },
       { icon: BarChart2, label: 'Reports', page: 'reports', requiredPermission: 'payables.view', requiredService: 'reports' },
       {
         icon: Database, label: 'Data Extraction', page: 'data-extraction',

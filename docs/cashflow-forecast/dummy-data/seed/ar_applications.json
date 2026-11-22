@@ -1,0 +1,1937 @@
+[
+  {
+    "id": "46d3b83d-023c-5908-b008-ad1050b72f69",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "063b037c-1071-5c78-b67a-cf947b9013e2",
+    "invoice_id": "703f7c52-ecbf-5595-89bb-4c6b824876c9",
+    "amount_paise": 27898000,
+    "tds_paise": 481000,
+    "applied_at": "2026-07-20T16:00:00+05:30"
+  },
+  {
+    "id": "89dc9711-dc63-5e9b-a160-c9f59e256e1b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9fa96170-a070-5691-9a76-13e5cbbbf612",
+    "invoice_id": "c39b32e3-d0b8-5ebe-ac49-445f4667c6cc",
+    "amount_paise": 31262000,
+    "tds_paise": 539000,
+    "applied_at": "2026-07-27T16:00:00+05:30"
+  },
+  {
+    "id": "924ce5aa-3b69-5a69-b990-95c8a2ab90b3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "57dac7ba-ca8b-55dc-9cc9-4ebc990f12db",
+    "invoice_id": "72a6025e-d220-55a2-8159-6231e64a05d1",
+    "amount_paise": 13746000,
+    "tds_paise": 237000,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "c872c79a-1916-53b2-9e30-1662ff3cc36a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "657ac0d7-0084-5b27-b3b1-e86d902f97b3",
+    "invoice_id": "166b2f7e-ad52-500e-86be-29f97c1daff1",
+    "amount_paise": 40310000,
+    "tds_paise": 695000,
+    "applied_at": "2026-08-26T16:00:00+05:30"
+  },
+  {
+    "id": "5833adde-a4a1-5a00-ad7c-9533cb2d7f9e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9b1a5132-3334-5d42-96c0-b17796a9ad34",
+    "invoice_id": "85fc91ab-8f8a-5bf1-aecd-9cbff3419f4f",
+    "amount_paise": 33524000,
+    "tds_paise": 578000,
+    "applied_at": "2026-09-07T16:00:00+05:30"
+  },
+  {
+    "id": "3009683b-0868-5bcb-82bb-0b8b79d9f213",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "414c23c0-58b8-5ff9-bb35-240da482ef37",
+    "invoice_id": "bba8ef01-a057-574e-bebb-102a231ad9e6",
+    "amount_paise": 71282000,
+    "tds_paise": 1229000,
+    "applied_at": "2026-09-11T16:00:00+05:30"
+  },
+  {
+    "id": "8be27155-2a11-5f75-b7b3-770a33263d0a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b08a44a7-6489-5941-ab10-9bee47e94915",
+    "invoice_id": "df876fb2-52d9-51f9-b2f8-5196b213baa6",
+    "amount_paise": 10730000,
+    "tds_paise": 185000,
+    "applied_at": "2026-10-05T16:00:00+05:30"
+  },
+  {
+    "id": "f8eae5fd-3118-559d-b24a-b64ea86a99bc",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "7494eac6-12b5-5374-a0ed-eb05310cb9ae",
+    "invoice_id": "d7349bbe-dedc-5400-b29b-a737f6c51ff4",
+    "amount_paise": 15776000,
+    "tds_paise": 272000,
+    "applied_at": "2026-11-07T16:00:00+05:30"
+  },
+  {
+    "id": "f5127417-91fe-5254-935a-f0b1631a0482",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "45c461be-d572-55c2-b478-92c01858d7a3",
+    "invoice_id": "adc7556a-0145-5615-94c1-492fead07ba8",
+    "amount_paise": 24128000,
+    "tds_paise": 416000,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "4f040dc7-eb8c-5707-96bf-2ab9418b1818",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a8429dd2-974d-5a32-89f6-ef39d45c168b",
+    "invoice_id": "ab10ebec-b9bd-555f-af55-caf11a6839ae",
+    "amount_paise": 66932000,
+    "tds_paise": 1154000,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "ece0aaf6-d738-5dae-9c46-d4bbdce3da8d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c8c8bdfb-17a5-5db6-95ae-6d9f2c78eb9f",
+    "invoice_id": "2124fa5f-39e0-5c99-bd49-ed284da094fe",
+    "amount_paise": 36285000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-17T16:00:00+05:30"
+  },
+  {
+    "id": "c9d4c8aa-01d8-5f58-a7a4-820be3f6c87f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f72b613b-7422-5b39-85db-c6d4a3ae1fc9",
+    "invoice_id": "10b6de77-5e8c-5dfe-a66b-b8147268b0b2",
+    "amount_paise": 54575000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-30T16:00:00+05:30"
+  },
+  {
+    "id": "0e512c58-e920-5ad0-b047-be467cf3e5b6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0659a2c8-92a0-53f2-915b-993080ca196d",
+    "invoice_id": "235e2950-0be4-5c83-95bd-5f744e28eb2f",
+    "amount_paise": 60121000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-23T16:00:00+05:30"
+  },
+  {
+    "id": "de47f22d-62da-593e-bd35-8e03f4a9c09d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3dc68ea7-d4d6-536a-9e91-eec690123b30",
+    "invoice_id": "a3421a62-f982-5b84-bbee-dd9334eecc6f",
+    "amount_paise": 44486000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-29T16:00:00+05:30"
+  },
+  {
+    "id": "032c7f19-d8a6-5203-8b65-6aaf7509b5c7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "75427eb2-2e06-57b1-9c33-f8e8f84c88f0",
+    "invoice_id": "602d9e2d-a0cb-5821-85cf-20254d5e6f8c",
+    "amount_paise": 7434000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-17T16:00:00+05:30"
+  },
+  {
+    "id": "c2ad658b-2260-50df-8a6e-29af26f89941",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "2c23f72b-8aa8-5c81-a531-56ca19ad4275",
+    "invoice_id": "87796b49-c233-526e-b5cd-8ed9e5cb6087",
+    "amount_paise": 71626000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-17T16:00:00+05:30"
+  },
+  {
+    "id": "8179aa5c-5a07-5470-a811-fd0649f756a5",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9e758f30-544e-5fb4-9361-b10887c86e9d",
+    "invoice_id": "9bd05583-6bd4-5dd4-974d-ea8aa4d3909f",
+    "amount_paise": 53867000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-05T16:00:00+05:30"
+  },
+  {
+    "id": "c32b14e1-8ee7-5085-8b19-51115550ccaa",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a5dd1e87-3b8c-5c84-abf4-f5061b3f864a",
+    "invoice_id": "5a202426-35c2-5623-8c72-fca914346d8b",
+    "amount_paise": 24662000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-15T16:00:00+05:30"
+  },
+  {
+    "id": "33f390fc-2eaa-5438-b937-85ce953e8f20",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b55584c4-ba20-5fbc-91f4-9122b0d63687",
+    "invoice_id": "3b4a3311-5a2f-545e-898d-ef82e16673b9",
+    "amount_paise": 28261000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-24T16:00:00+05:30"
+  },
+  {
+    "id": "6730bf5c-bdfd-5054-a554-c8e8fe66ee4d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ce615605-9f2c-52eb-a2dd-07896f0e52d6",
+    "invoice_id": "b4bf5905-e180-5576-b05a-c8d08ec71951",
+    "amount_paise": 50386000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-15T16:00:00+05:30"
+  },
+  {
+    "id": "91029be3-d495-58ca-a6c4-7f749c79ad6d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "95c6c3c2-4a2c-5905-ba88-4faee17fee9f",
+    "invoice_id": "feeb477e-0205-5f9b-832f-14b6bde4fc6d",
+    "amount_paise": 42303000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-07T16:00:00+05:30"
+  },
+  {
+    "id": "2f4b6e7e-b7da-57bc-9d67-a717ae9c321f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5aebd26a-5f16-5e5a-bc41-93f7943a3b4e",
+    "invoice_id": "f1d622be-ef32-5ae8-81d9-c2f16812a661",
+    "amount_paise": 7965000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "294af42d-f4fa-5c97-8633-c5dfdab79cb9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b78be679-010d-55dc-81f6-0137810fd766",
+    "invoice_id": "5fa9e860-f919-57ba-bcf5-4fcefa689080",
+    "amount_paise": 8816000,
+    "tds_paise": 152000,
+    "applied_at": "2026-05-28T16:00:00+05:30"
+  },
+  {
+    "id": "58384a54-a07f-5322-92c6-2e096886f1c0",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5a0e2c73-31e3-54e5-a160-38c5a99403ea",
+    "invoice_id": "3eaedcea-400c-5be3-a5bd-ba679dd1c964",
+    "amount_paise": 11658000,
+    "tds_paise": 201000,
+    "applied_at": "2026-06-10T16:00:00+05:30"
+  },
+  {
+    "id": "555343d1-39e8-50ad-b438-effcd8ec7ad6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a34faa3c-1a12-539c-a2b6-dad42935bd35",
+    "invoice_id": "c33e5fa2-ecb2-55fd-9cec-1ad42834e888",
+    "amount_paise": 13108000,
+    "tds_paise": 226000,
+    "applied_at": "2026-06-26T16:00:00+05:30"
+  },
+  {
+    "id": "ec0cffe2-d911-5e2a-8e8d-40986731d370",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "921f9346-f656-5fda-a60e-15a40f6c4851",
+    "invoice_id": "0833b9be-ba1f-5457-84f9-72ae41ac9b3a",
+    "amount_paise": 61828000,
+    "tds_paise": 1066000,
+    "applied_at": "2026-07-13T16:00:00+05:30"
+  },
+  {
+    "id": "0213a000-a7fc-58d6-9e8a-29d742a94811",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e20b4a1e-29f2-5b48-9bec-edd3ec5692fd",
+    "invoice_id": "87384fe0-b4f2-571a-b4dd-9a80bdd30915",
+    "amount_paise": 67802000,
+    "tds_paise": 1169000,
+    "applied_at": "2026-07-27T16:00:00+05:30"
+  },
+  {
+    "id": "b270dbf6-ac01-514d-a057-1229e5dc332b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e281dd9e-d5c8-5771-acaf-eaccc5e1e065",
+    "invoice_id": "4cf80c24-5aa0-51f8-af0b-777c61dc1879",
+    "amount_paise": 63684000,
+    "tds_paise": 1098000,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "be39108c-295b-5759-b934-c000114f0b87",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f4a01877-cb64-5b10-aa2a-864e64b2d983",
+    "invoice_id": "985099a1-f347-5a12-99ba-d632afe5d303",
+    "amount_paise": 55448000,
+    "tds_paise": 956000,
+    "applied_at": "2026-08-13T16:00:00+05:30"
+  },
+  {
+    "id": "dbfde3ef-c7fb-5a2a-a823-bae559f59507",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "dee57bd5-0a90-575d-82b0-99f7d70d4f63",
+    "invoice_id": "7af96c13-d329-59ed-8728-066bbdc926d9",
+    "amount_paise": 11426000,
+    "tds_paise": 197000,
+    "applied_at": "2026-08-24T16:00:00+05:30"
+  },
+  {
+    "id": "63a57580-0551-593c-9efd-085b03381f6e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "dd8dee8b-8b6a-5c18-947a-0d0eda493971",
+    "invoice_id": "50dfa36c-e8c0-523b-affe-a67e34b614a2",
+    "amount_paise": 35902000,
+    "tds_paise": 619000,
+    "applied_at": "2026-09-14T16:00:00+05:30"
+  },
+  {
+    "id": "5023b68e-8093-5b37-9426-b17a4f4a7571",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9ba867cc-d4e6-588c-9be8-11cb5111b119",
+    "invoice_id": "88278138-0b3d-5356-be51-57fc81755ce1",
+    "amount_paise": 35728000,
+    "tds_paise": 616000,
+    "applied_at": "2026-09-16T16:00:00+05:30"
+  },
+  {
+    "id": "6c8167be-3608-55d2-bf8b-54fd129e334a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "35a3b390-031f-5e47-adf0-73cf91c2f8b5",
+    "invoice_id": "1a2f586d-9a76-5f84-9338-bacb6daef43c",
+    "amount_paise": 73428000,
+    "tds_paise": 1266000,
+    "applied_at": "2026-10-03T16:00:00+05:30"
+  },
+  {
+    "id": "60e56199-5a38-53f6-9fad-c71b64779e01",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "8c2f4df3-9fba-5d27-91c4-616dfda01ca0",
+    "invoice_id": "29dd1b97-d2aa-5587-a45e-5e345962e81a",
+    "amount_paise": 34278000,
+    "tds_paise": 591000,
+    "applied_at": "2026-10-14T16:00:00+05:30"
+  },
+  {
+    "id": "64b26ed7-46fe-552d-b921-1f5044d62afe",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d89ba4a8-2c02-5136-882f-3b74b92c2835",
+    "invoice_id": "d0bfba55-dfbe-5d41-9c35-2ecd225e065e",
+    "amount_paise": 24708000,
+    "tds_paise": 426000,
+    "applied_at": "2026-10-29T16:00:00+05:30"
+  },
+  {
+    "id": "c9e93c1e-596f-5a35-9201-7a5c82425fb8",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "26174641-e56d-514d-98ec-2f873a85e5b0",
+    "invoice_id": "99488780-d954-5baa-9328-824028d2b1de",
+    "amount_paise": 67048000,
+    "tds_paise": 1156000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "bee4f079-8b41-58b4-94b3-32da5de337e2",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "36fb677f-7e01-5631-81e1-89ab95ebde64",
+    "invoice_id": "e1a6afaf-acac-5e16-9996-1255e0b9bb7e",
+    "amount_paise": 63548100,
+    "tds_paise": 53900,
+    "applied_at": "2026-06-12T16:00:00+05:30"
+  },
+  {
+    "id": "6eb23dc8-cda9-5a18-8425-a3239dbd639f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d5f822f3-b7a4-5f50-87d0-18d5c721aaa1",
+    "invoice_id": "a50886ff-77ac-5a4e-93bb-0c981b51f56a",
+    "amount_paise": 62722800,
+    "tds_paise": 53200,
+    "applied_at": "2026-06-29T16:00:00+05:30"
+  },
+  {
+    "id": "cc4b169e-2e10-545f-98b7-bfc51cbb331c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "610ec306-9b7f-57ab-8611-5a1240a6d973",
+    "invoice_id": "c1326741-4d67-5dbc-80b8-ebc30e0c24c4",
+    "amount_paise": 36136350,
+    "tds_paise": 30650,
+    "applied_at": "2026-06-26T16:00:00+05:30"
+  },
+  {
+    "id": "883dc51e-d5cd-5c3e-a3d8-b3d804d3d9ed",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "efe79233-5dc4-51fa-9d00-2df69f2842f3",
+    "invoice_id": "878fb177-2b98-5b1b-9875-e6f68e3fb41f",
+    "amount_paise": 43564050,
+    "tds_paise": 36950,
+    "applied_at": "2026-07-20T16:00:00+05:30"
+  },
+  {
+    "id": "adda1ca7-c28b-53c2-ac7b-775f6ef21e62",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e683f9dd-4128-5a15-852d-743f3b8a6618",
+    "invoice_id": "b96de1e5-478c-59f8-83b3-52af09680f6c",
+    "amount_paise": 62604900,
+    "tds_paise": 53100,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "30a3d501-15bc-5a77-adad-5ad3d3c538df",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "54f367ff-3b2b-5767-96c9-249d37742619",
+    "invoice_id": "e6b3e0af-dbc9-5630-93d8-cac8dea69980",
+    "amount_paise": 23049450,
+    "tds_paise": 19550,
+    "applied_at": "2026-08-14T16:00:00+05:30"
+  },
+  {
+    "id": "3423993b-498e-512c-ac02-d1ab838f7804",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1839bade-aded-5b62-bc7a-5b25a1cb4c57",
+    "invoice_id": "60bd1b38-4294-5023-af7c-0d2c62226545",
+    "amount_paise": 18687150,
+    "tds_paise": 15850,
+    "applied_at": "2026-09-05T16:00:00+05:30"
+  },
+  {
+    "id": "84ce80ec-b50e-52ed-9668-c8185d7f9fef",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1d3f5fd4-c4e8-555b-b2ce-a9c57501648c",
+    "invoice_id": "2a7b53f0-ae5d-5c91-819c-0c7d86245772",
+    "amount_paise": 30123450,
+    "tds_paise": 25550,
+    "applied_at": "2026-09-09T16:00:00+05:30"
+  },
+  {
+    "id": "11ef55c9-de4b-50ae-a00f-ad10103b2299",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "8c27d9be-31b7-504e-9b9e-9a4e132b1d99",
+    "invoice_id": "26324de0-35a5-5d74-9de2-205fbfa23966",
+    "amount_paise": 37669050,
+    "tds_paise": 31950,
+    "applied_at": "2026-09-22T16:00:00+05:30"
+  },
+  {
+    "id": "455d4cce-9fb3-52a8-aac5-398dbaf3ecbc",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "959d35bc-2494-593c-a5ad-003576781050",
+    "invoice_id": "4ec02356-8dba-522a-88ec-4589bb71d96e",
+    "amount_paise": 27175950,
+    "tds_paise": 23050,
+    "applied_at": "2026-09-29T16:00:00+05:30"
+  },
+  {
+    "id": "e705eab5-7a92-5cf8-8da1-f4aafb906c4b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ebab2280-0358-59b8-a03e-153fed01af18",
+    "invoice_id": "024cd7a5-388f-5956-8fd0-dfe4e5a963d6",
+    "amount_paise": 44566200,
+    "tds_paise": 37800,
+    "applied_at": "2026-10-14T16:00:00+05:30"
+  },
+  {
+    "id": "a06f9a8e-d235-5685-ac14-b545ac21b379",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "43580ede-f527-509e-9b15-a6fef1233420",
+    "invoice_id": "1851bfcb-7fb0-5fa7-8bae-b8cd4019c468",
+    "amount_paise": 20514600,
+    "tds_paise": 17400,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "d510643a-0220-5dca-860b-ce4e9ccc5e25",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "7699f81c-07e8-5f52-91f0-30b1d61d4aa8",
+    "invoice_id": "ef36c276-fc7c-5538-a1d6-d0ba2ef2870f",
+    "amount_paise": 37020600,
+    "tds_paise": 31400,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "1767010a-c11b-55b7-99ee-cab530c69bab",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "171d0dbf-dcc3-58dc-8449-13e34ed7baa4",
+    "invoice_id": "c222a21d-02ba-54e9-bffd-18568a6003bf",
+    "amount_paise": 70740000,
+    "tds_paise": 60000,
+    "applied_at": "2026-11-18T16:00:00+05:30"
+  },
+  {
+    "id": "33655748-f515-56dc-9984-0721c7b47e86",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1e660273-00b9-509b-9270-7a344e2193d9",
+    "invoice_id": "927d73f8-0137-54e5-8f08-c3eb10ec494d",
+    "amount_paise": 50924000,
+    "tds_paise": 878000,
+    "applied_at": "2026-06-22T16:00:00+05:30"
+  },
+  {
+    "id": "9d4053cb-1e23-5e1e-af07-5ca682374be5",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "dfc96e40-16af-5b20-8f45-814a908cbfb1",
+    "invoice_id": "531b0836-6d09-56f1-9e8e-13682b1bbfd7",
+    "amount_paise": 70006000,
+    "tds_paise": 1207000,
+    "applied_at": "2026-07-06T16:00:00+05:30"
+  },
+  {
+    "id": "f80d8ed9-01ca-5835-93f7-49b1b0c022de",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "564fef1e-bdfb-5d4e-95c8-97a612f60d83",
+    "invoice_id": "c1b3cd44-185e-5445-84cb-19fb1b5df154",
+    "amount_paise": 36366000,
+    "tds_paise": 627000,
+    "applied_at": "2026-07-20T16:00:00+05:30"
+  },
+  {
+    "id": "3cca7b53-ee7c-57ad-aecf-85b0b1ab4c8b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "440f8f42-0b64-59d0-b7bb-552a01d80ccd",
+    "invoice_id": "2a406c0b-2d41-5e48-9e5c-1252d6d3342d",
+    "amount_paise": 52258000,
+    "tds_paise": 901000,
+    "applied_at": "2026-08-05T16:00:00+05:30"
+  },
+  {
+    "id": "9b042eb5-2c53-56a6-89cd-fdfc7d7be33f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3de0c0ea-74d5-5bf7-918b-40579dac7e70",
+    "invoice_id": "e3f84f37-0448-5513-a393-67b274e72be9",
+    "amount_paise": 37816000,
+    "tds_paise": 652000,
+    "applied_at": "2026-08-15T16:00:00+05:30"
+  },
+  {
+    "id": "b5e26737-1665-5c0a-a55d-ae22dfd95d45",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "fc13ea9f-de8f-5d72-b418-d9cec15c06d7",
+    "invoice_id": "212e2961-1f6e-58d6-9197-c25ed9258ac2",
+    "amount_paise": 22968000,
+    "tds_paise": 396000,
+    "applied_at": "2026-08-26T16:00:00+05:30"
+  },
+  {
+    "id": "a8eb3a85-4450-5e2a-adf8-64119060b1fe",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5b08611c-9fe0-59f7-8e9b-468700f08e2c",
+    "invoice_id": "8828c261-2854-5dc7-93b0-a1f7b4f9726f",
+    "amount_paise": 50286000,
+    "tds_paise": 867000,
+    "applied_at": "2026-09-08T16:00:00+05:30"
+  },
+  {
+    "id": "cfc16e12-41cb-58b0-9d35-36dc8ff53705",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "394a8885-4d4f-50e6-96e7-5cb1779f1a3c",
+    "invoice_id": "3f473436-c1f7-55fd-a770-f38c35010e8d",
+    "amount_paise": 49242000,
+    "tds_paise": 849000,
+    "applied_at": "2026-09-14T16:00:00+05:30"
+  },
+  {
+    "id": "9ea8c51d-08ad-56e7-88af-1e2ab2542347",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "64e5594b-36d7-51ca-99c5-7f79331886d4",
+    "invoice_id": "cfbf9205-80bb-58f2-afd6-9c97d9cb9358",
+    "amount_paise": 41644000,
+    "tds_paise": 718000,
+    "applied_at": "2026-10-05T16:00:00+05:30"
+  },
+  {
+    "id": "544d4f66-8412-5781-aeef-9c7a9b04c5f9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9aa8beee-32c8-5053-8467-ddd96cefd482",
+    "invoice_id": "70ce1cbb-85e4-578c-9f37-a03bebfa13fe",
+    "amount_paise": 61306000,
+    "tds_paise": 1057000,
+    "applied_at": "2026-10-13T16:00:00+05:30"
+  },
+  {
+    "id": "bc3bd74e-95a4-5a74-af33-33dbf721b853",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "62d12833-0e54-5fd7-962e-399ee5f2f1ed",
+    "invoice_id": "9fcce708-abcd-51c3-8174-a4687d76cbc7",
+    "amount_paise": 24302000,
+    "tds_paise": 419000,
+    "applied_at": "2026-10-16T16:00:00+05:30"
+  },
+  {
+    "id": "b213a93d-72b5-5faa-995a-10c706812edb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "8135c2ca-7eaf-525a-956a-71dc139f9650",
+    "invoice_id": "20ea1428-2b3b-5680-978a-7e8a49a62534",
+    "amount_paise": 53070000,
+    "tds_paise": 915000,
+    "applied_at": "2026-10-31T16:00:00+05:30"
+  },
+  {
+    "id": "a887565d-1d69-559a-bef2-4b48da1a1e24",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3d6bb1cf-de43-5da8-9079-048576fc2cfe",
+    "invoice_id": "8fceecd4-9988-5ad6-a655-dababc271f49",
+    "amount_paise": 10905750,
+    "tds_paise": 9250,
+    "applied_at": "2026-07-06T16:00:00+05:30"
+  },
+  {
+    "id": "f51b931d-9c25-5404-b00f-f3fee7277651",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d548f3e5-7a54-54ec-bf6a-4d1743264153",
+    "invoice_id": "d842fa07-90ca-5ea4-ab2f-4c76686cb424",
+    "amount_paise": 45804150,
+    "tds_paise": 38850,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "4db05e22-bad3-5eb2-ade0-e3688196b910",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "8ca352de-36b1-55c1-a3d9-0d4c8cbf062f",
+    "invoice_id": "276d660f-6b63-5069-a5ab-03ca93d709c9",
+    "amount_paise": 70798950,
+    "tds_paise": 60050,
+    "applied_at": "2026-06-30T16:00:00+05:30"
+  },
+  {
+    "id": "7511a3f4-5e42-5fdf-9bb5-6223758a25cb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "6b85038b-8bd5-576d-92c7-5d3f322a9fb1",
+    "invoice_id": "769a6303-e033-5c2f-b5e3-f4917c213523",
+    "amount_paise": 39378600,
+    "tds_paise": 33400,
+    "applied_at": "2026-07-22T16:00:00+05:30"
+  },
+  {
+    "id": "eb884c81-5d59-5f0b-af78-9e61ab562ccc",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "04f7b3ed-89c2-53ba-9033-0490f9aa4385",
+    "invoice_id": "69b01570-b130-5a60-9257-4b1d61ed8b72",
+    "amount_paise": 44566200,
+    "tds_paise": 37800,
+    "applied_at": "2026-07-23T16:00:00+05:30"
+  },
+  {
+    "id": "34dc16a2-7d17-5109-9f00-2423c669acf5",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "690cee59-4a85-511e-b0d0-5aa0ce9f6e33",
+    "invoice_id": "c8af44a5-d78a-5828-9a5e-27edbf00eaa0",
+    "amount_paise": 50225400,
+    "tds_paise": 42600,
+    "applied_at": "2026-09-10T16:00:00+05:30"
+  },
+  {
+    "id": "4d177557-2dd6-555e-ab54-5fe703aa043b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "adabd711-29e1-5dd5-8001-7e1a0668ea3f",
+    "invoice_id": "b362b548-fe26-55cd-8193-a87042d9470d",
+    "amount_paise": 55236150,
+    "tds_paise": 46850,
+    "applied_at": "2026-10-12T16:00:00+05:30"
+  },
+  {
+    "id": "a032adc0-7dab-5bca-8ec7-f958ac88d99f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d101df04-822b-527c-bbfa-158ce330bfff",
+    "invoice_id": "f9b8b95d-f98f-581e-af6b-7dd1017b63fd",
+    "amount_paise": 15503850,
+    "tds_paise": 13150,
+    "applied_at": "2026-09-01T16:00:00+05:30"
+  },
+  {
+    "id": "18db6e5a-5d47-5038-b26d-494a3ef4673c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "41bf04fe-1b18-5f88-b3f0-d451fa8682a3",
+    "invoice_id": "a1d357a5-5e63-5404-8e93-c3ef090805e8",
+    "amount_paise": 33483600,
+    "tds_paise": 28400,
+    "applied_at": "2026-09-14T16:00:00+05:30"
+  },
+  {
+    "id": "1a230358-c189-51a6-82ef-c83b71989e02",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f947859c-e0a9-5368-8809-70063ed5c6eb",
+    "invoice_id": "ad1cd644-f9e7-5d9c-b85b-001d91edd6cf",
+    "amount_paise": 39201750,
+    "tds_paise": 33250,
+    "applied_at": "2026-10-27T16:00:00+05:30"
+  },
+  {
+    "id": "2610d7b2-38ff-5240-90ce-c51b026425dd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ff2f1e71-c718-5776-b694-f114560e425b",
+    "invoice_id": "95eddfe8-a280-58af-b540-8f47a4fbb46a",
+    "amount_paise": 23403150,
+    "tds_paise": 19850,
+    "applied_at": "2026-10-23T16:00:00+05:30"
+  },
+  {
+    "id": "9258f9e1-6bc8-5698-9d23-ffeb2bce3d00",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5e2fa9e9-573d-5db2-a449-628a45f89af8",
+    "invoice_id": "ef445eb9-eda5-5e18-9c57-74bbaa9a9699",
+    "amount_paise": 33099000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-29T16:00:00+05:30"
+  },
+  {
+    "id": "730a2d67-707c-5298-ac26-4b189a781303",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c7e39f63-66d3-55e0-91a7-1c07ed928c10",
+    "invoice_id": "5e62eb9f-1119-561b-8960-cd9a0816bf7a",
+    "amount_paise": 55873000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "608493b9-b449-5a6f-a359-0a3974bc22e1",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ff5cc80c-2880-53ea-b939-4ce3a3308f16",
+    "invoice_id": "ac02c694-48b6-5a61-84e4-1a834c1d00c2",
+    "amount_paise": 70859000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-29T16:00:00+05:30"
+  },
+  {
+    "id": "292d6395-792b-5f9c-9d80-89af7f30fcc3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "2c6cc7d8-9bcd-5fc0-a246-e532de707e4d",
+    "invoice_id": "e265be33-3508-5562-be76-10c01e7431ed",
+    "amount_paise": 51684000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-18T16:00:00+05:30"
+  },
+  {
+    "id": "ebd28ee9-c1a5-5fd0-af5d-e7f710ba1a18",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "4be90fb9-79f2-5696-976b-1aadd05e1b4e",
+    "invoice_id": "b2835e4c-c2fb-5487-83f6-eefeebc76f61",
+    "amount_paise": 35046000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-14T16:00:00+05:30"
+  },
+  {
+    "id": "1882e0ba-28ef-5c04-b3b0-322fe4806423",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ab6196ee-79e6-55ab-a93f-91d5bbac72fa",
+    "invoice_id": "8cd485f7-303f-5ff5-a227-02bb47712c6a",
+    "amount_paise": 35636000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-03T16:00:00+05:30"
+  },
+  {
+    "id": "821cc358-e9bc-5ab2-a3b9-fa0cbc1d5e2c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "01a7fd08-d9ca-5cb4-a0c1-225af8bf8dc9",
+    "invoice_id": "57838fd9-e6ab-531e-9f3c-8dd7cb2162bc",
+    "amount_paise": 8968000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-01T16:00:00+05:30"
+  },
+  {
+    "id": "d92740b2-2243-5975-bb40-21b5c2df979a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "301cb888-84f6-50bc-929c-7b3481d09092",
+    "invoice_id": "7b82e1ee-ca1e-5f9c-82ac-b1d21e784522",
+    "amount_paise": 72452000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-19T16:00:00+05:30"
+  },
+  {
+    "id": "56943d34-8a0e-5488-989c-7888423bc0c1",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3e1f051f-8fdf-5006-8614-2e6dedf6f990",
+    "invoice_id": "ee821e39-0f38-5a6d-87b7-f4aa89d52680",
+    "amount_paise": 55224000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "ec269ebe-b773-5307-a8e6-cda220f01be0",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "09053e3d-078f-55be-b5c3-bbf22bce2d8b",
+    "invoice_id": "85ba2aba-0c7c-52bb-aeb2-8bc1f52dc370",
+    "amount_paise": 53100000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-05T16:00:00+05:30"
+  },
+  {
+    "id": "f9e1ff48-5b1d-5c41-83cd-95964183403c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3bdc5089-1572-5fb7-808a-bd3d04fafaf5",
+    "invoice_id": "7444291a-67cf-5ad1-965f-b36aba74fbdf",
+    "amount_paise": 46905000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "ed8d8229-8941-5b3e-a239-8a6311d492b7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9b6b93d3-1a07-5a21-b024-ddbddc948f20",
+    "invoice_id": "0bf6d12c-680b-5d51-9807-3f5dea62d3aa",
+    "amount_paise": 47318000,
+    "tds_paise": 0,
+    "applied_at": "2026-05-25T16:00:00+05:30"
+  },
+  {
+    "id": "a42386c7-cd37-5fc0-984a-11f1753c4f0f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "80e7d130-1da8-53f8-b075-bf8f21084c1e",
+    "invoice_id": "14ff1290-3f7c-5470-8d91-f8daae7a9a05",
+    "amount_paise": 45430000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-08T16:00:00+05:30"
+  },
+  {
+    "id": "b328e899-c45f-5265-9ab8-f38130ea33cd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "133605ea-1d72-58e3-a6e2-61995f62142f",
+    "invoice_id": "230b1d54-6034-5d45-ab2a-ee433ce2f152",
+    "amount_paise": 18998000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-17T16:00:00+05:30"
+  },
+  {
+    "id": "ef5378cf-47f0-5e28-8236-a70ff4960b39",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c01f3d71-4f45-5c92-b0d1-2f9c2b4e02b0",
+    "invoice_id": "08ae1fee-7a23-5a47-99b3-c2c3a23e6ca3",
+    "amount_paise": 8378000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-06T16:00:00+05:30"
+  },
+  {
+    "id": "69dc6a6e-3d40-5443-a770-aed0ddecd6e7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c7d765bb-1be9-59f2-8e37-51f3322a1665",
+    "invoice_id": "e74a23f2-d53a-5e74-b572-0ad17dafaffb",
+    "amount_paise": 26904000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-24T16:00:00+05:30"
+  },
+  {
+    "id": "b33198d3-adba-5693-af6a-35a839fd098a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "41c67279-9e17-5b79-a627-b4959d983d25",
+    "invoice_id": "1c921e96-8d49-55a6-a8ec-564b0c7724c4",
+    "amount_paise": 60062000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-01T16:00:00+05:30"
+  },
+  {
+    "id": "656df74c-4c7e-5f04-bee7-74a3ed0684fc",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "cfaa899a-0f27-5497-9fb9-39a83536c805",
+    "invoice_id": "a3362ada-37d7-577c-9855-90f41bf24f1e",
+    "amount_paise": 31034000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-17T16:00:00+05:30"
+  },
+  {
+    "id": "3db6d82b-a42c-58bb-8d0d-423a9b8a28a2",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "6f6f4080-38e6-5da7-918a-97c27f89f517",
+    "invoice_id": "3654566e-328b-54a8-838d-c27f45bde885",
+    "amount_paise": 55165000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-29T16:00:00+05:30"
+  },
+  {
+    "id": "9ea40a55-f5b7-519b-92d1-bed8298067d5",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a850af50-89a3-5abc-820f-2fae76db2dd4",
+    "invoice_id": "e0196405-82a9-59f0-a663-3e712f882c5a",
+    "amount_paise": 62304000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-10T16:00:00+05:30"
+  },
+  {
+    "id": "49eba486-19ee-5d1c-b03c-9adeb8ece27e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d5641758-e472-5fdf-b113-231cfcfcd187",
+    "invoice_id": "db76b980-797f-571b-8c92-4616dcea08f5",
+    "amount_paise": 42362000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-23T16:00:00+05:30"
+  },
+  {
+    "id": "1749be38-e1b4-5181-bc9c-02028583858f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "228b53e8-36f6-5a51-bf49-4786a6e8bc9f",
+    "invoice_id": "281061f3-e77b-54f5-87c0-95488717f03e",
+    "amount_paise": 64782000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-16T16:00:00+05:30"
+  },
+  {
+    "id": "f4f82950-95d0-585d-b630-d5404fde82ef",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "676b5683-675f-5b87-8d66-8d7015fe8936",
+    "invoice_id": "088524e4-fb4c-5202-a720-600639d5186b",
+    "amount_paise": 17641000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-17T16:00:00+05:30"
+  },
+  {
+    "id": "fcf52f2c-f7f3-5941-9edd-70fab182e68a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e46efee3-ee83-55f9-b0f9-554eb01dd4fe",
+    "invoice_id": "6165368d-4159-522d-b736-8a1aa9899611",
+    "amount_paise": 48911000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "b8f188b7-2950-50e1-b263-614c519e9e38",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "cd7fed18-44d5-5173-9157-a388e1adc549",
+    "invoice_id": "35526eeb-3b21-5358-b375-9237041e0c7b",
+    "amount_paise": 15776000,
+    "tds_paise": 272000,
+    "applied_at": "2026-06-29T16:00:00+05:30"
+  },
+  {
+    "id": "c1d8c875-443d-5606-8c33-fb209a68d53d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e164f517-844c-5ca6-8510-f2cb9d623009",
+    "invoice_id": "e87d6c91-7ffb-5364-a0f5-cafab31db0d2",
+    "amount_paise": 26448000,
+    "tds_paise": 456000,
+    "applied_at": "2026-07-09T16:00:00+05:30"
+  },
+  {
+    "id": "90052060-f719-5500-8769-a445d630177b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "170d0e9a-43f5-5efd-a40d-19be627d3094",
+    "invoice_id": "c0c74005-05c2-5910-963f-3e33ae966d4d",
+    "amount_paise": 55506000,
+    "tds_paise": 957000,
+    "applied_at": "2026-07-15T16:00:00+05:30"
+  },
+  {
+    "id": "9a3da2c5-4237-5415-93ba-ccfa3d60a14a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1711f87d-e864-5004-a386-b9893cb124c2",
+    "invoice_id": "fb323472-1799-5dba-acdf-3a1983480658",
+    "amount_paise": 18038000,
+    "tds_paise": 311000,
+    "applied_at": "2026-08-05T16:00:00+05:30"
+  },
+  {
+    "id": "1eb5b5f3-9f87-56f9-9acc-e65cf7115cdd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "4b515b79-6e4d-5e0c-9cf8-190d36b6ab49",
+    "invoice_id": "16359ce5-b5ab-5c73-b6e9-254e4cc60d5d",
+    "amount_paise": 22910000,
+    "tds_paise": 395000,
+    "applied_at": "2026-08-15T16:00:00+05:30"
+  },
+  {
+    "id": "04814363-25e3-5dba-bb26-63a1651fe606",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "040279fd-11c5-5262-94e7-f6055a4eb52e",
+    "invoice_id": "9aaeb160-3685-5431-835e-a2a9a5f3553e",
+    "amount_paise": 34974000,
+    "tds_paise": 603000,
+    "applied_at": "2026-08-17T16:00:00+05:30"
+  },
+  {
+    "id": "2d2dca2d-3147-55f1-8c63-52a780893abb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b83379ee-c86e-5b2a-b7ab-2f4c3c2ce8f8",
+    "invoice_id": "0fa08bdd-d805-5738-95b2-f60eab17b6d0",
+    "amount_paise": 55100000,
+    "tds_paise": 950000,
+    "applied_at": "2026-09-17T16:00:00+05:30"
+  },
+  {
+    "id": "2543a15c-5ca0-5dd8-804f-41547eb565b8",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "02957f1f-e38b-5ca2-92c5-5f69366647b8",
+    "invoice_id": "ee878229-e530-5dd4-9399-d2e32f0d944e",
+    "amount_paise": 13862000,
+    "tds_paise": 239000,
+    "applied_at": "2026-09-07T16:00:00+05:30"
+  },
+  {
+    "id": "1e433d51-aeb9-5fad-925e-467c5a971c6a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "058a5cfc-d1d0-5baa-9688-3c8f62b805c6",
+    "invoice_id": "3afeef10-7df4-5784-8ea5-95c2d57a3ac6",
+    "amount_paise": 38164000,
+    "tds_paise": 658000,
+    "applied_at": "2026-10-13T16:00:00+05:30"
+  },
+  {
+    "id": "118d7ba1-8f72-54a6-8708-e14b0431c982",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b06036c8-6aa1-5ed5-b348-5be20ffd9dfe",
+    "invoice_id": "4b93897c-8182-5804-9fe8-62a5449d30ef",
+    "amount_paise": 70760000,
+    "tds_paise": 1220000,
+    "applied_at": "2026-10-12T16:00:00+05:30"
+  },
+  {
+    "id": "3b898983-c0ee-5ce2-9164-c11300d75b3c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f248f3d6-0d33-5e45-a6c4-ec418afdea38",
+    "invoice_id": "d10f70e9-2dea-5700-96d9-878fbb064a7c",
+    "amount_paise": 61944000,
+    "tds_paise": 1068000,
+    "applied_at": "2026-10-30T16:00:00+05:30"
+  },
+  {
+    "id": "f786a942-1fe1-553b-88f9-f93778ea07ee",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "2e4532bd-2e92-5300-a025-e30b1e3eac6d",
+    "invoice_id": "10a58a50-b7cc-5139-9161-e91a6f17f4f3",
+    "amount_paise": 12702000,
+    "tds_paise": 219000,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "1f9a169b-864d-5376-9ab2-4b26e63e0aa7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "2484cffe-ce98-5829-92e5-ea1a522d42d8",
+    "invoice_id": "52de5e70-3cf3-5c72-8761-66bbc454926e",
+    "amount_paise": 53708000,
+    "tds_paise": 926000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "158986b9-2d6c-5747-ac1d-5ed6ee3aa671",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b9ef1986-662b-503c-ab93-a20a9fd19746",
+    "invoice_id": "1753e470-106a-59f4-b581-1986399086d7",
+    "amount_paise": 14914350,
+    "tds_paise": 12650,
+    "applied_at": "2026-07-03T16:00:00+05:30"
+  },
+  {
+    "id": "be470764-d579-5af0-a073-94f39aeab36f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "de80feff-df30-5d8d-a832-5db0a6741dda",
+    "invoice_id": "045432d8-f828-546c-9af2-bc50fe1e37c4",
+    "amount_paise": 65080800,
+    "tds_paise": 55200,
+    "applied_at": "2026-07-17T16:00:00+05:30"
+  },
+  {
+    "id": "29830fef-0d30-516a-a217-a7eff6955932",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a90d67df-d1e2-52b1-8aae-6b34d5acf2ba",
+    "invoice_id": "b6f858be-aeda-5179-9021-439943e69e25",
+    "amount_paise": 38907000,
+    "tds_paise": 33000,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "430c06f4-bca1-5352-b79b-17d21f1e1366",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e9db5feb-e62d-5e6a-9538-69dc2ffd2b5e",
+    "invoice_id": "6dd74d1d-108f-54d0-a84f-4732788183bd",
+    "amount_paise": 70857900,
+    "tds_paise": 60100,
+    "applied_at": "2026-07-31T16:00:00+05:30"
+  },
+  {
+    "id": "749195a1-823c-5a1f-8206-8a99bba57767",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b7246158-31c9-5e92-b000-6af434a95621",
+    "invoice_id": "3e6624ca-08c5-5fc8-8362-b9e43613b705",
+    "amount_paise": 26999100,
+    "tds_paise": 22900,
+    "applied_at": "2026-08-18T16:00:00+05:30"
+  },
+  {
+    "id": "6eebc3d9-f58f-5da6-b501-292161f66bde",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "bfdd3bb0-1c1b-57bc-8ce2-952c0dddabfb",
+    "invoice_id": "78bb3ae8-c2e0-5430-997e-038a3bcff2d1",
+    "amount_paise": 33247800,
+    "tds_paise": 28200,
+    "applied_at": "2026-08-28T16:00:00+05:30"
+  },
+  {
+    "id": "1337d6e8-62b0-5eff-a545-0371ea6c873b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5857414a-e289-518c-8ad6-a45bac6484b1",
+    "invoice_id": "fdba7465-6505-591e-a2c8-daa337f66232",
+    "amount_paise": 49694850,
+    "tds_paise": 42150,
+    "applied_at": "2026-09-11T16:00:00+05:30"
+  },
+  {
+    "id": "70084b0f-0a2e-56dd-bc6c-3057e5c8f3bf",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "4c4f2afc-47fa-5658-9f81-cb1f954a046e",
+    "invoice_id": "8befd5c1-d96f-50bd-94a7-d109e682cec3",
+    "amount_paise": 45037800,
+    "tds_paise": 38200,
+    "applied_at": "2026-10-05T16:00:00+05:30"
+  },
+  {
+    "id": "1db9f265-4387-5793-9f61-4eb3221f06a3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c27e7135-6847-50c5-9f5b-ae9ed6c0df41",
+    "invoice_id": "b0ebc9bc-230c-5e91-a075-629f2999ec30",
+    "amount_paise": 69914700,
+    "tds_paise": 59300,
+    "applied_at": "2026-09-19T16:00:00+05:30"
+  },
+  {
+    "id": "b9c120e6-e6ca-5e14-bb95-9268372b3e38",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "282ea3f6-8abe-5e6e-b348-3acb5184f964",
+    "invoice_id": "81a16e04-5e71-574c-b7c6-a6576ceb741c",
+    "amount_paise": 68264100,
+    "tds_paise": 57900,
+    "applied_at": "2026-10-15T16:00:00+05:30"
+  },
+  {
+    "id": "e24954ac-7ebd-5f41-ae00-31b7094c6d9a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3955d3ba-4a47-51a2-95f7-3e3c1a017939",
+    "invoice_id": "c0cf10a5-a64d-5408-9075-31e1cea96ee4",
+    "amount_paise": 51581250,
+    "tds_paise": 43750,
+    "applied_at": "2026-10-23T16:00:00+05:30"
+  },
+  {
+    "id": "0dd62bfe-8068-59cc-b518-b713326482db",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b67a5aeb-9ccd-5d70-9cbe-3df25ee0fd41",
+    "invoice_id": "e043aba3-216c-59b5-8a62-6a683f0b0de6",
+    "amount_paise": 70622100,
+    "tds_paise": 59900,
+    "applied_at": "2026-10-26T16:00:00+05:30"
+  },
+  {
+    "id": "43b39180-4572-55b2-a3f6-547ee0f09482",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "978ac48f-b65f-52a8-8d21-f8ba7c626c7b",
+    "invoice_id": "55cb6bc8-9bd2-57b8-9534-d357fb49ebc4",
+    "amount_paise": 63779000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-15T16:00:00+05:30"
+  },
+  {
+    "id": "7cb4e9d4-7367-510c-9e58-ae74a81a4c16",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "aea44fdd-fd91-58a6-8a04-389caadd1922",
+    "invoice_id": "2d7fa02c-4f7d-5583-a728-fe44d4c526a0",
+    "amount_paise": 29972000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-24T16:00:00+05:30"
+  },
+  {
+    "id": "dfc4ec15-c5af-59ec-ba3c-71723f52f3a3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "4e970904-65a0-50a5-88c4-7a62b12a7bba",
+    "invoice_id": "0f5b06b8-bebd-5fcd-a08c-793b579cb4fa",
+    "amount_paise": 12508000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-05T16:00:00+05:30"
+  },
+  {
+    "id": "9efec4b2-5058-53f3-a1c2-3abc18fca09d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "dc3eddc8-2f08-5fe2-bc7b-313223e3e992",
+    "invoice_id": "8eecb8dc-bf3a-5f29-8ad0-73cc4d48792f",
+    "amount_paise": 32804000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "d52d0278-7196-5572-873f-ce99f0655f35",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "41585ab3-7a5a-54b8-b23d-764fdbe6e586",
+    "invoice_id": "eac7cfa2-4856-5d9c-8045-bc0485cc818d",
+    "amount_paise": 8083000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-02T16:00:00+05:30"
+  },
+  {
+    "id": "e2e2819b-975f-5ba5-b0b9-ff55142b00dd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "4d4cb6be-ad51-57d5-855d-a9018e6e3487",
+    "invoice_id": "1933fede-b1c7-5792-9bb0-98e27f80d5c8",
+    "amount_paise": 57289000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-06T16:00:00+05:30"
+  },
+  {
+    "id": "9799a67e-b81d-51b2-bba5-e5db6674ee0a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "06424b76-f2e2-5f7d-a977-c3e63cb2b61d",
+    "invoice_id": "a8b1e0d0-8e6b-5b4a-bf1b-f606e33a84ff",
+    "amount_paise": 23895000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-10T16:00:00+05:30"
+  },
+  {
+    "id": "a3c5f08a-2b0b-5659-b47d-ba6e6f703c5f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3bbf49da-5a26-54a1-8823-e8635b6ea5af",
+    "invoice_id": "42f1542b-c24d-51ac-8f03-f1facecfaef1",
+    "amount_paise": 37524000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-01T16:00:00+05:30"
+  },
+  {
+    "id": "5f150217-7479-5eff-b30c-04901cc408e4",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f902af43-dd14-535f-af46-f3c9e9334d73",
+    "invoice_id": "000c3c22-78e4-5a64-9d50-ec3e795daf0a",
+    "amount_paise": 70918000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-31T16:00:00+05:30"
+  },
+  {
+    "id": "2e4d47ff-3acb-5a16-ad42-698f283fafbd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0dcf0b54-67d2-5f90-ac9e-d280345dbfc7",
+    "invoice_id": "8050e47b-4783-52ac-96e6-bffc79a384db",
+    "amount_paise": 38704000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-15T16:00:00+05:30"
+  },
+  {
+    "id": "00181ddb-084c-5225-a33b-1ce8981ac9a7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ea02bdf1-9ac0-5c99-ba71-1b4c5e606991",
+    "invoice_id": "4865756d-f148-5f6d-a78c-0c3dc46aafbc",
+    "amount_paise": 21181000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-19T16:00:00+05:30"
+  },
+  {
+    "id": "f243e017-a1c0-59d0-9adf-e52d6046fda9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "77c872f7-886d-5636-bd8b-47cbf45095e3",
+    "invoice_id": "2c6171a8-bc4f-5968-859c-e97509784097",
+    "amount_paise": 38317500,
+    "tds_paise": 32500,
+    "applied_at": "2026-06-04T16:00:00+05:30"
+  },
+  {
+    "id": "6e79468b-836a-5d44-b106-db44fcace242",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d56286d4-326e-5f2b-b242-c63106c149c4",
+    "invoice_id": "460c5668-3117-5acb-98e7-5a0de11be5e3",
+    "amount_paise": 51168600,
+    "tds_paise": 43400,
+    "applied_at": "2026-06-29T16:00:00+05:30"
+  },
+  {
+    "id": "69aa6984-0ee6-5bde-bbcd-752bf3034c64",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "03b08d0c-443d-5694-9c27-b727e38190ea",
+    "invoice_id": "b150dc76-6414-5445-994f-4e7f17d5af6d",
+    "amount_paise": 59067900,
+    "tds_paise": 50100,
+    "applied_at": "2026-07-10T16:00:00+05:30"
+  },
+  {
+    "id": "71d9ada8-eb9d-573b-89dc-f4124da8d476",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e79e9176-04a8-5da1-b3db-b3b8c0363b6f",
+    "invoice_id": "5d5755f0-0b8f-5bf1-9837-ad6253cd56c1",
+    "amount_paise": 43976700,
+    "tds_paise": 37300,
+    "applied_at": "2026-07-22T16:00:00+05:30"
+  },
+  {
+    "id": "347ef19f-e5d0-5cf8-b791-c985dee9b636",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "bac44837-8dfc-5cfa-9e57-1a4e9c1e4a71",
+    "invoice_id": "395e7b26-9daa-5073-a6ce-06043474345d",
+    "amount_paise": 38789100,
+    "tds_paise": 32900,
+    "applied_at": "2026-07-30T16:00:00+05:30"
+  },
+  {
+    "id": "21af98b6-1156-54c3-a6cc-01383b9c186f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "7c226670-5c99-56a7-9e59-0474807339aa",
+    "invoice_id": "91481b7a-31bb-5c40-b2ba-a1b812ffc724",
+    "amount_paise": 58832100,
+    "tds_paise": 49900,
+    "applied_at": "2026-08-24T16:00:00+05:30"
+  },
+  {
+    "id": "c4bf5c28-0761-524d-b8a8-8b2cca6257bc",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0540718e-4391-5332-b967-ee1baf7f608f",
+    "invoice_id": "d65ae295-2b0d-54e5-ab47-e21986fc3d5f",
+    "amount_paise": 60600600,
+    "tds_paise": 51400,
+    "applied_at": "2026-08-31T16:00:00+05:30"
+  },
+  {
+    "id": "177ec83a-59ae-50f1-935a-b077e6e0fa12",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c636e7a0-25e8-57b3-be2e-744abea58af7",
+    "invoice_id": "f89be928-4f50-54d9-b492-3051715fa8e1",
+    "amount_paise": 28354950,
+    "tds_paise": 24050,
+    "applied_at": "2026-09-14T16:00:00+05:30"
+  },
+  {
+    "id": "28c3d981-f99e-5194-95fb-54c70914cebb",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5279c58f-d1a2-5631-8bb7-cc7715c9f98b",
+    "invoice_id": "d6fc2a1d-bc92-569b-8b63-d1de6a742a81",
+    "amount_paise": 25348500,
+    "tds_paise": 21500,
+    "applied_at": "2026-09-28T16:00:00+05:30"
+  },
+  {
+    "id": "f7a0d93a-6dac-5760-9966-b97fbd727e16",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "70fc2cab-f076-563c-9f5f-84c7dd96917e",
+    "invoice_id": "44a4fcc3-31f4-516a-8139-e58ef737cd9b",
+    "amount_paise": 68912550,
+    "tds_paise": 58450,
+    "applied_at": "2026-10-12T16:00:00+05:30"
+  },
+  {
+    "id": "b973bb4b-5dd7-5942-929d-cb2d9095a5b6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "bd8bbf50-ee7a-545f-812b-e615ddceba9c",
+    "invoice_id": "8c1b907b-c8c3-52a3-a93a-4c49269e5095",
+    "amount_paise": 67026150,
+    "tds_paise": 56850,
+    "applied_at": "2026-10-21T16:00:00+05:30"
+  },
+  {
+    "id": "93784c6d-37d4-58b3-b40f-a9b7704bad64",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ea0df6bd-1d5a-5503-9c61-392c43c5d016",
+    "invoice_id": "f329008f-1818-5f3b-a5dc-58289fdd7e0f",
+    "amount_paise": 16918650,
+    "tds_paise": 14350,
+    "applied_at": "2026-10-30T16:00:00+05:30"
+  },
+  {
+    "id": "1ce4ba0b-1688-59b9-afe9-9ff46307a609",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "98853d54-115c-5c00-9c1d-8ed34b2ec3fc",
+    "invoice_id": "03d82171-f110-5442-a4af-c9072f181575",
+    "amount_paise": 32422500,
+    "tds_paise": 27500,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "8458e397-b3c3-52ba-b081-b1ca4670cbc2",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a1583269-3753-5242-8f21-36b7bd00e75b",
+    "invoice_id": "ee2ff3aa-1620-5336-8dd3-d0493e9840d9",
+    "amount_paise": 20886000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-22T16:00:00+05:30"
+  },
+  {
+    "id": "1733f027-47ff-5361-9a0a-70b82e00c075",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0920e66b-e216-51a5-a630-f6da6629d2cb",
+    "invoice_id": "2088d32b-84cc-5f6b-9ae8-d58b96e85f92",
+    "amount_paise": 24780000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-06T16:00:00+05:30"
+  },
+  {
+    "id": "fb2296ae-d82b-5d18-8b99-21a2acf95aff",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "01265dd3-e263-5dbf-9bb9-ab244e346e8a",
+    "invoice_id": "f404cae4-c210-57ce-81cf-ccac8727bb79",
+    "amount_paise": 25960000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-18T16:00:00+05:30"
+  },
+  {
+    "id": "a71b0da0-2c6b-5f40-8739-76846c0c9de3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "961d20d9-5ac5-55b3-9ad5-306e5a7efe33",
+    "invoice_id": "70eac0e3-a789-5111-8aaf-ee888c01a48d",
+    "amount_paise": 36639000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-11T16:00:00+05:30"
+  },
+  {
+    "id": "1c6af9d7-443f-530f-ae71-ed33c906a2da",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3aaf51c1-7052-54bf-ada4-0e929837e422",
+    "invoice_id": "97067c16-625f-581b-84c6-b806aab278b4",
+    "amount_paise": 23954000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-05T16:00:00+05:30"
+  },
+  {
+    "id": "c8673a57-8ba7-588a-af30-8cb847340e86",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "177e82c5-4169-5374-854f-9b624d280b39",
+    "invoice_id": "ec0233b1-f76b-5cc0-9d6f-8ce2062b5178",
+    "amount_paise": 36167000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-11T16:00:00+05:30"
+  },
+  {
+    "id": "fa6692df-b25e-53c1-93b3-590b0523a37b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "15c062e1-3964-505b-8e38-00b4f0203584",
+    "invoice_id": "f22fff16-679a-5057-a2f4-7fa4184a826e",
+    "amount_paise": 57702000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-28T16:00:00+05:30"
+  },
+  {
+    "id": "ef358aa2-3d3b-5fba-976e-448ccee8411d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b57dd76c-3c5a-58ba-b28b-9a23e1361bc4",
+    "invoice_id": "44d0d133-4866-5f0c-a48e-7381e697ebf7",
+    "amount_paise": 12508000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-24T16:00:00+05:30"
+  },
+  {
+    "id": "582d5d38-aa68-53c0-b0d2-618eff048810",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5355b4c1-cf94-5039-8a66-50a70b2b58f3",
+    "invoice_id": "ce0fc71a-b6ae-58a5-8614-753883b091b6",
+    "amount_paise": 53277000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-22T16:00:00+05:30"
+  },
+  {
+    "id": "0db13240-72bf-5341-a619-0ec75e1bdfe1",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "98c404ed-4d4b-51a5-a170-4f841ed8d275",
+    "invoice_id": "f44eca07-21f7-586a-8cc5-66615f08ca9c",
+    "amount_paise": 17523000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-26T16:00:00+05:30"
+  },
+  {
+    "id": "42696d36-52d8-5322-9f3b-a0ee0ed0f695",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ac807820-caf8-5fe2-af51-dbf6b82fb163",
+    "invoice_id": "4c2fc239-3768-5fe9-a1d6-3fac0d820bc0",
+    "amount_paise": 74281000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-03T16:00:00+05:30"
+  },
+  {
+    "id": "861c59e3-d973-57dc-8145-2844ee66cf99",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "744468ce-5b29-541b-9a63-efdef4523b53",
+    "invoice_id": "42375f95-0f19-500f-a64d-370540a95d7d",
+    "amount_paise": 15222000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "e059cc84-85de-554b-87d1-5002a15b7c96",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0023e136-0d91-5afb-8e6f-af5330bc1d5a",
+    "invoice_id": "d714329b-4516-50ba-9a7f-3dd81b3d8ab1",
+    "amount_paise": 11774000,
+    "tds_paise": 203000,
+    "applied_at": "2026-07-06T16:00:00+05:30"
+  },
+  {
+    "id": "04f7ecb2-67ce-5e22-b07d-638fc64c95fd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d0a079d9-e2ae-50ab-b7dd-d04334f82198",
+    "invoice_id": "c227390e-5f10-5858-9e50-872f12c07c62",
+    "amount_paise": 52954000,
+    "tds_paise": 913000,
+    "applied_at": "2026-07-20T16:00:00+05:30"
+  },
+  {
+    "id": "5e7c988f-8b9e-59c5-b75a-849cb6adb718",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "8fd0eba5-7a57-5b21-89a4-84cf961f8d4c",
+    "invoice_id": "dc0bc62c-57c3-58f4-abb3-930d6dbbd1f5",
+    "amount_paise": 35496000,
+    "tds_paise": 612000,
+    "applied_at": "2026-08-17T16:00:00+05:30"
+  },
+  {
+    "id": "b30a015e-834f-559a-8a2e-07cbb5aacefd",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d3d6ebec-e981-5505-83df-b1b2b1e98a1f",
+    "invoice_id": "28e392ac-f8fb-5b8d-b68e-89c5f5cc254b",
+    "amount_paise": 60378000,
+    "tds_paise": 1041000,
+    "applied_at": "2026-09-01T16:00:00+05:30"
+  },
+  {
+    "id": "c6d81b52-c00d-5b62-a65e-1b42b67ad4e6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "cdea7e09-5d5b-5a68-8d80-d928b78d2cfc",
+    "invoice_id": "b0308ad6-7de4-58a7-ba3c-c29d3adb7e38",
+    "amount_paise": 17400000,
+    "tds_paise": 300000,
+    "applied_at": "2026-08-24T16:00:00+05:30"
+  },
+  {
+    "id": "946beb79-1918-5e04-9192-475be6ae794c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "66cfffed-4354-52e3-9b71-835e0f649a74",
+    "invoice_id": "5e0d2819-b9b5-5099-86cb-11eb0eb5045b",
+    "amount_paise": 54694000,
+    "tds_paise": 943000,
+    "applied_at": "2026-09-02T16:00:00+05:30"
+  },
+  {
+    "id": "102db8db-476a-56aa-81cd-b249be529966",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "09f8c02b-52d2-5a0b-9374-75c480bb2708",
+    "invoice_id": "6be9aa67-abb7-5ba1-9399-8f6336625df9",
+    "amount_paise": 16414000,
+    "tds_paise": 283000,
+    "applied_at": "2026-09-25T16:00:00+05:30"
+  },
+  {
+    "id": "c432675e-7306-5186-9d68-d026edfd0f21",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "cda6bb0e-2424-523d-b2ca-266bb18efc9e",
+    "invoice_id": "daa43515-fdb6-5d0e-9c29-ddc5e5c27ecc",
+    "amount_paise": 33176000,
+    "tds_paise": 572000,
+    "applied_at": "2026-10-17T16:00:00+05:30"
+  },
+  {
+    "id": "23657748-5617-5a78-bcb4-aa2ac2c4de9e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3ab0680c-20ce-56b0-94ac-b97e31bd2a85",
+    "invoice_id": "697ae924-415d-5b7c-9efe-6d589306b7d9",
+    "amount_paise": 19372000,
+    "tds_paise": 334000,
+    "applied_at": "2026-11-02T16:00:00+05:30"
+  },
+  {
+    "id": "1fabf14c-cd0e-52a5-aafa-73ec2bc37cb9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "86ae1216-ab0e-5fb1-a28c-fa96b23c046e",
+    "invoice_id": "8a85e247-ba67-58fd-93c7-dca42ca30c09",
+    "amount_paise": 51156000,
+    "tds_paise": 882000,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "6bfa4061-4a90-5d72-8287-28a3c466a91a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3406c99e-5dd6-5723-986e-a59668402be4",
+    "invoice_id": "f2e31106-6372-533c-a10d-10a925d273d9",
+    "amount_paise": 57710000,
+    "tds_paise": 995000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "c492e54a-850c-5f50-8ccc-fd183f4efaf3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "bdd4cb38-ead4-59e9-8896-5a70bb3b914c",
+    "invoice_id": "fd5acb74-2779-5720-8045-1e5d03720d2e",
+    "amount_paise": 62540000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-04T16:00:00+05:30"
+  },
+  {
+    "id": "741a152d-a90b-52e6-9870-0f5fdf659c14",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "75dfe420-d3a2-5266-aef8-1c1930574d8d",
+    "invoice_id": "7e30df00-8de3-5191-aab3-8db53dfcce8e",
+    "amount_paise": 19175000,
+    "tds_paise": 0,
+    "applied_at": "2026-06-17T16:00:00+05:30"
+  },
+  {
+    "id": "1eac14cb-6e14-5e75-9a79-c9aa9d4a3c37",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "37a5572a-4801-55f7-b9e4-f49325528209",
+    "invoice_id": "93972685-893d-5239-83fd-ab7a9d83cfbb",
+    "amount_paise": 56699000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-01T16:00:00+05:30"
+  },
+  {
+    "id": "797ab597-44cd-5239-8382-1778d617e005",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ecb4f404-a374-5fe6-b5b5-5bf384266a29",
+    "invoice_id": "2d0c6266-bedb-5254-929f-3fc1ba1b31f8",
+    "amount_paise": 50268000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-14T16:00:00+05:30"
+  },
+  {
+    "id": "842f32c4-44b5-5695-aa61-45b03a74e65e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "b972b70e-d19a-5ffa-b5f5-25880ff5ef3c",
+    "invoice_id": "0f368e3a-cc84-5cb2-97f5-201091a65412",
+    "amount_paise": 65136000,
+    "tds_paise": 0,
+    "applied_at": "2026-07-27T16:00:00+05:30"
+  },
+  {
+    "id": "7562bf97-2e83-5769-bada-9b7b1960b138",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "ea4fe249-1add-5f84-9f32-b13058b943f6",
+    "invoice_id": "63759d8c-b3f9-5394-9545-5bd079dc0503",
+    "amount_paise": 73691000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-01T16:00:00+05:30"
+  },
+  {
+    "id": "8fe219a6-1ae0-59ee-9745-088d8ef3e857",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "78b3a4b8-6e7c-5fd7-aca1-093c61416132",
+    "invoice_id": "94b1258b-6bae-5200-8b71-cca1c02dd9fe",
+    "amount_paise": 39235000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-18T16:00:00+05:30"
+  },
+  {
+    "id": "3121d812-7d60-5490-b027-94b4df3b215e",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1db4b521-2095-57d6-b212-b3540e969761",
+    "invoice_id": "474dd48c-ac2a-5734-9b9c-2896b3193952",
+    "amount_paise": 72393000,
+    "tds_paise": 0,
+    "applied_at": "2026-08-25T16:00:00+05:30"
+  },
+  {
+    "id": "df6526fc-be02-5d43-9db1-ee9d5b324c95",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "643d957f-c80d-5ef9-be4c-ec85461ff7bc",
+    "invoice_id": "77b2606f-13f6-56b7-b66c-0862f0d0f09b",
+    "amount_paise": 46905000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-15T16:00:00+05:30"
+  },
+  {
+    "id": "7d579132-a59d-5f77-b4ed-548092d44659",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5840d5de-8f6b-5ce1-8faa-a572422c4808",
+    "invoice_id": "d9ff29a5-f10d-5f84-82c0-2329fefd41ac",
+    "amount_paise": 67260000,
+    "tds_paise": 0,
+    "applied_at": "2026-09-17T16:00:00+05:30"
+  },
+  {
+    "id": "5b2a3b84-3b5b-5baf-96e5-2c5fa69d5e62",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "aa62f06d-3580-54f2-b1fa-c12ff1fab1dc",
+    "invoice_id": "1885d142-bb2f-5ae6-9d0b-488d15fdde8d",
+    "amount_paise": 9027000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-08T16:00:00+05:30"
+  },
+  {
+    "id": "85761ccc-6b4e-5442-89fd-39aecf60c295",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e4702b2a-48db-5e7d-abd1-f399f7aa9f75",
+    "invoice_id": "58a8a212-bc7f-5832-a7db-7b965122d4ce",
+    "amount_paise": 74104000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-14T16:00:00+05:30"
+  },
+  {
+    "id": "76be6099-2405-5453-87dd-35724a02f0c3",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9bd135f5-ead3-510f-816e-7ceb8af02549",
+    "invoice_id": "f3f46283-c073-59f1-800f-4ab0478e03fb",
+    "amount_paise": 59059000,
+    "tds_paise": 0,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "31a6f3f5-0fe1-5d35-b3d6-3d6e3c52c5ba",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "6cbaf951-9eb2-590c-98a7-f770446712a2",
+    "invoice_id": "157024f1-e14b-5187-9560-3f4fb4adaa48",
+    "amount_paise": 25370000,
+    "tds_paise": 0,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "7b9dedc9-4196-51b6-933a-2d95b0bc389c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "051dd223-c6a0-5291-85ba-91d5dca37464",
+    "invoice_id": "8823c440-cce8-5ca5-856d-822a1998ea31",
+    "amount_paise": 55680000,
+    "tds_paise": 960000,
+    "applied_at": "2026-07-13T16:00:00+05:30"
+  },
+  {
+    "id": "c006ff99-979e-54c9-bfb1-1c6e9771cd57",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "f6d5b5b3-abd8-5858-8dd9-3be84ebad9d9",
+    "invoice_id": "e2b86097-ccfc-5f06-9c81-661f74f8854d",
+    "amount_paise": 28594000,
+    "tds_paise": 493000,
+    "applied_at": "2026-07-13T16:00:00+05:30"
+  },
+  {
+    "id": "f36aa773-6c44-5ec3-a655-7db51c08297f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "d1bbb954-db15-5716-8371-aae9e52bee7f",
+    "invoice_id": "2a0c98b6-447a-517e-9871-133c6de3702c",
+    "amount_paise": 34858000,
+    "tds_paise": 601000,
+    "applied_at": "2026-07-31T16:00:00+05:30"
+  },
+  {
+    "id": "c836a87e-98f6-5dc4-aacc-87b797e15e7c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "72a3cd24-861b-550a-8c93-2bb6dd08e5a2",
+    "invoice_id": "1e417ca0-34b2-595c-b6c0-249ea82717d1",
+    "amount_paise": 64844000,
+    "tds_paise": 1118000,
+    "applied_at": "2026-08-07T16:00:00+05:30"
+  },
+  {
+    "id": "0311a3d7-0dd2-55cc-9c7e-95ec5e9b633d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3206a5b4-73ad-5ce7-a639-97541769d5f5",
+    "invoice_id": "23143552-a969-5899-923b-47653527f571",
+    "amount_paise": 69774000,
+    "tds_paise": 1203000,
+    "applied_at": "2026-08-25T16:00:00+05:30"
+  },
+  {
+    "id": "adb53486-3767-5eb1-87e8-0463ec60ead2",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e72bbe30-d705-566b-9ba2-b4335d1bf5bf",
+    "invoice_id": "b9189ca4-233d-5332-a38d-83104c8f1b71",
+    "amount_paise": 24128000,
+    "tds_paise": 416000,
+    "applied_at": "2026-09-03T16:00:00+05:30"
+  },
+  {
+    "id": "c76e13a0-b846-5972-baf3-9353c021bf0f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "649d083c-8384-594e-ab22-f06c2ddaef85",
+    "invoice_id": "70d43bf2-bc9a-576a-9c7d-6a869a2743e3",
+    "amount_paise": 19256000,
+    "tds_paise": 332000,
+    "applied_at": "2026-09-05T16:00:00+05:30"
+  },
+  {
+    "id": "745d31f4-5752-537b-9f81-a855fe40be9b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "da284be1-9221-5d3c-8165-89801da1676b",
+    "invoice_id": "a12dc6b8-3a5a-58fa-a14a-eb24ae86a614",
+    "amount_paise": 18908000,
+    "tds_paise": 326000,
+    "applied_at": "2026-09-25T16:00:00+05:30"
+  },
+  {
+    "id": "14278981-09f5-5c8c-b3b1-c820a5b0cf6b",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "a8d01bff-6a63-5f95-ad24-c6df568bfdea",
+    "invoice_id": "c6f9753c-27a9-5175-8fc2-517050528b53",
+    "amount_paise": 38918000,
+    "tds_paise": 671000,
+    "applied_at": "2026-10-19T16:00:00+05:30"
+  },
+  {
+    "id": "56c58af6-0b1c-5ff9-9a27-9792e4c470c4",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9d6fbd5e-9ebf-57e0-abaa-acc7cd113371",
+    "invoice_id": "d3eec55a-7e80-565b-9ddf-d32ce7729028",
+    "amount_paise": 51272000,
+    "tds_paise": 884000,
+    "applied_at": "2026-10-19T16:00:00+05:30"
+  },
+  {
+    "id": "ce26078d-d272-5089-91cf-5d19992d00ad",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "fe38013b-244b-525f-ad9d-ce2eb8241c5d",
+    "invoice_id": "f797cced-3ad9-5a65-82df-532b7e8582f3",
+    "amount_paise": 24592000,
+    "tds_paise": 424000,
+    "applied_at": "2026-11-03T16:00:00+05:30"
+  },
+  {
+    "id": "f60ed350-394d-5c65-8f35-3c01ce3aa62c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "952dfb00-ed45-582a-8a21-6cbf9eee44a1",
+    "invoice_id": "069e9c56-4444-5fce-8873-cab1a4ea05dc",
+    "amount_paise": 20358000,
+    "tds_paise": 351000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "f235aec9-4f10-5cec-8f96-6d974529de05",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "89b042a3-cc0b-59cb-bbf8-491a774de476",
+    "invoice_id": "4c1111b7-a73c-5dbe-acd8-ad4e4b514b57",
+    "amount_paise": 40262850,
+    "tds_paise": 34150,
+    "applied_at": "2026-06-24T16:00:00+05:30"
+  },
+  {
+    "id": "8204c4bc-af04-583c-b38e-b59803fd7aad",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1aad7234-0835-5116-97bd-c09e8ee7bd8b",
+    "invoice_id": "cc774109-c78d-577c-8cd1-5741aa5e5635",
+    "amount_paise": 20043000,
+    "tds_paise": 17000,
+    "applied_at": "2026-07-23T16:00:00+05:30"
+  },
+  {
+    "id": "4b4c3649-b2b6-59dd-b39d-8e62c803c326",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "787043f1-0172-530a-911f-fed1b11193de",
+    "invoice_id": "ea2bca78-cd7e-57a3-9ac8-a2364b0190af",
+    "amount_paise": 37020600,
+    "tds_paise": 31400,
+    "applied_at": "2026-07-28T16:00:00+05:30"
+  },
+  {
+    "id": "c7516a1d-2521-5aed-b2c5-b00ecd9d0ab6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "63b30571-44d7-5e8f-a83b-95b01df351c8",
+    "invoice_id": "dc27a877-2366-5c25-a3bc-d4aa9e0ac3e4",
+    "amount_paise": 26586450,
+    "tds_paise": 22550,
+    "applied_at": "2026-07-28T16:00:00+05:30"
+  },
+  {
+    "id": "9a11b42e-cd37-5511-b7c1-fc123c1761a7",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "17dbc833-75e2-57e8-b84d-8f3bfd6ea48d",
+    "invoice_id": "154052f2-2fe1-5620-91a6-de583ac58d66",
+    "amount_paise": 16329150,
+    "tds_paise": 13850,
+    "applied_at": "2026-09-18T16:00:00+05:30"
+  },
+  {
+    "id": "616638f5-f057-5fd0-96b6-1c1c2d31969a",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "fe1bac9a-48ef-5ed7-a2f4-504bd3daea61",
+    "invoice_id": "2691325d-2987-55f4-8dd5-25c96ded4d15",
+    "amount_paise": 52996050,
+    "tds_paise": 44950,
+    "applied_at": "2026-08-12T16:00:00+05:30"
+  },
+  {
+    "id": "a1ac1dca-9289-57e2-b40e-71e99e643be1",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "c8d28746-873b-51f4-ad03-33777d66e48b",
+    "invoice_id": "c8f72947-2f87-5772-8936-d84b744b4ca5",
+    "amount_paise": 12792150,
+    "tds_paise": 10850,
+    "applied_at": "2026-08-29T16:00:00+05:30"
+  },
+  {
+    "id": "873b34ce-a408-528a-913f-fb59bfe6808d",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e2d4b57c-a0c9-5349-955c-da9c315841e7",
+    "invoice_id": "b8c4a31e-ffee-5545-9f4a-4994ed17b384",
+    "amount_paise": 71211600,
+    "tds_paise": 60400,
+    "applied_at": "2026-11-11T16:00:00+05:30"
+  },
+  {
+    "id": "0d06c9aa-d7d2-5f50-beb6-6ea72f4080c8",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "cdd704ae-8a24-55a4-b044-5ba81a063561",
+    "invoice_id": "9aabf5fd-5a06-5672-a6c2-515b936d8c68",
+    "amount_paise": 23462100,
+    "tds_paise": 19900,
+    "applied_at": "2026-10-26T16:00:00+05:30"
+  },
+  {
+    "id": "dc52347f-336b-54e0-b353-a0994cd17e43",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "e43b7294-bd89-5438-9063-6b0d8dca27f5",
+    "invoice_id": "31394ae0-bc85-588e-b73c-971404c58018",
+    "amount_paise": 17920800,
+    "tds_paise": 15200,
+    "applied_at": "2026-11-02T16:00:00+05:30"
+  },
+  {
+    "id": "91d18899-72be-5469-9573-b8e687fd915c",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "0eb76855-a857-53e9-8708-ede9900ae14d",
+    "invoice_id": "cbd223fa-8550-50a2-823d-b6041ec35be0",
+    "amount_paise": 74124000,
+    "tds_paise": 1278000,
+    "applied_at": "2026-07-23T16:00:00+05:30"
+  },
+  {
+    "id": "25a93d4f-2fa0-599a-b5ed-533485b5cf14",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "463fa588-9a1b-5948-8026-bbaa760b9558",
+    "invoice_id": "b303bab4-a12b-506c-be31-cd60534e94a4",
+    "amount_paise": 10440000,
+    "tds_paise": 180000,
+    "applied_at": "2026-08-10T16:00:00+05:30"
+  },
+  {
+    "id": "7fb56e16-9c4f-527e-8e46-ae9de1c45d52",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "5de183f1-244e-5577-bba1-a01517a862b2",
+    "invoice_id": "b5d57820-5493-51f7-a905-f10e31b684b5",
+    "amount_paise": 38628000,
+    "tds_paise": 666000,
+    "applied_at": "2026-08-28T16:00:00+05:30"
+  },
+  {
+    "id": "f6e09cff-981c-5487-a852-9d024ac5eec2",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "79f15974-f18b-55f3-a15d-36b96eb7294d",
+    "invoice_id": "49de8942-443e-507c-b320-4916e4c0ec33",
+    "amount_paise": 12702000,
+    "tds_paise": 219000,
+    "applied_at": "2026-09-07T16:00:00+05:30"
+  },
+  {
+    "id": "cba75093-afab-5e65-ab65-6925d0513c91",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "3b06eade-6365-567e-8d5a-0994bbb84ac7",
+    "invoice_id": "b34aab0a-f7a7-509f-b4c6-80b4daabb6c4",
+    "amount_paise": 59740000,
+    "tds_paise": 1030000,
+    "applied_at": "2026-09-25T16:00:00+05:30"
+  },
+  {
+    "id": "0bf2db7b-25e9-5a53-8720-02f99b7848f6",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "fe93a8c9-832c-56e4-9310-20cfb6a95233",
+    "invoice_id": "8ce9ac3b-4927-52ab-9ef4-8767dd424d03",
+    "amount_paise": 33060000,
+    "tds_paise": 570000,
+    "applied_at": "2026-10-05T16:00:00+05:30"
+  },
+  {
+    "id": "632a9a78-e6e2-5e93-a86c-5923607a8f95",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "99c339d7-107b-53d4-ab3c-4df075f49c7f",
+    "invoice_id": "69093ad1-7e08-541f-8425-d7dc370d6310",
+    "amount_paise": 13978000,
+    "tds_paise": 241000,
+    "applied_at": "2026-11-03T16:00:00+05:30"
+  },
+  {
+    "id": "65e74059-5c8c-54d6-863e-c77bd0169dc0",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9c0c9d23-f933-5d75-ab46-341079815b7c",
+    "invoice_id": "7a011ebd-2729-5c37-baa6-1e684c432a02",
+    "amount_paise": 40890000,
+    "tds_paise": 705000,
+    "applied_at": "2026-10-28T16:00:00+05:30"
+  },
+  {
+    "id": "d65e832e-722b-5b71-a865-3453571b6124",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "9dfc0f4a-85b8-5330-b8d0-c56b393621fe",
+    "invoice_id": "574e624f-ba6e-5ba8-9bff-1ce1facebe10",
+    "amount_paise": 65366000,
+    "tds_paise": 1127000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  },
+  {
+    "id": "f213b4fc-171a-5738-b6f0-a2ba2520fe03",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "payment_id": "1cd38284-643e-532f-92a4-a9462f7a2411",
+    "invoice_id": "c8ca04ff-99e4-527d-815d-cc88a7833dbd",
+    "amount_paise": 16182000,
+    "tds_paise": 279000,
+    "applied_at": "2026-11-16T16:00:00+05:30"
+  }
+]

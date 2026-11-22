@@ -1,0 +1,43 @@
+{
+  "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+  "legal_name": "Kaveri Packaging & Distribution Pvt Ltd (synthetic)",
+  "trade_name": "Kaveri Pack",
+  "industry": "B2B packaging materials distributor",
+  "state": "Maharashtra",
+  "gstin": "27QFICL2346K1ZJ",
+  "pan": "QFICL2346K",
+  "timezone": "Asia/Kolkata",
+  "base_currency": "INR",
+  "annual_turnover_paise": 24000000000,
+  "employees": 46,
+  "users": [
+    {
+      "user_id": "a6274c91-7aba-59a3-a486-821065970e0f",
+      "name": "Owner (synthetic)",
+      "email": "owner@kaveri.example",
+      "role": "finance_controller",
+      "persona": "Owner / approver"
+    },
+    {
+      "user_id": "5dc2d47a-9fa4-574c-a23e-d7ee72ae2135",
+      "name": "Accountant (synthetic)",
+      "email": "accounts@kaveri.example",
+      "role": "accountant",
+      "persona": "Accountant / preparer"
+    },
+    {
+      "user_id": "b123457e-bac6-5978-9e52-b68b6032ca37",
+      "name": "CA auditor (synthetic)",
+      "email": "audit@kaveri.example",
+      "role": "auditor",
+      "persona": "Read-only reviewer"
+    },
+    {
+      "user_id": "5bdc88de-ed14-5a63-904d-02dca55afa99",
+      "name": "Sales coordinator (synthetic)",
+      "email": "sales@kaveri.example",
+      "role": "member",
+      "persona": "No cash forecast access"
+    }
+  ]
+}

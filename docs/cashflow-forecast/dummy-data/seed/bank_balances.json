@@ -1,0 +1,29 @@
+[
+  {
+    "id": "a6b20868-7c39-5aed-b73c-cbd7d548bcf9",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "bank_account_id": "733058b9-e15c-5231-948d-e43190dd983b",
+    "balance_paise": 435148250,
+    "as_of": "2026-11-20T18:30:00+05:30",
+    "source": "bank_statement",
+    "source_ref": "statement:733058b9-e15c-5231-948d-e43190dd983b:2026-11-20"
+  },
+  {
+    "id": "d2444e2b-b086-5a19-b9d8-f1b3acaef5a0",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "bank_account_id": "497a6b94-8336-5fe6-9495-75cd1353d1a2",
+    "balance_paise": 51894934,
+    "as_of": "2026-11-20T18:30:00+05:30",
+    "source": "bank_statement",
+    "source_ref": "statement:497a6b94-8336-5fe6-9495-75cd1353d1a2:2026-11-20"
+  },
+  {
+    "id": "874f884b-163f-50a8-81f2-d3085a65442f",
+    "tenant_id": "7f3c2a10-5b8e-4c1d-9a6f-0c2e4d8b1a01",
+    "bank_account_id": "7f35391e-8d29-5c33-86dc-fd1fe922774a",
+    "balance_paise": 0,
+    "as_of": "2026-11-20T18:30:00+05:30",
+    "source": "bank_statement",
+    "source_ref": "statement:7f35391e-8d29-5c33-86dc-fd1fe922774a:2026-11-20"
+  }
+]

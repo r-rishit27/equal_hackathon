@@ -44,6 +44,7 @@ from .routers import auth as auth_routes, bank_logos, bill_approvals, bill_attac
 from .routers.copilot_chat import router as copilot_chat_router
 from .routers.copilot import router as copilot_router
 from .routers.inventory import router as inventory_router
+from .routers.cash_forecast import router as cash_forecast_router
 from .routers.admin import router as admin_router
 from .routers.agent import router as agent_router
 from .routers.agent_hub import router as agents_router
@@ -157,6 +158,7 @@ for _router_module in (
 app.include_router(copilot_router)
 app.include_router(copilot_chat_router)
 app.include_router(inventory_router)
+app.include_router(cash_forecast_router, dependencies=[Depends(require_service("cash_forecast"))])
 app.include_router(tally_agent_router)
 app.include_router(tds_router, dependencies=[Depends(require_service("tds"))])
 app.include_router(fx_router, dependencies=[Depends(require_service("fx"))])
