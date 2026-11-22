@@ -4,7 +4,7 @@ Run the commands below in Windows PowerShell from the repository root. The compl
 
 ## Demo sign-in
 
-Open [Reckon.ai sign-in](http://127.0.0.1:5174/login). On the local Vite development server, choose a role in **Demo account**, then click **Sign In**. The selector fills the form and the backend authenticates the account. Production builds use manual sign-in. Usernames are case-sensitive. These four accounts already exist in the configured hackathon database.
+Open [Reckon.ai sign-in](http://127.0.0.1:5174/login). On the local Vite development server, choose a role in **Demo account**, then click **Sign In**. The selector fills the form and the backend authenticates the account. On the deployed sign-in page, select the same role and enter its password from the table below. Usernames are case-sensitive. These four accounts already exist in the configured hackathon database.
 
 | Username | Password | Role | Workspace |
 | --- | --- | --- | --- |

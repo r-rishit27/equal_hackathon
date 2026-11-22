@@ -232,30 +232,26 @@ export default function LoginPage({ login, loginWithSso }: Pick<ReturnType<typeo
             {step === 'login' && (
               <>
               <form className="lp__form" onSubmit={e => { e.preventDefault(); handleLogin() }}>
-                {import.meta.env.DEV && (
-                  <div className="lp__field">
-                    <label className="lp__lbl" htmlFor="demo-account">Demo account</label>
-                    <select id="demo-account" className="lp__inp" value="" disabled={loading}
-                      onChange={event => {
-                        const account = [
-                          ['vibhanshu', 'vibhanshu123'], ['ravi', 'ravi123'],
-                          ['arjun', 'arjun123'], ['finance', 'finance123'],
-                        ].find(([name]) => name === event.target.value)
-                        if (account) {
-                          setUsername(account[0])
-                          setPassword(account[1])
-                          setShow(false)
-                          setError('')
-                        }
-                      }}>
-                      <option value="">Choose a role to fill the form</option>
-                      <option value="vibhanshu">Admin (vibhanshu)</option>
-                      <option value="ravi">Member (ravi)</option>
-                      <option value="arjun">Approver (arjun)</option>
-                      <option value="finance">Finance controller (finance)</option>
-                    </select>
-                  </div>
-                )}
+                <div className="lp__field">
+                  <label className="lp__lbl" htmlFor="demo-account">Demo account</label>
+                  <select id="demo-account" className="lp__inp" value={['vibhanshu', 'ravi', 'arjun', 'finance'].includes(username) ? username : ''} disabled={loading}
+                    onChange={event => {
+                      const selected = event.target.value
+                      setUsername(selected)
+                      const localPasswords: Record<string, string> = import.meta.env.DEV
+                        ? { vibhanshu: 'vibhanshu123', ravi: 'ravi123', arjun: 'arjun123', finance: 'finance123' }
+                        : {}
+                      setPassword(localPasswords[selected] ?? '')
+                      setShow(false)
+                      setError('')
+                    }}>
+                    <option value="">Choose a demo role</option>
+                    <option value="vibhanshu">Admin (vibhanshu)</option>
+                    <option value="ravi">Member (ravi)</option>
+                    <option value="arjun">Approver (arjun)</option>
+                    <option value="finance">Finance controller (finance)</option>
+                  </select>
+                </div>
                 <div className="lp__field">
                   <label className="lp__lbl" htmlFor="reckon-login-username">Username</label>
                   <input id="reckon-login-username" className="lp__inp" placeholder="e.g. admin" value={username}
