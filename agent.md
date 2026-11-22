@@ -1,10 +1,10 @@
-﻿# Reckon.ai hackathon local runbook
+# Reckon.ai hackathon local runbook
 
 Run the commands below in Windows PowerShell from the repository root. The complete demo uses four processes sharing one hackathon PostgreSQL database. Vendor document reconciliation runs inside the main API. Nova billing reconciliation has its own API.
 
 ## Demo sign-in
 
-Open [Reckon.ai sign-in](http://127.0.0.1:5174/login). Usernames are case-sensitive. These four accounts already exist in the configured hackathon database.
+Open [Reckon.ai sign-in](http://127.0.0.1:5174/login). On the local Vite development server, choose a role in **Demo account**, then click **Sign In**. The selector fills the form and the backend authenticates the account. Production builds use manual sign-in. Usernames are case-sensitive. These four accounts already exist in the configured hackathon database.
 
 | Username | Password | Role | Workspace |
 | --- | --- | --- | --- |
@@ -34,7 +34,7 @@ if (!(Test-Path .env)) { Copy-Item .env.example .env }
 notepad .env
 ```
 
-Set `DB_URL` to the connection string for that demo database. The API, Nova and the pipeline all read the root `.env`. Supply the team's local `JWT_SECRET` and existing encryption keys privately. For Nova, `NOVA_KEY_ENCRYPTION_KEY` must match the key used to save the workspace's Nova credentials. Check Integrations → Nova and the [vendor mapping](lendix/nova_vendor_mapping.json) before demonstrating a populated ledger. For OCR or AI extraction, configure the provider selected in `.env`. For live WhatsApp delivery, configure the sender in Integrations and use a publicly reachable signed Twilio webhook. Local sign-in and viewing saved data do not test provider connectivity.
+Use the [root environment template](.env.example) as the configuration reference. Set `DB_URL` to the connection string for that demo database. The API, Nova and the pipeline all read the root `.env`. Supply the team's local `JWT_SECRET` and existing encryption keys privately. For Nova, `NOVA_KEY_ENCRYPTION_KEY` must match the key used to save the workspace's Nova credentials. Check Integrations → Nova and the [vendor mapping](lendix/nova_vendor_mapping.json) before demonstrating a populated ledger. For OCR or AI extraction, configure the provider selected in `.env`. For live WhatsApp delivery, configure the sender in Integrations and use a publicly reachable signed Twilio webhook. Local sign-in and viewing saved data do not test provider connectivity.
 
 ## Install dependencies
 

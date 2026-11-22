@@ -1,5 +1,7 @@
 # Reckon.ai
 
+[Open the Reckon.ai application](https://www.reckon.collabup.co.in/)
+
 > Finance operations for payables, receivables, and working capital.
 
 Reckon.ai brings invoice capture, vendor reconciliation, tax review, approvals, payouts, cash application, and cash flow forecasting into one workspace. This README describes the code on `dev`, including the tenant-licensed workflows and deployment configurations checked into the repository.
