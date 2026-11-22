@@ -226,9 +226,17 @@
 
 .cfm-card__value {
   display: flex;
-  flex-wrap: wrap;
-  gap: 4px 8px;
-  align-items: baseline;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+}
+
+.cfm-card__of {
+  margin-top: -6px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .cfm-card__amount {
@@ -388,6 +396,7 @@
 
 .cfm__table {
   width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
   font-size: var(--fs-sm);
   font-variant-numeric: tabular-nums;
@@ -407,6 +416,9 @@
 
 .cfm__table td {
   padding: 7px 12px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   border-bottom: 1px solid var(--line-100);
   color: var(--ink-800);
 }
@@ -453,16 +465,6 @@
   font-weight: var(--fw-semibold);
 }
 
-.cfm__pill {
-  margin-left: 6px;
-  padding: 1px 6px;
-  border-radius: var(--r-sm);
-  background: var(--surface-2);
-  color: var(--ink-600);
-  font-size: var(--fs-xs);
-  font-weight: var(--fw-normal);
-  animation: cfm-blink 1.8s var(--ease, ease) infinite;
-}
 
 .cfm__split {
   display: grid;
@@ -492,6 +494,7 @@
 
 .cfm__split-legend {
   display: flex;
+  white-space: nowrap;
   justify-content: space-between;
   font-variant-numeric: tabular-nums;
 }
@@ -568,6 +571,7 @@
 }
 
 .cfm-card__today {
+  flex: none;
   margin-left: auto;
   padding: 2px 6px;
   border-radius: var(--r-sm);
@@ -598,6 +602,14 @@
 
 .cfm__balance.is-bump-out td {
   animation: cfm-bump-out 0.5s var(--ease, ease);
+}
+
+.cfm__col-acct {
+  width: 80px;
+}
+
+.cfm__col-amt {
+  width: 96px;
 }
 
 .cfm__balance-date {
@@ -635,7 +647,8 @@
 }
 
 .cfm__landing {
-  min-height: 104px;
+  height: 112px;
+  overflow: hidden;
   padding: 8px 10px;
   border: 1px dashed var(--line-300);
   border-radius: var(--r-md);
@@ -643,16 +656,14 @@
 }
 
 .cfm__landing-title {
+  display: flex;
+  justify-content: space-between;
   margin: 0 0 6px;
   color: var(--ink-400);
   font-family: var(--font-mono);
   font-size: var(--fs-2xs, 10px);
   letter-spacing: 0.06em;
   text-transform: uppercase;
-}
-
-.cfm__landing-empty {
-  margin: 0;
 }
 
 .cfm__landing ul {
@@ -892,8 +903,7 @@
   }
 
   .cfm__dash,
-  .cfm__live i,
-  .cfm__pill {
+  .cfm__live i {
     animation: none;
   }
 }

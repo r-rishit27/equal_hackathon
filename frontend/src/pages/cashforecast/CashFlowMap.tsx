@@ -499,6 +499,11 @@ export default function CashFlowMap({ result, snapshot, scenario }: { result: Fo
               </div>
             </div>
             <table className="cfm__table">
+              <colgroup>
+                <col className="cfm__col-acct" />
+                <col />
+                <col className="cfm__col-amt" />
+              </colgroup>
               <thead>
                 <tr>
                   <th scope="col">Acct</th>
@@ -543,14 +548,13 @@ export default function CashFlowMap({ result, snapshot, scenario }: { result: Fo
               </tbody>
               <tfoot>
                 <tr ref={balanceEl} className="cfm__balance">
-                  <td colSpan={2}>
+                  <td colSpan={2} className="cfm__balance-label">
                     <span className="cfm__balance-date">{today ? day(today.date) : 'Today, opening'}</span>
                     {today && todayNet !== 0 && (
                       <span key={step} className={`cfm__delta ${todayNet > 0 ? 'is-in' : 'is-out'}`}>
                         {compact(todayNet, { sign: true })} today
                       </span>
                     )}
-                    {playing && <span className="cfm__pill">Forecasting…</span>}
                   </td>
                   <td className={`cf-num cfm__balance-value${below ? ' is-bad' : ''}`}>{compact(Math.round(tBalance))}</td>
                 </tr>
@@ -560,9 +564,12 @@ export default function CashFlowMap({ result, snapshot, scenario }: { result: Fo
 
           {tl.exact && (
             <div className="cfm__landing" aria-live="off">
-              <p className="cfm__landing-title">{today ? `Landing ${shortDay(today.date)}` : 'Press play to watch each day land'}</p>
-              {today && !landing.length && <p className="cf-muted cf-small cfm__landing-empty">Nothing moves today.</p>}
+              <p className="cfm__landing-title">
+                <span>{today ? `Landing ${shortDay(today.date)}` : 'Press play to watch each day land'}</span>
+                {landingMore > 0 && <span>+{landingMore} more</span>}
+              </p>
               <ul key={step}>
+                {today && !landing.length && <li className="cf-muted cf-small">Nothing moves today.</li>}
                 {landing.map(e => (
                   <li key={e.event_key} className={`cfm__land cfm__land--${e.direction}`}>
                     {e.direction === 'in' ? <ArrowDownLeft size={12} /> : <ArrowUpRight size={12} />}
@@ -576,7 +583,6 @@ export default function CashFlowMap({ result, snapshot, scenario }: { result: Fo
                     </span>
                   </li>
                 ))}
-                {landingMore > 0 && <li className="cf-muted cf-small">+{landingMore} more</li>}
               </ul>
             </div>
           )}
@@ -647,6 +653,12 @@ function FlowCard({
           <strong>{f.label}</strong>
           <span className="cf-muted cf-small">{f.sub}</span>
         </div>
+      </div>
+      <div className="cfm-card__value">
+        <span className="cfm-card__amount">
+          {f.dir === 'in' ? '+' : '−'}
+          {compact(Math.round(shown))}
+        </span>
         {todayPaise > 0 && (
           <span key={`chip-${step}`} className="cfm-card__today">
             {f.dir === 'in' ? '+' : '−'}
@@ -654,15 +666,9 @@ function FlowCard({
           </span>
         )}
       </div>
-      <div className="cfm-card__value">
-        <span className="cfm-card__amount">
-          {f.dir === 'in' ? '+' : '−'}
-          {compact(Math.round(shown))}
-        </span>
-        <span className="cf-muted cf-small">
-          {exact ? `of ${compact(f.paise)} · ${Math.round(f.share * 100)}% of money ${f.dir}` : `${Math.round(f.share * 100)}% of money ${f.dir}`}
-        </span>
-      </div>
+      <span className="cf-muted cf-small cfm-card__of">
+        {exact ? `of ${compact(f.paise)} · ${Math.round(f.share * 100)}% of money ${f.dir}` : `${Math.round(f.share * 100)}% of money ${f.dir}`}
+      </span>
       <span className="cfm-card__meter" aria-hidden="true">
         <i style={{ width: `${Math.max(exact ? 0 : 4, progress * 100)}%` }} />
       </span>
