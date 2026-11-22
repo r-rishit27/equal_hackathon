@@ -195,7 +195,7 @@ Auditors can view forecasts. Accountants can also edit inputs and prepare plans.
 
 ### 3.11 WhatsApp communication through Twilio
 
-Agent Hub manages one sender connection per tenant under the `whatsapp_agent` entitlement. Twilio posts inbound messages and delivery updates to connection-specific webhooks. The API verifies the Twilio signature and resolves the connection before recording activity. A watched contact's eligible text enters the Communication Agent's extraction queue. Eligible PDF attachments enter a leased worker queue for classification, OCR and duplicate checks. Finance reviews the resulting draft in Bills. [Webhook routes](../../backend_ocr/app/routers/whatsapp_webhook.py) · [Ingress and triage](../../backend_ocr/app/whatsapp/ingress.py)
+Integrations manages one sender connection per tenant under the `whatsapp_agent` entitlement. Twilio posts inbound messages and delivery updates to connection-specific webhooks. The API verifies the Twilio signature and resolves the connection before recording activity. A watched contact's eligible text enters the Communication Agent's extraction queue. Eligible PDF attachments enter a leased worker queue for classification, OCR and duplicate checks. Finance reviews the resulting draft in Bills. [Webhook routes](../../backend_ocr/app/routers/whatsapp_webhook.py) · [Ingress and triage](../../backend_ocr/app/whatsapp/ingress.py)
 
 ```mermaid
 flowchart TB

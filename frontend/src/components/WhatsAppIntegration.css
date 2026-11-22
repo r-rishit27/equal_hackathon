@@ -1,0 +1,16 @@
+﻿.wa-integration { box-sizing: border-box; max-width: 680px; margin-bottom: 20px; padding: 20px; display: grid; gap: 14px; background: white; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 14px; color: #19334e; }
+.wa-integration header, .wa-integration footer, .wa-url { display: flex; align-items: center; gap: 10px; }
+.wa-integration footer { justify-content: space-between; flex-wrap: wrap; }
+.wa-integration h2 { flex: 1; margin: 0; font-size: 16px; }
+.wa-integration p { margin: 0; }
+.wa-integration form, .wa-integration label { display: grid; gap: 6px; }
+.wa-integration form { gap: 12px; }
+.wa-integration input, .wa-url code { border-radius: 6px; padding: 8px; min-width: 0; }
+.wa-integration input { border: 1px solid #bccddd; }
+.wa-url code { flex: 1; background: #f2f6fa; overflow-wrap: anywhere; font-size: 12px; }
+.wa-expand { width: 100%; display: flex; align-items: center; gap: 10px; padding: 6px 0; border: 0; background: transparent; color: inherit; font: inherit; cursor: pointer; }
+.wa-expand[aria-expanded="true"] svg:last-child { transform: rotate(180deg); }
+.wa-details:not([hidden]) { display: grid; gap: 14px; }
+.wa-intake { display: inline-flex; align-items: center; gap: 8px; }
+.wa-intake .u-switch[aria-checked="true"] { background: #087947; border-color: #087947; }
+.wa-integration footer { flex-wrap: wrap; }

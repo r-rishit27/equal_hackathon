@@ -359,7 +359,7 @@ function AppShell() {
                 path={PATHS['agent-hub']}
                 element={
                   <RequireService service="agent_hub">
-                    <AgentHubPage onReviewDraft={handleReviewDraft} />
+                    <AgentHubPage key={JSON.stringify([user?.company_id, activeBrand?.id])} onReviewDraft={handleReviewDraft} />
                   </RequireService>
                 }
               />

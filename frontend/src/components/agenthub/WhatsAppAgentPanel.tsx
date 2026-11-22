@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
-  MessageCircle, RefreshCw, FileText, XCircle, AlertTriangle, Clock, Copy, Send, RotateCcw, Link2, PauseCircle,
+  MessageCircle, RefreshCw, FileText, XCircle, AlertTriangle, Clock, Send, RotateCcw, PauseCircle,
 } from 'lucide-react'
 import { useAuth } from '../../auth/AuthContext'
-import { Badge, Button, ConfirmDialog, Modal, Switch, useToast, type BadgeTone } from '../../ui'
+import { Badge, Button, Modal, Switch, useToast, type BadgeTone } from '../../ui'
 import {
-  fetchWaStatus, fetchWaEvents, fetchWaContacts, connectWa, disconnectWa, updateWaSettings, refreshWa,
+  fetchWaEvents, fetchWaContacts, updateWaSettings, refreshWa,
   retryWaJob, draftWaJobAnyway, setWaWatch, fetchWaConversation, sendWaReply, errorText,
   type WaStatus, type WaEvent, type WaContact, type WaMessage, type WaJob,
 } from '../../api/whatsapp'
@@ -14,14 +14,9 @@ interface Props {
   /** Opens a draft in ReviewPage (same handler the email drafts use). */
   onOpenDraft: (draftId: string, sourceFile: string) => void
   /** Bumps when the parent wants a reload (e.g. after a draft was submitted). */
+  status: WaStatus | null
+  loadStatus: () => Promise<void>
   reloadKey?: number
-}
-
-const STATE_META: Record<string, { label: string; tone: BadgeTone }> = {
-  ACTIVE: { label: 'Active', tone: 'success' },
-  AWAITING_TEST: { label: 'Awaiting test message', tone: 'warn' },
-  PAUSED: { label: 'Paused', tone: 'neutral' },
-  NEEDS_ATTENTION: { label: 'Needs attention', tone: 'danger' },
 }
 
 const OUTCOME_META: Record<string, { label: string; color: string; icon: React.ElementType }> = {
@@ -68,33 +63,31 @@ function newOpKey(): string {
   try { return crypto.randomUUID() } catch { return `${Date.now()}-${Math.random().toString(36).slice(2)}` }
 }
 
-export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey }: Props) {
+export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey, status, loadStatus }: Props) {
   const { user, activeBrand } = useAuth()
   const toast = useToast()
   const brandId = activeBrand?.id ?? null
   const isAdmin = user?.role === 'admin'
 
-  const [status, setStatus] = useState<WaStatus | null>(null)
   const [events, setEvents] = useState<WaEvent[]>([])
   const [contacts, setContacts] = useState<WaContact[]>([])
   const [loadError, setLoadError] = useState<string | null>(null)
   const [busy, setBusy] = useState<string | null>(null)
   const [chat, setChat] = useState<WaContact | null>(null)
-  const [confirmDisconnect, setConfirmDisconnect] = useState(false)
   const loadSeq = useRef(0)
 
   const load = useCallback(async () => {
     const seq = ++loadSeq.current
     try {
-      const [s, e, c] = await Promise.all([fetchWaStatus(brandId), fetchWaEvents(brandId, 50), fetchWaContacts(brandId)])
+      const [e, c] = await Promise.all([fetchWaEvents(brandId, 50), fetchWaContacts(brandId), loadStatus()])
       if (seq !== loadSeq.current) return // a newer load (e.g. brand switch) superseded this one
-      setStatus(s); setEvents(e); setContacts(c); setLoadError(null)
+      setEvents(e); setContacts(c); setLoadError(null)
     } catch (err) {
       if (seq !== loadSeq.current) return
       const code = (err as { response?: { status?: number } })?.response?.status
       setLoadError(code === 403 ? 'WhatsApp Agent is not enabled for this workspace.' : errorText(err, 'Could not load WhatsApp Agent.'))
     }
-  }, [brandId])
+  }, [brandId, loadStatus])
 
   // Brand switch: clear stale rows first so one brand's data never shows under another.
   useEffect(() => { setEvents([]); setContacts([]); load() }, [load, reloadKey])
@@ -111,12 +104,6 @@ export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey }: Props) {
   }
 
   const conn = status?.connection ?? null
-  const stateMeta = conn ? (!conn.inbound_enabled ? STATE_META.PAUSED : STATE_META[conn.state]) : null
-
-  const copy = (text: string) => {
-    navigator.clipboard?.writeText(text).then(() => toast.success('Copied'), () => toast.error('Copy failed', text))
-  }
-
   const toggleWatch = async (c: WaContact) => {
     const next = !c.watch_enabled
     setContacts(prev => prev.map(x => x.id === c.id ? { ...x, watch_enabled: next } : x))
@@ -146,88 +133,7 @@ export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey }: Props) {
 
   return (
     <>
-      {/* ── Connection ─────────────────────────────────────────────────────── */}
-      <div className="ah-panel" style={{ marginBottom: 'var(--sp-4)' }}>
-        <div className="ah-panel__head">
-          <div className="ah-panel__title"><MessageCircle size={13} aria-hidden="true" /> WhatsApp connection</div>
-          {stateMeta && <Badge tone={stateMeta.tone}>{stateMeta.label}</Badge>}
-        </div>
-        <div className="ah-panel__body" style={{ padding: 'var(--sp-4)', display: 'grid', gap: 'var(--sp-3)' }}>
-          {!conn && (
-            <>
-              <div style={{ fontSize: 13, color: 'var(--ink-600)' }}>
-                Connect a Twilio WhatsApp sender. Vendors you watch below can then send PDF invoices on WhatsApp,
-                and each one becomes a draft bill for review.
-              </div>
-              {isAdmin ? (
-                <div>
-                  <Button
-                    variant="primary"
-                    iconLeft={<Link2 size={14} />}
-                    loading={busy === 'connect'}
-                    disabled={!status?.server_credentials_available}
-                    onClick={() => run('connect', () => connectWa({ use_server_credentials: true }),
-                      'WhatsApp connected — send a test message to finish setup', 'Could not connect WhatsApp')}
-                  >
-                    Connect Twilio{status?.server_sender ? ` (${status.server_sender})` : ''}
-                  </Button>
-                  {!status?.server_credentials_available && (
-                    <div style={{ fontSize: 12, color: 'var(--danger-600)', marginTop: 6 }}>
-                      The server has no Twilio credentials. Set TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN and
-                      TWILIO_WHATSAPP_FROM on the backend.
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div style={{ fontSize: 12, color: 'var(--ink-500)' }}>Ask an admin to connect WhatsApp.</div>
-              )}
-            </>
-          )}
-
-          {conn && (
-            <>
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 'var(--sp-4)', fontSize: 13 }}>
-                <span><b>Sender</b> {conn.sender}</span>
-                <span><b>Account</b> {conn.account_sid}</span>
-                <span><b>Last processed</b> {timeAgo(conn.last_processed_at)}</span>
-                {conn.signature_failures > 0 && (
-                  <span style={{ color: 'var(--danger-600)' }}><b>Rejected requests</b> {conn.signature_failures}</span>
-                )}
-              </div>
-
-              <div style={{ display: 'grid', gap: 6 }}>
-                <div style={{ fontSize: 12, color: 'var(--ink-500)' }}>
-                  Twilio Console → Messaging → Try it out → WhatsApp sandbox settings → <b>When a message comes in</b> (POST):
-                </div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', minWidth: 0 }}>
-                  <code style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, padding: '6px 8px', background: 'var(--ink-50, #f6f7f9)', borderRadius: 6 }}>
-                    {conn.webhook_url}
-                  </code>
-                  <Button size="sm" variant="secondary" iconLeft={<Copy size={13} />} onClick={() => copy(conn.webhook_url)}>Copy</Button>
-                </div>
-                <div style={{ fontSize: 12, color: 'var(--ink-500)' }}><b>Status callback URL</b> (POST):</div>
-                <div style={{ display: 'flex', gap: 6, alignItems: 'center', minWidth: 0 }}>
-                  <code style={{ flex: 1, minWidth: 0, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 12, padding: '6px 8px', background: 'var(--ink-50, #f6f7f9)', borderRadius: 6 }}>
-                    {conn.status_callback_url}
-                  </code>
-                  <Button size="sm" variant="secondary" iconLeft={<Copy size={13} />} onClick={() => copy(conn.status_callback_url)}>Copy</Button>
-                </div>
-              </div>
-
-              {conn.state === 'AWAITING_TEST' && (
-                <div style={{ fontSize: 12, background: 'var(--warn-50, #fffbeb)', color: 'var(--warn-700, #92400e)', padding: 10, borderRadius: 8 }}>
-                  <b>Finish setup:</b> paste the URL above into the Twilio sandbox settings, then from a phone that has
-                  joined the sandbox send any message to {conn.sender}. This card turns <b>Active</b> once a signed message arrives.
-                </div>
-              )}
-
-              {!status?.worker_enabled && (
-                <div style={{ fontSize: 12, color: 'var(--danger-600)' }}>
-                  The processing worker is disabled on this server (WA_WORKER_ENABLED=false). Messages are recorded but not processed.
-                </div>
-              )}
-
-              {(status?.queue.held ?? 0) > 0 && conn.inbound_enabled && isAdmin && (
+              {(status?.queue.held ?? 0) > 0 && conn?.inbound_enabled && isAdmin && (
                 <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexWrap: 'wrap', fontSize: 12 }}>
                   <span>{status?.queue.held} attachment(s) arrived while paused (oldest {timeAgo(status?.queue.oldest_at ?? null)}).</span>
                   <Button size="sm" variant="primary" loading={busy === 'drain'}
@@ -241,37 +147,6 @@ export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey }: Props) {
                 </div>
               )}
 
-              {isAdmin && (
-                <div style={{ display: 'flex', gap: 'var(--sp-4)', alignItems: 'center', flexWrap: 'wrap' }}>
-                  <Switch
-                    checked={conn.inbound_enabled}
-                    showLabel
-                    label="Process incoming invoices"
-                    disabled={busy === 'inbound'}
-                    onChange={v => run('inbound', () => updateWaSettings({ inbound_enabled: v }),
-                      v ? 'Inbound resumed' : 'Inbound paused — new messages are held')}
-                  />
-                  <Switch
-                    checked={conn.outbound_enabled}
-                    showLabel
-                    label="Allow replies to vendors"
-                    disabled={busy === 'outbound'}
-                    onChange={v => run('outbound', () => updateWaSettings({ outbound_enabled: v }),
-                      v ? 'Replies enabled' : 'Replies paused')}
-                  />
-                  <span style={{ flex: 1 }} />
-                  <Button size="sm" variant="danger" loading={busy === 'disconnect'}
-                    onClick={() => setConfirmDisconnect(true)}>
-                    Disconnect
-                  </Button>
-                </div>
-              )}
-            </>
-          )}
-        </div>
-      </div>
-
-      {/* ── Telemetry ──────────────────────────────────────────────────────── */}
       <div className="ah-tele">
         {telemetry.map(t => (
           <div key={t.key} className="ah-tele__cell">
@@ -376,19 +251,6 @@ export default function WhatsAppAgentPanel({ onOpenDraft, reloadKey }: Props) {
           </div>
         </div>
       </div>
-
-      <ConfirmDialog
-        open={confirmDisconnect}
-        onCancel={() => setConfirmDisconnect(false)}
-        onConfirm={async () => {
-          setConfirmDisconnect(false)
-          await run('disconnect', disconnectWa, 'WhatsApp disconnected', 'Could not disconnect')
-        }}
-        title="Disconnect WhatsApp?"
-        description="Incoming WhatsApp messages will be rejected until you connect again. Drafts, history and contact watches are kept."
-        confirmLabel="Disconnect"
-        tone="danger"
-      />
 
       {chat && (
         <ConversationModal

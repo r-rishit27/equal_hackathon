@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import {
   Cpu, RefreshCw, FileText, Mail, XCircle, AlertTriangle, Clock, Network,
@@ -18,6 +18,7 @@ import {
   fetchAgentDrafts, fetchAgentDraft, fetchAgentDraftFile,
   type AgentStatus, type AgentEvent, type AgentPoc, type AgentDraft,
 } from '../api/agent'
+import { fetchWaStatus, updateWaSettings, errorText, type WaStatus } from '../api/whatsapp'
 import './agenthub.css'
 
 interface Props {
@@ -104,6 +105,35 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
   const [savingToggle, setSavingToggle] = useState(false)
   const [showGraph, setShowGraph] = useState(false)
 
+  const [waStatus, setWaStatus] = useState<WaStatus | null>(null)
+  const [waSaving, setWaSaving] = useState(false)
+  const waVersion = useRef(0)
+  const loadWaStatus = useCallback(async () => {
+    const version = ++waVersion.current
+    try {
+      const result = await fetchWaStatus(activeBrand?.id)
+      if (version === waVersion.current) setWaStatus(result)
+    } catch (err) {
+      if (version === waVersion.current) setWaStatus(null)
+      throw err
+    }
+  }, [activeBrand?.id])
+  const wa = waStatus?.connection
+  const toggleWaIntake = async (enabled: boolean) => {
+    if (user?.role !== 'admin' || !wa || waSaving) return
+    setWaSaving(true)
+    try {
+      const { connection } = await updateWaSettings({ inbound_enabled: enabled })
+      ++waVersion.current
+      setWaStatus(current => current && { ...current, connection })
+      toast.success(enabled ? 'WhatsApp intake enabled' : 'WhatsApp intake paused')
+    } catch (err) {
+      toast.error('Could not update WhatsApp intake', errorText(err, 'Try again.'))
+    } finally {
+      setWaSaving(false)
+    }
+  }
+
   const refresh = useCallback(async () => {
     if (!companyId) return
     try {
@@ -182,7 +212,8 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
   const watched = pocs.filter(p => p.agent_enabled)
   const mailboxEnabled = status?.enabled === true
   const plannedCount = SERVICES.filter(agent => agent.planned).length
-  const liveCount = SERVICES.length - plannedCount + 3 /* Communication, Compliance, WhatsApp */
+  const waLive = Boolean(wa?.inbound_enabled && wa.state === 'ACTIVE' && waStatus?.worker_enabled)
+  const liveCount = SERVICES.length - plannedCount + 2 + Number(waLive)
 
   const telemetry = [
     { key: 'Watched contacts', val: status?.watched_pocs ?? 0 },
@@ -259,16 +290,29 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
                   <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Live</span>
                   {has('review_hub') && <Link className="ah-shortcut" to={reviewPath()}>View findings <ArrowUpRight size={12} aria-hidden="true" /></Link>}
                 </li>
-                <li className="ah-agent">
-                    <div className="ah-roster__identity">
-                      <span className="ah-agent__icon"><MessageCircle size={16} aria-hidden="true" /></span>
-                      <div><strong>WhatsApp</strong><small>Vendor WhatsApp PDF → OCR → duplicate check → draft</small></div>
-                    </div>
-                  <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Pilot</span>
-                  <div className="ah-agent__actions">
-                    <button type="button" className="ah-shortcut" onClick={() => focusPanel('ah-whatsapp')}>Open</button>
+                {has('whatsapp_agent') && <li className="ah-agent">
+                  <div className="ah-roster__identity">
+                    <span className="ah-agent__icon"><MessageCircle size={16} aria-hidden="true" /></span>
+                    <div><strong>WhatsApp Agent</strong><small>Vendor invoices and messages via Twilio</small></div>
                   </div>
-                </li>
+                  {wa && <span className="ah-roster__status">
+                    <span className={waLive ? 'ah-dot ah-dot--on' : 'ah-dot'} aria-hidden="true" />
+                    {waLive ? 'Live' : !wa.inbound_enabled ? 'Paused' : wa.state === 'AWAITING_TEST' ? 'Testing' : 'Check setup'}
+                  </span>}
+                  <div className="ah-agent__actions">
+                    <button type="button" className="ah-shortcut" onClick={() => focusPanel('ah-whatsapp')}>
+                      WhatsApp activity
+                    </button>
+                    {user?.role === 'admin' && <Link className="ah-shortcut" to="/integrations#whatsapp">
+                      {waStatus && !wa ? 'Connection setup' : 'Manage connection'}
+                    </Link>}
+                  </div>
+                  <div className="ah-agent__switch">
+                    <span>WhatsApp intake</span>
+                    <Switch checked={!!wa?.inbound_enabled} onChange={toggleWaIntake}
+                      disabled={!wa || waSaving || user?.role !== 'admin'} label="WhatsApp intake" />
+                  </div>
+                </li>}
                 {SERVICES.map(agent => {
                   const Icon = agent.icon
                   const shortcuts = agent.shortcuts?.filter(shortcut =>
@@ -419,14 +463,14 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
         </div>
       </div>
 
-      <section className="ah-panel" id="ah-whatsapp" tabIndex={-1} aria-label="WhatsApp Agent" style={{ marginTop: 'var(--sp-6, 24px)' }}>
+      {has('whatsapp_agent') && <section className="ah-panel" id="ah-whatsapp" tabIndex={-1} aria-label="WhatsApp Agent" style={{ marginTop: 'var(--sp-6, 24px)' }}>
         <div className="ah-panel__head">
           <div className="ah-panel__title"><MessageCircle size={13} aria-hidden="true" /> WhatsApp Agent · vendor invoices on WhatsApp</div>
         </div>
         <div className="ah-panel__body">
-          <WhatsAppAgentPanel onOpenDraft={openDraft} />
+          <WhatsAppAgentPanel onOpenDraft={openDraft} status={waStatus} loadStatus={loadWaStatus} />
         </div>
-      </section>
+      </section>}
 
       {showGraph && <FactGraphModal companyId={companyId} onClose={() => setShowGraph(false)} />}
     </div>

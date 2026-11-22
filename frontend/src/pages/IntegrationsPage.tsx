@@ -1,6 +1,7 @@
+import WhatsAppIntegration from '../components/WhatsAppIntegration'
 import { useState, useEffect, useCallback } from 'react'
 import { useAuth } from '../auth/AuthContext'
-import { useService } from '../auth/EntitlementsContext'
+import { useService, useServiceState } from '../auth/EntitlementsContext'
 import { PageHeader } from '../ui'
 import {
   Zap, CheckCircle2, AlertCircle, Clock, RefreshCw,
@@ -234,7 +235,8 @@ export default function IntegrationsPage() {
   const [sapToken, setSapToken]         = useState<{ token: string; expires_at: string } | null>(null)
   const [sapGenLoading, setSapGenLoading] = useState(false)
   const [sapError, setSapError]         = useState('')
-  const { user } = useAuth()
+  const { user, activeBrand } = useAuth()
+  const whatsappLicense = useServiceState('whatsapp_agent')
   const sapEnabled                      = useService('sap_matching')
   const novaEnabled                     = useService('nova_billing')
 
@@ -374,7 +376,8 @@ export default function IntegrationsPage() {
     <div className="workspace-scroll-page">
 
       {/* Page header */}
-      <PageHeader title="Integrations" sub="Connect your accounting systems to sync invoices, bills, item masters, and payments." />
+      <PageHeader title="Integrations" sub="Manage accounting connections and invoice intake channels." />
+
 
       {/* Tally card */}
       <div style={{
@@ -1005,6 +1008,15 @@ export default function IntegrationsPage() {
           </div>
         </details>
       </div>
+      )}
+
+      {whatsappLicense === 'on' ? <WhatsAppIntegration key={user?.company_id + '/' + activeBrand?.id} brandId={activeBrand?.id} /> : (
+        <section id="whatsapp" className="wa-integration" aria-labelledby="whatsapp-plugin-title" ref={node => { if (window.location.hash === '#whatsapp') node?.scrollIntoView?.() }}>
+          <header><h2 id="whatsapp-plugin-title">WhatsApp (Twilio)</h2>
+            <span>{whatsappLicense === 'loading' ? 'Checking license' : 'License required'}</span>
+          </header>
+          <p>{whatsappLicense === 'loading' ? 'Checking workspace access...' : 'Ask your platform administrator to enable WhatsApp Agent for this workspace to manage the Twilio connection.'}</p>
+        </section>
       )}
 
       <style>{`

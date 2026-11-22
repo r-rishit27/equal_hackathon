@@ -22,7 +22,7 @@ export type ServiceKey =
   // payments
   | 'disbursement' | 'nova_billing' | 'demo_payments' | 'receivables'
   // ai
-  | 'agent_hub' | 'fact_graph' | 'anomaly_ai' | 'playground' | 'sap_matching' | 'cash_forecast'
+  | 'whatsapp_agent' | 'agent_hub' | 'fact_graph' | 'anomaly_ai' | 'playground' | 'sap_matching' | 'cash_forecast'
   // integrations
   | 'data_extraction' | 'tally_connector' | 'accounting_api_sync' | 'email_sending'
 
@@ -46,6 +46,7 @@ export const SERVICE_LABELS: Record<ServiceKey, string> = {
   demo_payments: 'Demo Payments',
   receivables: 'Receivables & Cash Application',
   review_hub: 'Review Hub',
+  whatsapp_agent: 'WhatsApp Agent',
   agent_hub: 'Agent Hub',
   fact_graph: 'Fact Graph',
   cash_forecast: 'Cash Flow Forecast',
@@ -78,6 +79,7 @@ export const SERVICE_DESCRIPTIONS: Record<ServiceKey, string> = {
   demo_payments: 'Pay is simulated: no bank call, the bill settles as paid, and receipts go only to one demo POC email.',
   receivables: 'Sales invoices, customers, bank-statement and remittance capture, and the cash application agent.',
   review_hub: 'One queue for everything that needs correcting, with a link to the root of each problem.',
+  whatsapp_agent: 'Vendor invoice intake and replies through Twilio WhatsApp.',
   agent_hub: 'The email-to-bill agent: watches a mailbox and drafts bills.',
   fact_graph: 'Knowledge graph over vendors, bills and payments.',
   cash_forecast: 'Daily 30-day bank-cash forecast with what-if scenarios and owner-approved cash plans. Never moves money.',
@@ -99,7 +101,7 @@ export const SERVICE_CATEGORIES: { label: string; services: ServiceKey[] }[] = [
   },
   { label: 'Tax & Compliance', services: ['tds', 'fx', 'recon', 'gst_tax_verification', 'kyc_verification'] },
   { label: 'Payments', services: ['disbursement', 'nova_billing', 'demo_payments', 'receivables'] },
-  { label: 'AI & Automation', services: ['agent_hub', 'fact_graph', 'cash_forecast', 'anomaly_ai', 'playground', 'sap_matching'] },
+  { label: 'AI & Automation', services: ['agent_hub', 'whatsapp_agent', 'fact_graph', 'cash_forecast', 'anomaly_ai', 'playground', 'sap_matching'] },
   { label: 'Integrations', services: ['data_extraction', 'tally_connector', 'accounting_api_sync', 'email_sending'] },
 ]
 

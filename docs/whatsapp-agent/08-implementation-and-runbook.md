@@ -46,7 +46,7 @@ Verified before deploy: 48 unit tests, and a 49-check simulation against a throw
    Without this, `GET /api/agent/whatsapp/status` returns 503 with this instruction.
 3. **License.** If `LICENSE_ENFORCEMENT=enforce`, enable **WhatsApp Agent** for the tenant in the platform admin panel. In `log`/`off` modes nothing is needed.
 4. **Deploy** backend and frontend.
-5. **Connect.** As a tenant admin: Agent Hub → WhatsApp Agent → **Connect Twilio**. The card shows two URLs.
+5. **Connect.** As a tenant admin, open Integrations, select WhatsApp (Twilio) and choose **Connect Twilio**. The card shows two URLs.
 6. **Twilio Console** → Messaging → Try it out → Send a WhatsApp message → **Sandbox settings**:
    - *When a message comes in* → the webhook URL, method **POST**
    - *Status callback URL* → the status URL, method **POST**
