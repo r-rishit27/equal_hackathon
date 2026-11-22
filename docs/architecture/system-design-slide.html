@@ -1,0 +1,346 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Reckon.ai System Design</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Public+Sans:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one slide — a measured header, a figure that is the whole argument, and a
+   detail rail that answers "what is this box and where does it live in the repo".
+   Palette and type are Reckon.ai's own tokens (frontend/src/styles/tokens.css):
+   navy #004080 for action, the wordmark teal #00696b for data, one cool canvas. */
+:root {
+  --canvas: #f5f7fb; --surface: #ffffff; --surface-2: #f1f5f9; --surface-3: #e9eef6;
+  --line: #e2e8f0; --line-strong: #b9c4d4;
+  --ink-900: #0b1c30; --ink-700: #374151; --ink-600: #4b5563; --ink-500: #5b6473;
+  --brand: #004080; --brand-700: #003a70; --brand-100: #e6eefa;
+  --teal: #00696b; --teal-50: #effbfb;
+  --warn: #b45309; --warn-50: #fffbeb;
+  --danger: #b91c1c; --ok: #047857; --ok-50: #ecfdf5;
+  --font-ui: Inter, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Public Sans", Inter, system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --r-sm: 4px; --r-md: 8px; --r-lg: 12px;
+  --e-1: 0 1px 2px rgb(11 28 48 / 7%);
+  --e-2: 0 6px 20px rgb(11 28 48 / 9%), 0 1px 3px rgb(11 28 48 / 6%);
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --canvas: #080f1a; --surface: #0f1a29; --surface-2: #152235; --surface-3: #1c2b41;
+    --line: #22334b; --line-strong: #41546f;
+    --ink-900: #eef3fa; --ink-700: #c3cedd; --ink-600: #a3b1c4; --ink-500: #8d9cb2;
+    --brand: #6ea8e4; --brand-700: #8fc0f1; --brand-100: #17293f;
+    --teal: #4cc6c8; --teal-50: #0d2b2c;
+    --warn: #e0a048; --warn-50: #2d2111;
+    --danger: #ef8080; --ok: #4ec18f; --ok-50: #0e2b20;
+    --e-1: 0 1px 2px rgb(0 0 0 / 40%);
+    --e-2: 0 8px 24px rgb(0 0 0 / 45%), 0 1px 3px rgb(0 0 0 / 35%);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --canvas: #080f1a; --surface: #0f1a29; --surface-2: #152235; --surface-3: #1c2b41;
+  --line: #22334b; --line-strong: #41546f;
+  --ink-900: #eef3fa; --ink-700: #c3cedd; --ink-600: #a3b1c4; --ink-500: #8d9cb2;
+  --brand: #6ea8e4; --brand-700: #8fc0f1; --brand-100: #17293f;
+  --teal: #4cc6c8; --teal-50: #0d2b2c;
+  --warn: #e0a048; --warn-50: #2d2111;
+  --danger: #ef8080; --ok: #4ec18f; --ok-50: #0e2b20;
+  --e-1: 0 1px 2px rgb(0 0 0 / 40%);
+  --e-2: 0 8px 24px rgb(0 0 0 / 45%), 0 1px 3px rgb(0 0 0 / 35%);
+  color-scheme: dark;
+}
+* { box-sizing: border-box }
+@media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important } }
+body { background: var(--canvas); color: var(--ink-700); font: 400 14px/1.5 var(--font-ui); margin: 0 }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px }
+button { font: inherit; color: inherit; cursor: pointer }
+
+.slide {
+  max-width: 1320px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 28px 36px;
+  display: grid; gap: 18px;
+}
+
+/* header */
+.head { display: grid; gap: 12px }
+.brandline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap }
+.mark { width: 24px; height: 24px; border-radius: 6px; background: var(--brand); display: grid; place-items: center; flex: none }
+.mark span { width: 10px; height: 10px; border: 2px solid var(--surface); border-right: 0; border-bottom: 0; transform: rotate(-45deg) translate(1px, 1px) }
+.wordmark { font: 700 16px/1 var(--font-display); color: var(--ink-900); letter-spacing: -.01em }
+.wordmark i { font-style: normal; color: var(--teal) }
+.eyebrow { font: 600 11px/1 var(--font-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--ink-500) }
+h1 { margin: 0; font: 700 clamp(26px, 3.4vw, 38px)/1.08 var(--font-display); color: var(--ink-900); letter-spacing: -.02em; text-wrap: balance }
+.lede { margin: 0; max-width: 78ch; color: var(--ink-600); font-size: 15px }
+.lede b { color: var(--ink-900); font-weight: 600 }
+
+/* numbers */
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(156px, 1fr)); gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: var(--r-lg); overflow: hidden }
+.fact { background: var(--surface); padding: 11px 13px; display: grid; gap: 2px; min-width: 0 }
+.fact b { font: 600 22px/1.1 var(--font-display); color: var(--ink-900); font-variant-numeric: tabular-nums; letter-spacing: -.02em }
+.fact b small { font-size: 12px; color: var(--ink-500); font-weight: 500 }
+.fact span { font-size: 12.5px; color: var(--ink-600) }
+.fact code { font: 400 10.5px/1.4 var(--font-mono); color: var(--ink-500); overflow-wrap: anywhere }
+
+/* figure + rail */
+.stage { display: grid; grid-template-columns: minmax(0, 1fr) 316px; gap: 16px; align-items: start }
+@media (max-width: 1060px) { .stage { grid-template-columns: 1fr } }
+figure { margin: 0; background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); box-shadow: var(--e-1); overflow: hidden; min-width: 0 }
+.scroll { overflow-x: auto }
+svg.map { display: block; width: 100%; min-width: 1000px; height: auto }
+figcaption { padding: 10px 14px; border-top: 1px solid var(--line); background: var(--surface-2); color: var(--ink-600); font-size: 12.5px }
+
+svg .node { cursor: pointer }
+svg .node rect.box { transition: stroke .14s, fill .14s }
+svg .node:hover rect.box, svg .node.sel rect.box { stroke: var(--brand); stroke-width: 2 }
+svg .edge path { transition: stroke .14s }
+svg .edge.lit path { stroke: var(--brand); stroke-width: 2.2 }
+svg .edge.lit text { fill: var(--brand); font-weight: 600 }
+svg text { font-family: var(--font-ui) }
+svg .t-label { font-size: 12.5px; font-weight: 600; fill: var(--ink-900) }
+svg .t-sub { font-size: 10.5px; fill: var(--ink-600) }
+svg .t-mono { font-family: var(--font-mono); font-size: 10px; fill: var(--ink-500) }
+svg .t-band { font-size: 10px; font-weight: 600; letter-spacing: .11em; fill: var(--ink-500) }
+svg .t-edge { font-size: 9.5px; fill: var(--ink-500); paint-order: stroke; stroke: var(--surface); stroke-width: 3px; stroke-linejoin: round }
+
+.rail { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 15px; display: grid; gap: 11px; align-content: start; position: sticky; top: 16px; box-shadow: var(--e-1); min-width: 0 }
+@media (max-width: 1060px) { .rail { position: static } }
+.rail h2 { margin: 0; font: 600 16px/1.25 var(--font-display); color: var(--ink-900) }
+.rail .tag { justify-self: start; font: 500 10.5px/1 var(--font-ui); letter-spacing: .07em; text-transform: uppercase; padding: 4px 7px; border-radius: var(--r-sm) }
+.rail dl { margin: 0; display: grid; gap: 9px }
+.rail dt { font: 600 10px/1 var(--font-ui); letter-spacing: .09em; text-transform: uppercase; color: var(--ink-500); margin-bottom: 3px }
+.rail dd { margin: 0; font-size: 13px; color: var(--ink-700) }
+.rail dd.path { font: 400 11.5px/1.5 var(--font-mono); color: var(--brand); background: var(--brand-100); padding: 4px 6px; border-radius: var(--r-sm); overflow-wrap: anywhere }
+.hint { font-size: 11.5px; color: var(--ink-500) }
+
+/* footer cards */
+.notes { display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 12px }
+.note { background: var(--surface); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 14px; display: grid; gap: 8px; align-content: start; min-width: 0 }
+.note.open { background: var(--warn-50); border-color: color-mix(in srgb, var(--warn) 35%, var(--line)) }
+.note h3 { margin: 0; font: 600 13.5px/1.3 var(--font-display); color: var(--ink-900) }
+.note p { margin: 0; font-size: 12.5px; color: var(--ink-600) }
+.note ul { margin: 0; padding-left: 16px; display: grid; gap: 4px; font-size: 12.5px; color: var(--ink-600) }
+.note code { font: 400 11px/1.4 var(--font-mono); color: var(--ink-700) }
+.chips { display: flex; flex-wrap: wrap; gap: 5px; align-items: center }
+.chip { font: 500 11px/1 var(--font-mono); padding: 5px 7px; border-radius: var(--r-sm); background: var(--surface-2); border: 1px solid var(--line); color: var(--ink-700) }
+.chip.raw { background: var(--surface-3) } .chip.stg { background: var(--brand-100); color: var(--brand); border-color: transparent }
+.chip.fact { background: var(--teal-50); color: var(--teal); border-color: transparent }
+.arrowchip { color: var(--ink-500); font-size: 12px }
+footer { color: var(--ink-500); font-size: 12px; border-top: 1px solid var(--line); padding-top: 12px }
+footer code { font-family: var(--font-mono); font-size: 11px }
+</style>
+
+<main class="slide">
+  <header class="head">
+    <div class="brandline">
+      <span class="mark" aria-hidden="true"><span></span></span>
+      <span class="wordmark">Reckon<i>.ai</i></span>
+      <span class="eyebrow">System design · one page · branch <code style="font-family:var(--font-mono)">dev</code></span>
+    </div>
+    <h1>One Postgres instance, four processes, and every route pinned to a tenant</h1>
+    <p class="lede">Reckon.ai runs payables, receivables and working capital for Indian finance teams. The architecture is deliberately small: a React workspace, one FastAPI app, one pipeline process of twelve change-data-capture workers, and <b>PostgreSQL as both the store and the event bus</b> — no Kafka, no queue broker. Everything that leaves the VPC is a named provider with a named failure mode. Select any box to see what it does and where it lives.</p>
+  </header>
+
+  <section class="facts" aria-label="Key figures">
+    <div class="fact"><b>218</b><span>HTTP routes, every one tenant-scoped</span><code>tests/test_tenant_route_map.py</code></div>
+    <div class="fact"><b>12</b><span>CDC workers in one asyncio process</span><code>pipelines/base.py</code></div>
+    <div class="fact"><b>&lt; 50<small> ms</small></b><span>LISTEN/NOTIFY wake, 60 s safety poll</span><code>pipelines/cdc.py</code></div>
+    <div class="fact"><b>404</b><span>answered on a wrong-tenant row, never 403</span><code>security/tenancy.py</code></div>
+    <div class="fact"><b>2</b><span>OCR engines merged per field by confidence</span><code>GPT-4o · Sarvam AI</code></div>
+    <div class="fact"><b>~180</b><span>lines left in main.py, down from 8,822</span><code>backend_ocr/app/main.py</code></div>
+  </section>
+
+  <div class="stage">
+    <figure>
+      <div class="scroll" id="mapHost"></div>
+      <figcaption>The request path runs left to right through three security gates into the API. The API and the pipeline never call each other — they meet at PostgreSQL, which is the store, the audit log and the <code style="font-family:var(--font-mono)">LISTEN/NOTIFY</code> bus. Nova runs as its own process against the same instance with its own pool and tables. Dashed boundary: the AWS VPC.</figcaption>
+    </figure>
+    <aside class="rail" id="rail" aria-live="polite"></aside>
+  </div>
+
+  <section class="notes" aria-label="Design decisions">
+    <article class="note">
+      <h3>A record is promoted, never trusted on arrival</h3>
+      <div class="chips">
+        <span class="chip raw">raw_</span><span class="arrowchip">→</span>
+        <span class="chip stg">stg_</span><span class="arrowchip">→</span>
+        <span class="chip fact">fact_</span>
+      </div>
+      <p>Staging is a validation buffer: a row reaches <code>fact_*</code> only after dedup and field validation. An exact <code>DUPLICATE</code> blocks promotion and forces <code>sync_status = ERROR</code>. A soft duplicate flags <code>REVIEW</code> and promotes anyway — a vendor legitimately re-issues a monthly retainer at the same amount, and blocking those would reject more good bills than bad ones.</p>
+    </article>
+    <article class="note">
+      <h3>Two Tally modes, one set of tables</h3>
+      <p>Server-side pull (<code>TallyReadWorker</code> over the XML socket) and agent push (<code>OnsummTallyAgent.exe</code> on the customer's machine) write the same <code>stg_invoices</code>, <code>stg_bills</code>, <code>stg_payments</code> with identical upsert logic. Nothing downstream knows which mode ran. The agent pairs once with a short-lived token, exchanges it for an API key, and only the SHA-256 hash is ever stored.</p>
+    </article>
+    <article class="note open">
+      <h3>What the structure still owes</h3>
+      <ul>
+        <li>85 connection acquisitions with no <code>finally</code> — watch <code>db_pool_connections_in_use</code> climb and never return.</li>
+        <li>Per-process caches in <code>core/</code> still block a second API replica.</li>
+        <li><code>migrations.py</code> runs 26 DDL steps in-process on every boot.</li>
+        <li>Per-environment payment caps live bank-side only, not at the application layer.</li>
+      </ul>
+    </article>
+  </section>
+
+  <footer>Compiled from <code>docs/architecture/ARCHITECTURE.md</code>, <code>docs/architecture/BACKEND_STRUCTURE.md</code> and the repository README on <code>dev</code>. Figures are counts the test suite or the worker registry pins, not estimates.</footer>
+</main>
+
+<script>
+(() => {
+  const esc = (v) => String(v ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+  // ── the map: boxes on a 5-column grid plus a managed-services band ──────────
+  const TONE = { people: "var(--line-strong)", edge: "var(--brand)", api: "var(--brand)", data: "var(--teal)", pipe: "var(--brand)", ext: "var(--warn)" };
+  const FILL = { people: "var(--surface)", edge: "var(--surface)", api: "var(--surface)", data: "var(--teal-50)", pipe: "var(--surface)", ext: "var(--warn-50)" };
+
+  const N = {
+    users:  { x: 14, y: 46, w: 146, h: 96, t: "people", label: "Finance users", lines: ["Analyst · Approver", "Controller · Admin", "scoped by tenant + brand"] },
+    tally:  { x: 14, y: 192, w: 146, h: 48, t: "people", label: "Tally Prime", lines: ["XML pull or agent push"] },
+    twilio: { x: 14, y: 254, w: 146, h: 48, t: "people", label: "Twilio WhatsApp", lines: ["vendor PDFs and text"] },
+    mail:   { x: 14, y: 316, w: 146, h: 48, t: "people", label: "Gmail · Microsoft", lines: ["watched vendor contacts"] },
+    feeds:  { x: 14, y: 378, w: 146, h: 48, t: "people", label: "Accounting feeds", lines: ["Apideck · SAP · webhooks"] },
+
+    spa:    { x: 216, y: 46, w: 158, h: 76, t: "edge", label: "React workspace", lines: ["React 18 · Vite · TS", "AWS Amplify, static build"] },
+    nginx:  { x: 216, y: 136, w: 158, h: 64, t: "edge", label: "Nginx · EC2", lines: ["HTTPS, route prefixes", "prod :8001 · dev :8002"] },
+    inbound:{ x: 216, y: 214, w: 158, h: 212, t: "edge", label: "Inbound connectors", lines: ["Twilio signature verified", "before the tenant resolves", "", "Tally: pairing token once,", "then a hashed api_key", "", "Gmail / MS OAuth tokens,", "Fernet-encrypted at rest", "", "Gateway events quarantined", "if tenant_id is unresolvable"] },
+
+    gates:  { x: 430, y: 46, w: 214, h: 96, t: "api", label: "Three security gates", lines: ["1 · identity — tenant from JWT", "2 · ownership — 404, never 403", "3 · entitlement — licensed service", "all three pinned by route-map tests"] },
+    api:    { x: 430, y: 156, w: 214, h: 92, t: "api", label: "FastAPI · Uvicorn · EC2", lines: ["main.py: composition root only", "routers/ one module per domain", "218 routes · a router never", "imports another router"] },
+    hubs:   { x: 430, y: 262, w: 214, h: 98, t: "api", label: "In-process agents", lines: ["Review Hub findings + evidence", "Agent Hub · CFO five-stage review", "Cash flow forecast engine", "Payment status sweeps"] },
+    disb:   { x: 430, y: 374, w: 214, h: 92, t: "api", label: "Payment Hub guardrails", lines: ["~can_pay = bank ∧ GSTIN verified", "OTP: SHA-256, 5 tries, 120 s TTL", "admin-only beneficiary override,", "reason required and audited"] },
+
+    pg:     { x: 700, y: 46, w: 214, h: 380, t: "data", label: "PostgreSQL 15 · RDS", lines: ["ONE instance, shared by the API,", "the pipeline and Nova.", "", "~raw_   inbound, unprocessed", "~stg_   validated, pre-promotion", "~fact_  analytics-ready", "~dim_ masters    wf_ workflow", "~int_ connections ai_ anomalies", "", "~tenant_id on every row;", "fiscal period computed once", "and stored on every fact.", "", "LISTEN / NOTIFY event bus —", "9 triggers, one shared plpgsql fn", "", "~wf_audit_log · bill_approval_chain", "~disbursement_overrides"] },
+
+    workers:{ x: 970, y: 46, w: 186, h: 246, t: "pipe", label: "Pipeline engine · EC2", lines: ["12 CDC workers, one asyncio", "process, asyncpg pool 2–10", "", "~upload_ocr · staging_promotion", "~deduplication · approval", "~api_sync · webhook", "~tally_read · tally_sync", "~gst_verify · bank_verify", "~category_enrich · tds", "", "Phase 1 drains the backlog,", "Phase 2 waits on NOTIFY with", "a 60 s safety poll behind it"] },
+    nova:   { x: 970, y: 306, w: 186, h: 120, t: "pipe", label: "Nova reconciliation", lines: ["its own process, own tables,", "own asyncpg pool on the", "same RDS instance", "", "3-way: vendor invoice vs", "Nova usage vs certified rate"] },
+
+    s3:     { x: 216, y: 502, w: 220, h: 70, t: "ext", label: "S3 · CloudFront", lines: ["document objects, signed delivery", "local disk when S3 is unset"] },
+    lendix: { x: 456, y: 502, w: 220, h: 70, t: "ext", label: "Lendix → ICICI Bank", lines: ["RSA-encrypted REST, IMPS rail", "no webhooks — status polled"] },
+    novaapi:{ x: 696, y: 502, w: 220, h: 70, t: "ext", label: "Nova billing API", lines: ["vendor usage ledger,", "one read per service month"] },
+    prov:   { x: 936, y: 502, w: 220, h: 70, t: "ext", label: "Model & KYB providers", lines: ["OpenAI GPT-4o · GPT-4o-mini", "Sarvam AI · Sandbox.co.in"] },
+  };
+
+  const E = [
+    { id: "e-user", d: "M160,94 H216", lab: "HTTPS", lx: 188, ly: 88 },
+    { id: "e-spa", d: "M295,122 V136" },
+    { id: "e-ngx", d: "M374,168 H430", lab: "REST", lx: 402, ly: 162 },
+    { id: "e-tally", d: "M160,216 H216" },
+    { id: "e-twilio", d: "M160,278 H216" },
+    { id: "e-mail", d: "M160,340 H216" },
+    { id: "e-feeds", d: "M160,402 H216" },
+    { id: "e-inb", d: "M374,310 H402 V202 H430", lab: "verified payloads", lx: 408, ly: 253, a: "start" },
+    { id: "e-gate", d: "M537,142 V156", lab: "tenant_id", lx: 545, ly: 152, a: "start" },
+    { id: "e-api-pg", d: "M644,202 H700", lab: "psycopg2 pool", lx: 672, ly: 196 },
+    { id: "e-hub-pg", d: "M644,310 H700", lab: "fact graph", lx: 672, ly: 304 },
+    { id: "e-disb-pg", d: "M644,420 H700", lab: "approval chain", lx: 672, ly: 414 },
+    { id: "e-notify", d: "M914,150 H970", lab: "NOTIFY", lx: 942, ly: 144 },
+    { id: "e-write", d: "M970,190 H914", lab: "upserts", lx: 942, ly: 184 },
+    { id: "e-nova-pg", d: "M970,366 H914", lab: "own pool", lx: 942, ly: 360 },
+    { id: "e-obj", d: "M430,318 H402 V486 H326 V502", lab: "uploads", lx: 364, ly: 480 },
+    { id: "e-lendix", d: "M537,466 V486 H566 V502", lab: "RSA · IMPS · idempotent tran_ref_no", lx: 580, ly: 480, a: "start" },
+    { id: "e-novaapi", d: "M1063,426 V470 H806 V502", lab: "usage by month", lx: 924, ly: 464 },
+    { id: "e-prov", d: "M1156,250 H1172 V478 H1046 V502", lab: "OCR · classify · verify", lx: 1109, ly: 472 },
+  ];
+
+  const LIT = {
+    users: ["e-user"], tally: ["e-tally"], twilio: ["e-twilio"], mail: ["e-mail"], feeds: ["e-feeds"],
+    spa: ["e-user", "e-spa"], nginx: ["e-spa", "e-ngx"],
+    inbound: ["e-tally", "e-twilio", "e-mail", "e-feeds", "e-inb"],
+    gates: ["e-ngx", "e-gate"], api: ["e-gate", "e-inb", "e-api-pg"],
+    hubs: ["e-hub-pg", "e-obj"], disb: ["e-disb-pg", "e-lendix"],
+    pg: ["e-api-pg", "e-hub-pg", "e-disb-pg", "e-notify", "e-write", "e-nova-pg"],
+    workers: ["e-notify", "e-write", "e-prov"], nova: ["e-nova-pg", "e-novaapi"],
+    s3: ["e-obj"], lendix: ["e-lendix"], novaapi: ["e-novaapi"], prov: ["e-prov"],
+  };
+
+  // [kind, what it does, where it lives, worth knowing]
+  const DETAIL = {
+    users: ["People", "Four roles on one workspace. The tenant's service plan and the signed-in role together decide which screens exist; switching brand refreshes approval badges, payment queues and transaction totals, and clears any open payment selection.", "backend_ocr/app/security/services.py", "An impersonated session is read-only everywhere."],
+    tally: ["Source", "Ledgers and vouchers from Tally Prime, pulled from its XML socket where the pipeline can reach the LAN, pushed by a Windows tray app where it cannot. Approved payables go back the other way as payment vouchers.", "tally_agent/agent.py · pipelines/tally_read.py", "Incremental: last_sync_at in int_connections; first run falls back 30 days."],
+    twilio: ["Source", "One sender connection per tenant under the whatsapp_agent entitlement. Twilio posts inbound messages and delivery callbacks to connection-specific webhooks; eligible PDFs become bill drafts, eligible text becomes extracted terms.", "backend_ocr/app/whatsapp/ingress.py", "The reply outbox enforces opt-out, pause state and the 24-hour window."],
+    mail: ["Source", "The Vendor Bill Agent polls each connected mailbox every 600 s, filters to flagged vendor contacts with attachments, classifies bill-versus-conversation, and drops the OCR result into agent_draft_bills.", "backend_ocr/app/routers/agent.py", "Thread-aware, and it never auto-submits a bill — a person reviews every draft."],
+    feeds: ["Source", "Accounting payloads and gateway webhook events land in raw_api_payloads and raw_webhook_events untouched, then normalise on the pipeline side.", "pipelines/api_sync.py · pipelines/webhook.py", "A payload with no resolvable tenant_id is quarantined, never attributed to a default tenant."],
+    spa: ["Edge", "React 18 + Vite + TypeScript, built by Amplify and served as a static bundle. It talks to the API over REST and multipart uploads and holds session state in an auth context with route guards.", "frontend/ · amplify.yml", "VITE_API_URL and the Nova base URL are build-time, so an environment swap is a rebuild."],
+    nginx: ["Edge", "Terminates HTTPS on EC2 and routes by prefix to the production API, the development API and the configured Nova route — separate systemd units on :8001, :8002 and :8102.", "docs/aws-deploy/DEV_ENVIRONMENT.md", "Two API units share one RDS instance; the environment, not the code, separates them."],
+    inbound: ["Edge", "Every inbound integration proves who it is before anything is written. Twilio by signature, the Tally agent by a hashed API key it got once from a pairing token, mailboxes by an OAuth grant stored under Fernet.", "integrations/email_oauth.py · routers/tally_agent.py", "The raw agent key is shown exactly once at pairing and is never retrievable again."],
+    gates: ["API", "Three concentric checks, each its own module. Identity resolves the tenant from a verified JWT. Ownership asks whether this row belongs to that tenant. Entitlement asks whether the route resolves to a service the tenant's plan licenses.", "backend_ocr/app/security/", "Ownership answers 404, never 403 — a 403 would turn the endpoint into an existence oracle for another tenant's ids."],
+    api: ["API", "main.py builds the app and mounts routers, and holds no endpoints. A helper used by one router stays there; a helper a second router needs moves to core/, because a router must never import another router.", "backend_ocr/app/main.py · routers/", "The split moved 218 routes verbatim and kept every path and scoping identical — pinned by a snapshot fixture."],
+    hubs: ["API", "Work the API hosts itself rather than handing to the pipeline: Review Hub's compliance adapters and findings, Agent Hub's Fact Graph and the CFO five-stage control review, the cash flow forecast engine, and payment status sweeps.", "routers/review_hub.py · routers/agent_hub.py · cashflow/", "The CFO review is request-driven and read-only; authorizing a payment stays in the payment workflow."],
+    disb: ["API", "Vendor payouts, called straight from the router rather than queued. Eligibility is enforced server-side before a bill can be paid at all, the OTP covers a whole bulk batch, and an override of the verified account needs a reason and lands in two audit tables.", "backend_ocr/app/routers/disbursement.py", "Every call is idempotent on tran_ref_no: a retry reuses the reference, it never mints a fresh one."],
+    pg: ["Data", "The store and the bus in one managed instance. Table prefixes encode the pipeline stage a row has reached, every row carries tenant_id, and nine triggers call one shared plpgsql function that notifies the channel named in its argument.", "pipelines/cdc.py · utils/fiscal.py", "Adding a worker needs a notify_channel on the class and one row in _TRIGGERS — no schema migration."],
+    workers: ["Pipeline", "One long-lived asyncio process. Each worker drains its backlog in large batches on startup, then waits on a dedicated LISTEN connection, woken by pg_notify through an asyncio.Event. A 60 s safety poll runs regardless, so a row that slips past a trigger is never stuck.", "pipelines/base.py · config.PIPELINE_CFG", "Chosen over Kafka or RabbitMQ: no broker to operate, and second-level freshness is enough for a cashflow platform."],
+    nova: ["Pipeline", "A standalone microservice for vendors billed through Nova. It checks certification, then the vendor's invoiced quantity against Nova's own usage, then Nova's arithmetic against the tenant's certified rate card, in that order.", "services/nova_reconciliation/", "It duplicates its own credential resolver rather than importing the API package, so the two deploy and scale independently."],
+    s3: ["Managed", "Uploaded invoices, attachments, vendor documents and brand logos. Every filesystem root now derives from one BACKEND_ROOT constant after five __file__-relative paths were found pointing one directory too shallow.", "backend_ocr/app/core/storage.py", "Signed CloudFront delivery when configured; local disk when S3 is not."],
+    lendix: ["Managed", "The single payment rail. ICICI Bank is the primary provider with a ₹5,00,000 hard cap per transaction; AU Bank is secondary with no automatic fallback between them.", "backend_ocr/app/integrations/imps_client.py", "Lendix pushes no webhooks, so reconciliation is an on-demand status call that logs to disbursement_gateway_calls."],
+    novaapi: ["Managed", "Nova's usage ledger for a vendor and service month, read with a per-tenant API key entered under Integrations and held Fernet-encrypted in int_nova_credentials.", "services/nova_reconciliation/app/credentials.py", "The orchestrator sweeps for eligible bills every 120 s; a manual sweep is one POST."],
+    prov: ["Managed", "GPT-4o vision reads the document; Sarvam AI runs as a fallback when GPT-4o's confidence drops below 0.6, and the two merge per field by confidence weight. Sandbox.co.in answers GSTIN, bank and TDS questions, five calls at a time.", "utils/ocr_engine.py · integrations/sandbox_kyb.py", "Bank verification is three-state, so an account that is definitively not found is never retried."],
+  };
+
+  const KIND_STYLE = {
+    People: ["var(--surface-3)", "var(--ink-700)"], Source: ["var(--surface-3)", "var(--ink-700)"],
+    Edge: ["var(--brand-100)", "var(--brand)"], API: ["var(--brand-100)", "var(--brand)"],
+    Data: ["var(--teal-50)", "var(--teal)"], Pipeline: ["var(--brand-100)", "var(--brand)"],
+    Managed: ["var(--warn-50)", "var(--warn)"],
+  };
+
+  const nodeSvg = (id, n) => {
+    const body = (n.lines || []).map((l, i) =>
+      l === "" ? "" : `<text class="${l[0] === "~" ? "t-mono" : "t-sub"}" x="${n.x + 12}" y="${n.y + 40 + i * 14}">${esc(l.replace(/^~/, ""))}</text>`).join("");
+    return `<g class="node" data-id="${id}" tabindex="0" role="button" aria-label="${esc(n.label)}">
+      <rect class="box" x="${n.x}" y="${n.y}" width="${n.w}" height="${n.h}" rx="7" fill="${FILL[n.t]}" stroke="var(--line-strong)" stroke-width="1"/>
+      <rect x="${n.x + 11}" y="${n.y + 12}" width="7" height="7" rx="2" fill="${TONE[n.t]}"/>
+      <text class="t-label" x="${n.x + 24}" y="${n.y + 23}">${esc(n.label)}</text>${body}</g>`;
+  };
+
+  const edgeSvg = (e) => `<g class="edge" data-id="${e.id}">
+      <path d="${e.d}" fill="none" stroke="var(--line-strong)" stroke-width="1.3" stroke-linejoin="round" marker-end="url(#ar)"/>
+      ${e.lab ? `<text class="t-edge" x="${e.lx}" y="${e.ly}" text-anchor="${e.a || "middle"}">${esc(e.lab)}</text>` : ""}</g>`;
+
+  const svg = `<svg class="map" viewBox="0 0 1180 590" role="img" aria-label="Reckon.ai system design. Finance users reach a React workspace on Amplify; vendor sources — Tally, Twilio WhatsApp, mailboxes and accounting feeds — reach a set of inbound connectors that verify each sender. Requests pass three security gates (identity, ownership, entitlement) into the FastAPI app on EC2, which also hosts Review Hub, Agent Hub and the cash forecast engine, plus the Payment Hub guardrails. The API writes to a single PostgreSQL 15 instance on RDS, which is also the LISTEN/NOTIFY event bus; a separate pipeline process of twelve CDC workers wakes on those notifications and writes back. Nova reconciliation runs as its own process on the same instance. Outside the VPC sit S3, the Lendix ICICI payment rail, the Nova billing API and the OCR and KYB providers.">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="var(--line-strong)"/></marker></defs>
+    <rect x="202" y="18" width="970" height="464" rx="12" fill="none" stroke="var(--brand)" stroke-width="1.2" stroke-dasharray="6 5" opacity=".55"/>
+    <text class="t-band" x="1168" y="12" text-anchor="end">AWS VPC</text>
+    <text class="t-band" x="14" y="34">PEOPLE &amp; SOURCES</text>
+    <text class="t-band" x="216" y="34">EDGE &amp; INBOUND</text>
+    <text class="t-band" x="430" y="34">API · FASTAPI ON EC2</text>
+    <text class="t-band" x="700" y="34">STORE &amp; EVENT BUS</text>
+    <text class="t-band" x="970" y="34">PIPELINE · EC2</text>
+    <text class="t-band" x="216" y="494">MANAGED SERVICES &amp; EXTERNAL PROVIDERS</text>
+    ${E.map(edgeSvg).join("")}
+    ${Object.entries(N).map(([k, n]) => nodeSvg(k, n)).join("")}
+  </svg>`;
+
+  const host = document.getElementById("mapHost");
+  host.innerHTML = svg;
+
+  function select(id) {
+    host.querySelectorAll(".node").forEach((g) => g.classList.toggle("sel", g.dataset.id === id));
+    const lit = LIT[id] || [];
+    host.querySelectorAll(".edge").forEach((g) => g.classList.toggle("lit", lit.includes(g.dataset.id)));
+    const [kind, what, where, note] = DETAIL[id];
+    const [bg, fg] = KIND_STYLE[kind] || ["var(--surface-2)", "var(--ink-600)"];
+    document.getElementById("rail").innerHTML =
+      `<span class="tag" style="background:${bg};color:${fg}">${esc(kind)}</span>
+       <h2>${esc(N[id].label)}</h2>
+       <dl>
+         <div><dt>What it does</dt><dd>${esc(what)}</dd></div>
+         <div><dt>Where it lives</dt><dd class="path">${esc(where)}</dd></div>
+         <div><dt>Worth knowing</dt><dd>${esc(note)}</dd></div>
+       </dl>
+       <p class="hint">Select another box in the diagram.</p>`;
+  }
+
+  host.querySelectorAll(".node").forEach((g) => {
+    const go = () => select(g.dataset.id);
+    g.addEventListener("click", go);
+    g.addEventListener("keydown", (ev) => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); go(); } });
+  });
+  select("pg");
+})();
+</script>

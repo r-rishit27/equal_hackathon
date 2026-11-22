@@ -1,0 +1,445 @@
+<title>Reckon.ai System Architecture</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+/* One figure, sized 16:9 for a slide. The page is chrome; the diagram keeps a fixed
+   blue-on-white palette in both themes so the exported PNG matches what is on screen. */
+:root {
+  --bg: #f4f8fd; --surface: #ffffff; --line: #d9e4f2; --ink: #0b1b30; --muted: #4c5f79;
+  --brand: #0b4fa8; --brand-soft: #e8f1fd;
+  --font: Inter, "Segoe UI", system-ui, -apple-system, sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #081220; --surface: #0f1d30; --line: #1f3450; --ink: #eaf1fa; --muted: #a2b4ca;
+    --brand: #74aef0; --brand-soft: #142942; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #081220; --surface: #0f1d30; --line: #1f3450; --ink: #eaf1fa; --muted: #a2b4ca;
+  --brand: #74aef0; --brand-soft: #142942; color-scheme: dark;
+}
+* { box-sizing: border-box }
+body { margin: 0; background: var(--bg); color: var(--muted); font: 400 15px/1.55 var(--font) }
+.wrap {
+  max-width: 1360px; margin: 0 auto;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 26px 40px; display: grid; gap: 16px;
+}
+h1 { margin: 0; font: 700 clamp(22px, 3vw, 30px)/1.12 var(--font); color: var(--ink); letter-spacing: -.02em; text-wrap: balance }
+p.lede { margin: 0; max-width: 72ch }
+p.lede b { color: var(--ink); font-weight: 600 }
+figure { margin: 0; background: #fff; border: 1px solid var(--line); border-radius: 14px; overflow: hidden }
+.scroll { overflow-x: auto }
+svg.map { display: block; width: 100%; min-width: 980px; height: auto }
+figcaption { padding: 11px 15px; border-top: 1px solid var(--line); background: var(--surface); color: var(--muted); font-size: 13px }
+.bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center }
+button {
+  font: 600 13.5px var(--font); color: #fff; background: var(--brand); border: 0;
+  border-radius: 8px; padding: 9px 15px; cursor: pointer;
+}
+button.ghost { background: var(--brand-soft); color: var(--brand) }
+button:hover { filter: brightness(1.07) }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px }
+.note { font-size: 12.5px; color: var(--muted) }
+code { font: 12px/1.5 Consolas, "JetBrains Mono", monospace; background: var(--brand-soft); color: var(--brand); padding: 2px 5px; border-radius: 4px }
+</style>
+
+<main class="wrap">
+  <h1>Reckon.ai capability map</h1>
+  <p class="lede">Capture, control and settlement as the finance team meets them, the agents and pipelines that do the work behind each one, and the AWS footprint it all runs on. Drawn 16:9 for a slide.</p>
+  <div class="bar">
+    <button type="button" id="png">Download PNG &middot; 3200 &times; 1800</button>
+    <button type="button" class="ghost" id="svgdl">Download SVG</button>
+    <span class="note" id="exporthint">PowerPoint: <b>Insert &rsaquo; Pictures</b> and pick the SVG to keep the text crisp, or drop in the PNG.</span>
+  </div>
+  <figure>
+    <div class="scroll"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 900" class="map" role="img" aria-label="Reckon.ai capability map. Invoices, vendor email, WhatsApp messages, ERP feeds, bank statements and PO, GRN and contract evidence come in on the left. Capture turns them into structured records with the OCR engine, e-invoice and document parsing, the email and WhatsApp communication agents and ERP ingestion. Control and agents then run vendor onboarding and KYC, GST, TDS and bank verification, four-way reconciliation, the Review Hub, the approval chain, the CFO Orchestrator, Reckon Copilot, the Vendor Playground and RBAC. Settle, collect and forecast covers IMPS payouts through ICICI and HDFC, gateway status, the cash application agent, the receivables review board, the cash flow predictor, Nova service inventory optimisation, the finance dashboard and report packs. Behind all of it run twelve change-data-capture pipeline workers, one PostgreSQL store and event bus, the agent runtime and a full audit log. It is deployed on AWS: Amplify for the React frontend, EC2 for the API and the pipeline workers, RDS for PostgreSQL, S3 and CloudFront for documents, and external AI, KYB and banking providers.">
+<defs><radialGradient id="rckCore" cx="36%" cy="30%" r="76%"><stop offset="0" stop-color="#EAF5FF"/><stop offset=".38" stop-color="#A9D0F5"/><stop offset=".72" stop-color="#4E93DE"/><stop offset="1" stop-color="#164E90"/></radialGradient><linearGradient id="rckDia" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#7CC3F8"/><stop offset="1" stop-color="#1462C4"/></linearGradient><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6.2" markerHeight="6.2" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8FA8C8"/></marker></defs>
+<rect width="1600" height="900" fill="#FFFFFF"/>
+<rect x="0" y="0" width="1600" height="82" fill="#F5F9FF"/>
+<g transform="translate(40 24) scale(1.2500)"><g fill="none" stroke="#2E9BF0" stroke-opacity=".85" stroke-width=".95"><ellipse cx="12" cy="12" rx="10.6" ry="4" transform="rotate(-32 12 12)"/><ellipse cx="12" cy="12" rx="10.6" ry="4" transform="rotate(28 12 12)"/><ellipse cx="12" cy="12" rx="10.6" ry="4" transform="rotate(90 12 12)"/></g><circle cx="12" cy="12" r="5.6" fill="url(#rckCore)"/><g fill="url(#rckDia)"><rect x="-1.65" y="-1.65" width="3.3" height="3.3" rx=".95" transform="translate(2.65 7.05) rotate(45)"/><rect x="-1.65" y="-1.65" width="3.3" height="3.3" rx=".95" transform="translate(21 6.4) rotate(45)"/><rect x="-1.65" y="-1.65" width="3.3" height="3.3" rx=".95" transform="translate(21.35 16.95) rotate(45)"/><rect x="-1.65" y="-1.65" width="3.3" height="3.3" rx=".95" transform="translate(3 17.6) rotate(45)"/></g></g>
+<text x="80" y="48" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="22" font-weight="700" fill="#0B1B30" letter-spacing="-.4">Reckon.ai</text>
+<text x="205" y="48" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="14.5" fill="#4C5F79">What the platform does, how the pieces interconnect, and what runs behind them</text>
+<text x="1560" y="36" text-anchor="end" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="600" fill="#0B4FA8">Payables &#183; Receivables &#183; Working capital &#183; one tenant-scoped workspace</text>
+<text x="1560" y="55" text-anchor="end" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="11" fill="#7D90AB">branch dev &#183; README.md &#167; 1&#8211;2</text>
+<line x1="0" y1="82" x2="1600" y2="82" stroke="#D3E0F0"/>
+<rect x="256" y="126" width="288" height="410" rx="14" fill="#F6FAFF" stroke="#DCE8F7"/>
+<rect x="584" y="126" width="420" height="410" rx="14" fill="#EFF6FF" stroke="#C6DBF5"/>
+<rect x="1044" y="126" width="516" height="410" rx="14" fill="#F6FAFF" stroke="#DCE8F7"/>
+<text x="40" y="112" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#7D90AB">WHAT COMES IN</text>
+<text x="256" y="112" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#0B4FA8">1 · CAPTURE</text>
+<text x="584" y="112" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#0B4FA8">2 · CONTROL &amp; AGENTS</text>
+<text x="1044" y="112" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#0B4FA8">3 · SETTLE, COLLECT &amp; FORECAST</text>
+<path d="M216,340 H254" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M546,340 H582" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M1006,340 H1042" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<text transform="translate(236 334) rotate(-90)" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.6" fill="#566B86">documents</text>
+<text transform="translate(565 334) rotate(-90)" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.6" fill="#566B86">structured facts</text>
+<text transform="translate(1025 334) rotate(-90)" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.6" fill="#566B86">approved actions</text>
+<g class="node" data-id="src0">
+<rect x="40" y="146" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 156) scale(0.6667)"><circle cx="8.6" cy="7.6" r="4" fill="#1565D8"/><circle cx="17.4" cy="9" r="3.2" fill="#7FB0EE"/><path d="M1.4 21c.7-4.4 3.6-6.8 7.2-6.8S15.1 16.6 15.8 21z" fill="#1565D8"/><path d="M16.6 14.6c3 .1 5.2 2.2 6 6.4h-4.4c-.2-2.6-.8-4.6-1.6-6.4z" fill="#7FB0EE"/></g>
+<text x="72" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">Finance team</text>
+<text x="52" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">analyst · approver · CFO</text>
+</g>
+<g class="node" data-id="src1">
+<rect x="40" y="212" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 222) scale(0.6667)"><rect x="1.5" y="5" width="21" height="14" rx="2.4" fill="#fff" stroke="#DADCE0"/><path d="M1.5 7.2 12 14.4 22.5 7.2" fill="none" stroke="#EA4335" stroke-width="2.2"/><path d="M1.5 7.4V17a2 2 0 0 0 2 2h1.4V9.6z" fill="#4285F4"/><path d="M22.5 7.4V17a2 2 0 0 1-2 2h-1.4V9.6z" fill="#34A853"/></g>
+<text x="72" y="235" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">Vendor email</text>
+<text x="52" y="251" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">invoices and replies</text>
+</g>
+<g class="node" data-id="src2">
+<rect x="40" y="278" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 288) scale(0.6667)"><circle cx="12" cy="12" r="11.5" fill="#F22F46"/><g fill="#fff"><circle cx="8.4" cy="8.4" r="2.1"/><circle cx="15.6" cy="8.4" r="2.1"/><circle cx="8.4" cy="15.6" r="2.1"/><circle cx="15.6" cy="15.6" r="2.1"/></g></g>
+<text x="72" y="301" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">WhatsApp</text>
+<text x="52" y="317" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">PDFs, terms, queries</text>
+</g>
+<g class="node" data-id="src3">
+<rect x="40" y="344" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 354) scale(0.6667)"><rect x="1.5" y="1.5" width="21" height="21" rx="5" fill="#0B4FA8"/><text x="12" y="17" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="13" font-weight="700" fill="#fff">T</text></g>
+<text x="72" y="367" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">Tally · SAP · Apideck</text>
+<text x="52" y="383" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">ledgers, vouchers, COA</text>
+</g>
+<g class="node" data-id="src4">
+<rect x="40" y="410" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 420) scale(0.6667)"><path d="M12 2.4 22 7.6v2H2v-2z" fill="#0B4FA8"/><g fill="#1565D8"><rect x="4.6" y="11" width="2.6" height="7.6"/><rect x="10.7" y="11" width="2.6" height="7.6"/><rect x="16.8" y="11" width="2.6" height="7.6"/></g><rect x="2" y="19.6" width="20" height="2.4" rx="1" fill="#0B4FA8"/></g>
+<text x="72" y="433" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">Bank statements</text>
+<text x="52" y="449" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">credits, UTR, MT940/CSV</text>
+</g>
+<g class="node" data-id="src5">
+<rect x="40" y="476" width="176" height="56" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 486) scale(0.6667)"><path d="M4.4 1.8h9.2L19.6 7.8V22H4.4z" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.4 2v6h6" fill="none" stroke="#1565D8" stroke-width="1.5"/><path d="M7.6 12.6h8.4M7.6 16h6" stroke="#1565D8" stroke-width="1.5" stroke-linecap="round"/></g>
+<text x="72" y="499" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" font-weight="700" fill="#0B1B30">PO · GRN · contracts</text>
+<text x="52" y="515" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">evidence for matching</text>
+</g>
+<g class="node" data-id="cap0">
+<rect x="268" y="146" width="264" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(279 156) scale(0.7083)"><path d="M2.4 7.4V4.2a1.8 1.8 0 0 1 1.8-1.8h3.2M16.6 2.4h3.2A1.8 1.8 0 0 1 21.6 4.2v3.2M21.6 16.6v3.2a1.8 1.8 0 0 1-1.8 1.8h-3.2M7.4 21.6H4.2a1.8 1.8 0 0 1-1.8-1.8v-3.2" fill="none" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round"/><rect x="6.2" y="10.6" width="11.6" height="2.8" rx="1.4" fill="#1565D8"/></g>
+<text x="302" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">OCR engine</text>
+<text x="280" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">GPT-4o vision, Sarvam AI fallback;</text>
+<text x="280" y="199" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">fields merged by confidence</text>
+</g>
+<g class="node" data-id="cap1">
+<rect x="268" y="222" width="264" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(279 232) scale(0.7083)"><path d="M4.4 1.8h9.2L19.6 7.8V22H4.4z" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.4 2v6h6" fill="none" stroke="#1565D8" stroke-width="1.5"/><path d="M7.6 12.6h8.4M7.6 16h6" stroke="#1565D8" stroke-width="1.5" stroke-linecap="round"/></g>
+<text x="302" y="245" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">E-invoice &amp; doc parsing</text>
+<text x="280" y="261" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">IRN/GST invoice, PO, GRN, contract</text>
+<text x="280" y="275" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">→ header + line items</text>
+</g>
+<g class="node" data-id="cap2">
+<rect x="268" y="298" width="264" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(279 308) scale(0.7083)"><path d="M2.4 13.4 5.6 4.2A2 2 0 0 1 7.5 2.8h9a2 2 0 0 1 1.9 1.4l3.2 9.2v5.8a2 2 0 0 1-2 2H4.4a2 2 0 0 1-2-2z" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.5" stroke-linejoin="round"/><path d="M2.4 13.6h5.2l1.4 2.8h6l1.4-2.8h5.2" fill="none" stroke="#1565D8" stroke-width="1.8" stroke-linejoin="round"/></g>
+<text x="302" y="321" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Email intake agent</text>
+<text x="280" y="337" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">watched mailboxes polled every 600 s,</text>
+<text x="280" y="351" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">attachments → draft bills</text>
+</g>
+<g class="node" data-id="cap3">
+<rect x="268" y="374" width="264" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(279 384) scale(0.7083)"><rect x="2.6" y="6.4" width="18.8" height="14" rx="4.4" fill="#1565D8"/><circle cx="8.6" cy="13" r="2.1" fill="#fff"/><circle cx="15.4" cy="13" r="2.1" fill="#fff"/><path d="M12 2.2v4.2M1 12v4M23 12v4" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="1.8" r="1.8" fill="#0B4FA8"/></g>
+<text x="302" y="397" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">WhatsApp agent</text>
+<text x="280" y="413" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">inbound PDFs → drafts; text → terms</text>
+<text x="280" y="427" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">extraction; replies in the 24 h window</text>
+</g>
+<g class="node" data-id="cap4">
+<rect x="268" y="450" width="264" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(279 460) scale(0.7083)"><path d="M8.2 1.8v5M15.8 1.8v5" stroke="#0B4FA8" stroke-width="2.2" stroke-linecap="round"/><path d="M4.6 7.4h14.8v4a7.4 7.4 0 0 1-14.8 0z" fill="#1565D8"/><path d="M12 18.6v4.2" stroke="#0B4FA8" stroke-width="2.2" stroke-linecap="round"/></g>
+<text x="302" y="473" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">ERP &amp; feed ingestion</text>
+<text x="280" y="489" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">Tally pull or agent push, Apideck,</text>
+<text x="280" y="503" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">SAP mapping, gateway webhooks</text>
+</g>
+<g class="node" data-id="ctl0">
+<rect x="596" y="146" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="596" y="154" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(607 156) scale(0.7083)"><circle cx="12" cy="9.6" r="7.4" fill="#1565D8"/><path d="M8.6 9.8 11 12.2l4.6-4.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M7.6 16.2 6 22.4l6-2.4 6 2.4-1.6-6.2" fill="#7FB0EE"/></g>
+<text x="630" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Vendor onboarding</text>
+<text x="608" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">KYC pack: GSTIN, PAN,</text>
+<text x="608" y="199" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">bank account, documents</text>
+</g>
+<g class="node" data-id="ctl1">
+<rect x="802" y="146" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="802" y="154" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(813 156) scale(0.7083)"><path d="M12 2 21 5.6v6.2c0 5.2-3.7 8.6-9 10.2-5.3-1.6-9-5-9-10.2V5.6z" fill="#0B4FA8"/><path d="M7.8 12.2 11 15.4l5.4-5.8" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="836" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">GST · TDS · COA</text>
+<text x="814" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">sections, thresholds, rules,</text>
+<text x="814" y="199" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">ledger auto-suggest</text>
+</g>
+<g class="node" data-id="ctl2">
+<rect x="596" y="222" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="596" y="230" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(607 232) scale(0.7083)"><g fill="none" stroke="#1565D8" stroke-width="1.8"><rect x="2" y="2.6" width="8" height="8" rx="2"/><rect x="14" y="2.6" width="8" height="8" rx="2"/><rect x="2" y="13.4" width="8" height="8" rx="2"/><rect x="14" y="13.4" width="8" height="8" rx="2"/></g><path d="M10 6.6h4M10 17.4h4M6 10.6v2.8M18 10.6v2.8" stroke="#0B4FA8" stroke-width="1.8" stroke-linecap="round"/></g>
+<text x="630" y="245" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">4-way reconciliation</text>
+<text x="608" y="261" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">invoice × PO × GRN ×</text>
+<text x="608" y="275" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">contract terms, line by line</text>
+</g>
+<g class="node" data-id="ctl3">
+<rect x="802" y="222" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="802" y="230" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(813 232) scale(0.7083)"><circle cx="10.6" cy="10.6" r="7.6" fill="none" stroke="#1565D8" stroke-width="2"/><path d="M16.4 16.4 22 22" stroke="#0B4FA8" stroke-width="2.4" stroke-linecap="round"/><path d="M7.4 10.8 9.8 13.2l4-4.6" fill="none" stroke="#1565D8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="836" y="245" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Review Hub</text>
+<text x="814" y="261" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">findings with evidence;</text>
+<text x="814" y="275" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">resolve, snooze, rerun</text>
+</g>
+<g class="node" data-id="ctl4">
+<rect x="596" y="298" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="596" y="306" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(607 308) scale(0.7083)"><g fill="none" stroke="#1565D8" stroke-width="2" stroke-linecap="round"><path d="M12 4.4h5.2a3.4 3.4 0 0 1 0 6.8H14"/><path d="M12 19.6H6.8a3.4 3.4 0 0 1 0-6.8H10"/></g><path d="M8.4 7.8H4M8.4 16.2H4" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round"/><circle cx="18.6" cy="16.4" r="3.2" fill="#1565D8"/><path d="M17.2 16.5l1 1 2-2.2" fill="none" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/></g>
+<text x="630" y="321" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Approval chain</text>
+<text x="608" y="337" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">per-tenant steps, send-back,</text>
+<text x="608" y="351" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">every decision recorded</text>
+</g>
+<g class="node" data-id="ctl5">
+<rect x="802" y="298" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="802" y="306" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(813 308) scale(0.7083)"><g fill="#1565D8"><rect x="1.8" y="9.4" width="6" height="5.2" rx="1.8"/><rect x="16.2" y="9.4" width="6" height="5.2" rx="1.8"/></g><rect x="9" y="3" width="6" height="5.2" rx="1.8" fill="#0B4FA8"/><rect x="9" y="15.8" width="6" height="5.2" rx="1.8" fill="#0B4FA8"/><g fill="none" stroke="#9FC4EC" stroke-width="1.6"><path d="M7.8 11.4 9 7.4M7.8 12.6 9 17M16.2 11.4 15 7.4M16.2 12.6 15 17"/></g></g>
+<text x="836" y="321" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">CFO Orchestrator</text>
+<text x="814" y="337" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">five-stage control review:</text>
+<text x="814" y="351" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">pass, review or blocked</text>
+</g>
+<g class="node" data-id="ctl6">
+<rect x="596" y="374" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="596" y="382" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(607 384) scale(0.7083)"><path d="M9 2.4 10.9 7.7 16.2 9.6 10.9 11.5 9 16.8 7.1 11.5 1.8 9.6 7.1 7.7z" fill="#1565D8"/><path d="M17.4 13.6 18.5 16.5 21.4 17.6 18.5 18.7 17.4 21.6 16.3 18.7 13.4 17.6 16.3 16.5z" fill="#7FB0EE"/></g>
+<text x="630" y="397" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Reckon Copilot</text>
+<text x="608" y="413" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">ask across bills, vendors,</text>
+<text x="608" y="427" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">findings — answers in context</text>
+</g>
+<g class="node" data-id="ctl7">
+<rect x="802" y="374" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="802" y="382" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(813 384) scale(0.7083)"><g fill="none" stroke="#1565D8" stroke-width="1.8"><path d="M7.4 6.4h5.2M7.4 17.6h5.2M16 8.6l-3 2.6M16 15.4l-3-2.6"/></g><g fill="#1565D8"><circle cx="4.4" cy="6.4" r="3"/><circle cx="4.4" cy="17.6" r="3"/></g><rect x="13.6" y="8.8" width="7.6" height="6.4" rx="2" fill="#0B4FA8"/></g>
+<text x="836" y="397" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Vendor Playground</text>
+<text x="814" y="413" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">plug-and-play agent nodes;</text>
+<text x="814" y="427" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">vendor-specific checks</text>
+</g>
+<g class="node" data-id="ctl8">
+<rect x="596" y="450" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="596" y="458" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(607 460) scale(0.7083)"><rect x="3.6" y="10" width="16.8" height="12" rx="3" fill="#1565D8"/><path d="M7.4 10V7.2a4.6 4.6 0 0 1 9.2 0V10" fill="none" stroke="#0B4FA8" stroke-width="2.4"/><circle cx="12" cy="15.6" r="2" fill="#fff"/></g>
+<text x="630" y="473" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">RBAC &amp; entitlements</text>
+<text x="608" y="489" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">role + tenant plan gate</text>
+<text x="608" y="503" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">every route and screen</text>
+</g>
+<g class="node" data-id="ctl9">
+<rect x="802" y="450" width="194" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<rect x="802" y="458" width="3.5" height="50" rx="1.8" fill="#1565D8"/>
+<g transform="translate(813 460) scale(0.7083)"><path d="M20.4 10.4A8.6 8.6 0 0 0 5.6 6.6M3.6 13.6a8.6 8.6 0 0 0 14.8 3.8" fill="none" stroke="#1565D8" stroke-width="2" stroke-linecap="round"/><path d="M20.8 4.6v6h-6M3.2 19.4v-6h6" fill="none" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="836" y="473" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Duplicate &amp; anomaly</text>
+<text x="814" y="489" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">exact match blocks, soft</text>
+<text x="814" y="503" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">match flags for review</text>
+</g>
+<g class="node" data-id="pay0">
+<rect x="1056" y="146" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1067 156) scale(0.7083)"><rect x="2" y="5" width="20" height="14.4" rx="3.4" fill="#1565D8"/><path d="M2 9.4h20" stroke="#0B4FA8" stroke-width="1.6"/><rect x="14.6" y="12" width="7.4" height="4.6" rx="2.3" fill="#fff"/><circle cx="18.3" cy="14.3" r="1.2" fill="#1565D8"/></g>
+<text x="1090" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Payment Hub · IMPS payouts</text>
+<text x="1068" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">ICICI · HDFC · AU rails; single or bulk,</text>
+<text x="1068" y="199" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">OTP-confirmed, beneficiary checked</text>
+</g>
+<g class="node" data-id="pay1">
+<rect x="1310" y="146" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1321 156) scale(0.7083)"><path d="M8.2 1.8v5M15.8 1.8v5" stroke="#0B4FA8" stroke-width="2.2" stroke-linecap="round"/><path d="M4.6 7.4h14.8v4a7.4 7.4 0 0 1-14.8 0z" fill="#1565D8"/><path d="M12 18.6v4.2" stroke="#0B4FA8" stroke-width="2.2" stroke-linecap="round"/></g>
+<text x="1344" y="169" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Gateway integration</text>
+<text x="1322" y="185" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">status polled and reconciled;</text>
+<text x="1322" y="199" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">idempotent on tran_ref_no</text>
+</g>
+<g class="node" data-id="pay2">
+<rect x="1056" y="222" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1067 232) scale(0.7083)"><path d="M20.4 10.4A8.6 8.6 0 0 0 5.6 6.6M3.6 13.6a8.6 8.6 0 0 0 14.8 3.8" fill="none" stroke="#1565D8" stroke-width="2" stroke-linecap="round"/><path d="M20.8 4.6v6h-6M3.2 19.4v-6h6" fill="none" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1090" y="245" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Cash application agent</text>
+<text x="1068" y="261" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">bank credits matched to sales invoices,</text>
+<text x="1068" y="275" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">auto-applied within policy</text>
+</g>
+<g class="node" data-id="pay3">
+<rect x="1310" y="222" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1321 232) scale(0.7083)"><circle cx="10.6" cy="10.6" r="7.6" fill="none" stroke="#1565D8" stroke-width="2"/><path d="M16.4 16.4 22 22" stroke="#0B4FA8" stroke-width="2.4" stroke-linecap="round"/><path d="M7.4 10.8 9.8 13.2l4-4.6" fill="none" stroke="#1565D8" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></g>
+<text x="1344" y="245" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Receivables review board</text>
+<text x="1322" y="261" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">ambiguous matches, manual allocation,</text>
+<text x="1322" y="275" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">reversals and cash KPIs</text>
+</g>
+<g class="node" data-id="pay4">
+<rect x="1056" y="298" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1067 308) scale(0.7083)"><path d="M2.4 17.6 8 11.4l4 3.6 7.8-8.6" fill="none" stroke="#1565D8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M14.6 6.4h5.6V12" fill="none" stroke="#0B4FA8" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.4 21.4h19.2" stroke="#9FC4EC" stroke-width="2" stroke-linecap="round"/></g>
+<text x="1090" y="321" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Cash flow predictor</text>
+<text x="1068" y="337" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">30-day daily bank cash; expected,</text>
+<text x="1068" y="351" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">downside and no-collections</text>
+</g>
+<g class="node" data-id="pay5">
+<rect x="1310" y="298" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1321 308) scale(0.7083)"><rect x="2" y="2.6" width="20" height="18.8" rx="3" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.4"/><g fill="#1565D8"><rect x="6" y="12" width="3" height="6" rx="1"/><rect x="10.6" y="8.4" width="3" height="9.6" rx="1"/><rect x="15.2" y="5.6" width="3" height="12.4" rx="1"/></g></g>
+<text x="1344" y="321" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Nova optimisation</text>
+<text x="1322" y="337" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">service inventory: invoice vs usage</text>
+<text x="1322" y="351" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">vs certified rate card</text>
+</g>
+<g class="node" data-id="pay6">
+<rect x="1056" y="374" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1067 384) scale(0.7083)"><rect x="2" y="3" width="20" height="18" rx="3.4" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.5"/><path d="M2 8h20" stroke="#1565D8" stroke-width="1.5"/><g fill="#1565D8"><rect x="5" y="11" width="6" height="7" rx="1.6"/><rect x="13" y="11" width="6" height="3.4" rx="1.6"/><rect x="13" y="16" width="6" height="2" rx="1"/></g></g>
+<text x="1090" y="397" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Finance dashboard</text>
+<text x="1068" y="413" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">spend, ageing, outstanding,</text>
+<text x="1068" y="427" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">approval activity by brand</text>
+</g>
+<g class="node" data-id="pay7">
+<rect x="1310" y="374" width="240" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1321 384) scale(0.7083)"><path d="M4.4 1.8h9.2L19.6 7.8V22H4.4z" fill="#fff" stroke="#1565D8" stroke-width="1.5" stroke-linejoin="round"/><path d="M13.4 2v6h6" fill="none" stroke="#1565D8" stroke-width="1.5"/><g fill="#1565D8"><rect x="7.4" y="14.4" width="2.4" height="4.4" rx=".8"/><rect x="11" y="12" width="2.4" height="6.8" rx=".8"/><rect x="14.6" y="15.8" width="2.4" height="3" rx=".8"/></g></g>
+<text x="1344" y="397" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Reports &amp; financing pack</text>
+<text x="1322" y="413" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">XLSX / CSV exports, expense and</text>
+<text x="1322" y="427" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">working-capital reporting</text>
+</g>
+<g class="node" data-id="comm">
+<rect x="1056" y="450" width="494" height="66" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1067 460) scale(0.7083)"><path d="M2.4 13.4 5.6 4.2A2 2 0 0 1 7.5 2.8h9a2 2 0 0 1 1.9 1.4l3.2 9.2v5.8a2 2 0 0 1-2 2H4.4a2 2 0 0 1-2-2z" fill="#E6EFFC" stroke="#1565D8" stroke-width="1.5" stroke-linejoin="round"/><path d="M2.4 13.6h5.2l1.4 2.8h6l1.4-2.8h5.2" fill="none" stroke="#1565D8" stroke-width="1.8" stroke-linejoin="round"/></g>
+<text x="1090" y="473" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">Communication outbox</text>
+<text x="1068" y="489" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">vendor nudges, WhatsApp and e-mail replies, delivery status — sent only inside the</text>
+<text x="1068" y="503" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">vendor&#x27;s reply window; every message stays tied to the bill or vendor it belongs to</text>
+</g>
+<path d="M400,536 V588" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M794,536 V588" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M1302,536 V588" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<text x="40" y="572" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#7D90AB">WHAT IS BEHIND IT · DATA PIPELINES, STORE AND LOGS</text>
+<rect x="40" y="586" width="1520" height="112" rx="14" fill="#F3F8FE" stroke="#DCE8F7"/>
+<g class="node" data-id="eng0">
+<rect x="52" y="598" width="364" height="88" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(63 608) scale(0.7500)"><path d="M12 1.6c-3.2 0-5 1.4-5 3.6v2.6h5.2v.9H5.1C2.8 8.7 1.4 10.2 1.4 13.2c0 2.9 1.3 4.5 3.5 4.5h1.9v-3.1c0-2.4 1.9-4.3 4.3-4.3h4.6c2 0 3.4-1.5 3.4-3.3V5.2c0-2-1.6-3.3-3.8-3.6z" fill="#366B99"/><circle cx="9.1" cy="5" r="1.1" fill="#fff"/><path d="M12 22.4c3.2 0 5-1.4 5-3.6v-2.6h-5.2v-.9h7.1c2.3 0 3.7-1.5 3.7-4.5 0-2.9-1.3-4.5-3.5-4.5h-1.9v3.1c0 2.4-1.9 4.3-4.3 4.3H8.3c-2 0-3.4 1.5-3.4 3.3v2.8c0 2 1.6 3.3 3.8 3.6z" fill="#FFCE3F"/><circle cx="14.9" cy="19" r="1.1" fill="#fff"/></g>
+<text x="88" y="621" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#0B1B30">Ingestion pipeline</text>
+<text x="64" y="637" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">12 CDC workers in one asyncio process</text>
+<text x="64" y="651" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.799999999999999" fill="#4C5F79">raw_ → stg_ → fact_  validate, dedup, promote</text>
+<text x="64" y="665" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">OCR, GST, TDS, bank verify, Tally sync</text>
+</g>
+<g class="node" data-id="eng1">
+<rect x="428" y="598" width="364" height="88" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(439 608) scale(0.7500)"><ellipse cx="12" cy="5.4" rx="9.2" ry="3.4" fill="#2F6793"/><path d="M2.8 5.4v13.2c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4V5.4" fill="#3B7AAD"/><g fill="none" stroke="#fff" stroke-width="1.1" stroke-opacity=".9"><path d="M2.8 5.4c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4"/><path d="M2.8 12c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4"/></g></g>
+<text x="464" y="621" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#0B1B30">PostgreSQL store &amp; bus</text>
+<text x="440" y="637" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">tenant_id on every row, fiscal period stored</text>
+<text x="440" y="651" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.799999999999999" fill="#4C5F79">LISTEN / NOTIFY  wakes the next worker in &lt; 50 ms</text>
+<text x="440" y="665" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">no Kafka, no broker to operate</text>
+</g>
+<g class="node" data-id="eng2">
+<rect x="804" y="598" width="364" height="88" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(815 608) scale(0.7500)"><rect x="2.6" y="6.4" width="18.8" height="14" rx="4.4" fill="#1565D8"/><circle cx="8.6" cy="13" r="2.1" fill="#fff"/><circle cx="15.4" cy="13" r="2.1" fill="#fff"/><path d="M12 2.2v4.2M1 12v4M23 12v4" stroke="#0B4FA8" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="1.8" r="1.8" fill="#0B4FA8"/></g>
+<text x="840" y="621" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#0B1B30">Agent runtime</text>
+<text x="816" y="637" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">Review Hub scheduler and compliance adapters</text>
+<text x="816" y="651" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">Agent Hub Fact Graph, CFO review, forecast engine</text>
+<text x="816" y="665" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">mailbox and payment-status sweeps</text>
+</g>
+<g class="node" data-id="eng3">
+<rect x="1180" y="598" width="364" height="88" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1191 608) scale(0.7500)"><rect x="3.6" y="10" width="16.8" height="12" rx="3" fill="#1565D8"/><path d="M7.4 10V7.2a4.6 4.6 0 0 1 9.2 0V10" fill="none" stroke="#0B4FA8" stroke-width="2.4"/><circle cx="12" cy="15.6" r="2" fill="#fff"/></g>
+<text x="1216" y="621" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12.5" font-weight="700" fill="#0B1B30">Audit &amp; logs</text>
+<text x="1192" y="637" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.799999999999999" fill="#4C5F79">wf_audit_log  entity changes with before/after</text>
+<text x="1192" y="651" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.799999999999999" fill="#4C5F79">int_sync_jobs  run history · gateway call log</text>
+<text x="1192" y="665" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.2" fill="#4C5F79">approval, override and access trails</text>
+</g>
+<text x="40" y="722" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" font-weight="700" letter-spacing="1.5" fill="#0B4FA8">HOW IT IS DEPLOYED · AWS</text>
+<text x="316" y="722" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="10.5" fill="#7D90AB">frontend on Amplify &#183; API and pipeline workers on EC2 behind Nginx &#183; one RDS instance &#183; documents on S3</text>
+<g class="node" data-id="dep0">
+<rect x="40" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(51 744) scale(0.7083)"><g fill="none" stroke="#1593C4" stroke-width="1.6"><ellipse cx="12" cy="12" rx="11" ry="4.2"/><ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="11" ry="4.2" transform="rotate(120 12 12)"/></g><circle cx="12" cy="12" r="2.5" fill="#1593C4"/></g>
+<text x="74" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">AWS Amplify</text>
+<text x="52" y="773" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">React 18 + Vite + TS build</text>
+<text x="52" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">static frontend, SPA rewrites</text>
+<text x="52" y="801" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.4" fill="#4C5F79">VITE_API_URL at build time</text>
+</g>
+<g class="node" data-id="dep1">
+<rect x="295" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(306 744) scale(0.7083)"><circle cx="12" cy="12" r="11.5" fill="#05998B"/><path d="M13.4 3.4 L6.2 13.1 h4.6 L9.9 20.6 L17.8 10.3 h-4.9z" fill="#fff"/></g>
+<text x="329" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">EC2 · API</text>
+<text x="307" y="773" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">Nginx terminates HTTPS</text>
+<text x="307" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">FastAPI + Uvicorn systemd units</text>
+<text x="307" y="801" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.4" fill="#4C5F79">prod :8001  dev :8002</text>
+</g>
+<g class="node" data-id="dep2">
+<rect x="550" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(561 744) scale(0.7083)"><path d="M12 1.6c-3.2 0-5 1.4-5 3.6v2.6h5.2v.9H5.1C2.8 8.7 1.4 10.2 1.4 13.2c0 2.9 1.3 4.5 3.5 4.5h1.9v-3.1c0-2.4 1.9-4.3 4.3-4.3h4.6c2 0 3.4-1.5 3.4-3.3V5.2c0-2-1.6-3.3-3.8-3.6z" fill="#366B99"/><circle cx="9.1" cy="5" r="1.1" fill="#fff"/><path d="M12 22.4c3.2 0 5-1.4 5-3.6v-2.6h-5.2v-.9h7.1c2.3 0 3.7-1.5 3.7-4.5 0-2.9-1.3-4.5-3.5-4.5h-1.9v3.1c0 2.4-1.9 4.3-4.3 4.3H8.3c-2 0-3.4 1.5-3.4 3.3v2.8c0 2 1.6 3.3 3.8 3.6z" fill="#FFCE3F"/><circle cx="14.9" cy="19" r="1.1" fill="#fff"/></g>
+<text x="584" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">EC2 · pipelines</text>
+<text x="562" y="773" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="9.4" fill="#4C5F79">python main.py  worker process</text>
+<text x="562" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">Nova service on :8102</text>
+<text x="562" y="801" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">scales by adding runners</text>
+</g>
+<g class="node" data-id="dep3">
+<rect x="805" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(816 744) scale(0.7083)"><ellipse cx="12" cy="5.4" rx="9.2" ry="3.4" fill="#2F6793"/><path d="M2.8 5.4v13.2c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4V5.4" fill="#3B7AAD"/><g fill="none" stroke="#fff" stroke-width="1.1" stroke-opacity=".9"><path d="M2.8 5.4c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4"/><path d="M2.8 12c0 1.9 4.1 3.4 9.2 3.4s9.2-1.5 9.2-3.4"/></g></g>
+<text x="839" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">RDS · PostgreSQL 15</text>
+<text x="817" y="773" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">one instance for API, workers</text>
+<text x="817" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">and Nova · migrations on boot</text>
+<text x="817" y="801" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">backups and point-in-time restore</text>
+</g>
+<g class="node" data-id="dep4">
+<rect x="1060" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1071 744) scale(0.7083)"><path d="M3.4 4.6h17.2l-2 15.2c-.1.9-3.1 2.2-6.6 2.2s-6.5-1.3-6.6-2.2z" fill="#4E9A2E"/><ellipse cx="12" cy="4.6" rx="8.6" ry="2.6" fill="#6CBF45"/></g>
+<text x="1094" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">S3 + CloudFront</text>
+<text x="1072" y="773" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">invoice PDFs and attachments</text>
+<text x="1072" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">signed delivery when configured</text>
+<text x="1072" y="801" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">local disk when S3 is unset</text>
+</g>
+<g class="node" data-id="dep5">
+<rect x="1315" y="734" width="241" height="86" rx="9" fill="#FFFFFF" stroke="#D3E0F0" stroke-width="1.2"/>
+<g transform="translate(1326 744) scale(0.7083)"><circle cx="12" cy="12" r="11.5" fill="#0E1117"/><path d="M12 4.2 18.8 8.1v7.8L12 19.8 5.2 15.9V8.1z" fill="none" stroke="#fff" stroke-width="1.5"/><path d="M12 4.2v7.8l6.8 3.9M12 12 5.2 15.9" fill="none" stroke="#fff" stroke-width="1.5"/></g>
+<text x="1349" y="757" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="12" font-weight="700" fill="#0B1B30">External providers</text>
+<text x="1327" y="773" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">OpenAI · Sarvam AI · Sandbox KYB</text>
+<text x="1327" y="787" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">IMPS banking gateway · Twilio</text>
+<text x="1327" y="801" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9.8" fill="#4C5F79">called over HTTPS, keys encrypted</text>
+</g>
+<path d="M281,777 H293" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M536,777 H548" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<path d="M1046,777 H1058" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<text x="287" y="770" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9" fill="#566B86">HTTPS</text>
+<text x="542" y="770" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9" fill="#566B86">SQL</text>
+<path d="M791,777 H803" fill="none" stroke="#8FA8C8" stroke-width="1.5" stroke-linejoin="round" marker-end="url(#ar)"/>
+<text x="797" y="770" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9" fill="#566B86">NOTIFY</text>
+<text x="1052" y="770" text-anchor="middle" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="9" fill="#566B86">files</text>
+<line x1="40" y1="840" x2="1560" y2="840" stroke="#D3E0F0"/>
+<rect x="40" y="852" width="13" height="13" rx="3.5" fill="#EFF6FF" stroke="#C6DBF5"/>
+<text x="60" y="862" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="#4C5F79">Agents and controls</text>
+<rect x="185.8" y="852" width="13" height="13" rx="3.5" fill="#F6FAFF" stroke="#DCE8F7"/>
+<text x="205.8" y="862" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="#4C5F79">Product capability</text>
+<rect x="325.40000000000003" y="852" width="13" height="13" rx="3.5" fill="#FFFFFF" stroke="#D3E0F0"/>
+<text x="345.40000000000003" y="862" font-family="Segoe UI, Inter, Helvetica Neue, Arial, sans-serif" font-size="11.5" fill="#4C5F79">Service or provider</text>
+<text x="1560" y="862" text-anchor="end" font-family="Consolas, JetBrains Mono, Menlo, monospace" font-size="10.5" fill="#7D90AB">README.md &#183; docs/architecture/ARCHITECTURE.md &#183; docs/aws-deploy/DEV_ENVIRONMENT.md</text>
+</svg></div>
+    <figcaption>Documents and messages come in on the left and move right: capture turns them into structured records, control and agents decide what is true and who approves it, and the third lane pays, collects and forecasts. The strip below is what runs behind every lane &mdash; twelve change-data-capture workers, one PostgreSQL store and <code>LISTEN/NOTIFY</code> bus, the agent runtime and the audit log &mdash; and the last strip is the AWS deployment.</figcaption>
+  </figure>
+</main>
+
+<script>
+(() => {
+  const svg = document.querySelector("svg.map");
+  // Saving a file only works when this page is opened from the repository; an embedded
+  // viewer blocks it, so there the buttons come off and the path to the files is shown.
+  let embedded = false;
+  try { embedded = window.self !== window.top } catch (err) { embedded = true }
+  if (embedded) {
+    document.getElementById("png").remove();
+    document.getElementById("svgdl").remove();
+    document.getElementById("exporthint").innerHTML =
+      "For the slide, use <b>docs/architecture/system-architecture.svg</b> from the repository: " +
+      "in PowerPoint, <b>Insert › Pictures › This Device</b>. Opening " +
+      "<b>system-architecture-slide.html</b> in a browser adds PNG and SVG download buttons.";
+  }
+  const serial = () => new XMLSerializer().serializeToString(svg);
+  const save = (blob, name) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url; a.download = name; document.body.appendChild(a); a.click();
+    a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000);
+  };
+  document.getElementById("svgdl").addEventListener("click", () => {
+    save(new Blob([serial()], { type: "image/svg+xml" }), "reckon-system-architecture.svg");
+  });
+  document.getElementById("png").addEventListener("click", () => {
+    const scale = 2, w = 1600 * scale, h = 900 * scale;
+    const img = new Image();
+    img.onload = () => {
+      const c = document.createElement("canvas");
+      c.width = w; c.height = h;
+      const ctx = c.getContext("2d");
+      ctx.fillStyle = "#ffffff"; ctx.fillRect(0, 0, w, h);
+      ctx.drawImage(img, 0, 0, w, h);
+      c.toBlob((b) => save(b, "reckon-system-architecture.png"), "image/png");
+    };
+    img.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(serial());
+  });
+})();
+</script>
