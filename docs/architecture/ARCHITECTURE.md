@@ -176,7 +176,7 @@ flowchart LR
 The Insights screen at `/finance-desk/cash-forecast` calls the FastAPI router at `/api/finance-desk/cash-forecast`. The existing API process hosts the forecast engine. Enable the `cash_forecast` service for each participating tenant and apply its PostgreSQL schema through the standard migration runner. The service is off by default. [Router](../../backend_ocr/app/routers/cash_forecast.py) · [Setup and verification](../cashflow-forecast/README.md)
 
 ```mermaid
-flowchart LR
+flowchart TB
     Books["Bank balances, AP bills and payouts, AR invoices and receipts"] --> Sources["Source adapters and timing rules"]
     Inputs["Recurring items, adjustments, payment windows and collection promises"] --> Sources
     Sources --> Snap["Tenant forecast snapshot"]
@@ -192,6 +192,26 @@ flowchart LR
 The engine calculates each day's closing balance in integer paise from opening cash plus inflows less outflows. It flags a breach when closing cash falls below the tenant's reserve. A snapshot holds the inputs behind a projection, so expected, downside and no-collections views can be compared on the same basis. If daily publication is enabled, a changed live snapshot can publish the expected forecast to `fact_cashflow_daily` while preserving actual cash flows. Fixture tenants skip publication. [Engine](../../backend_ocr/app/cashflow/engine.py) · [Snapshot and plan service](../../backend_ocr/app/cashflow/service.py)
 
 Auditors can view forecasts. Accountants can also edit inputs and prepare plans. Finance controllers and admins can manage settings and decide plans. Impersonated sessions are read-only. Approval checks source coverage, the submitted version, the current forecast and the tenant's self-approval policy. An approved decision supplies planned cash dates for forecasting. Payment execution stays in the disbursement workflow. Scheduled refresh, breach notifications, the accuracy panel and the dedicated Copilot tool are listed as future work. [Access controls](../../backend_ocr/app/routers/cash_forecast.py) · [Feature scope](../cashflow-forecast/README.md)
+
+### 3.11 WhatsApp communication through Twilio
+
+Agent Hub manages one sender connection per tenant under the `whatsapp_agent` entitlement. Twilio posts inbound messages and delivery updates to connection-specific webhooks. The API verifies the Twilio signature and resolves the connection before recording activity. A watched contact's eligible text enters the Communication Agent's extraction queue. Eligible PDF attachments enter a leased worker queue for classification, OCR and duplicate checks. Finance reviews the resulting draft in Bills. [Webhook routes](../../backend_ocr/app/routers/whatsapp_webhook.py) · [Ingress and triage](../../backend_ocr/app/whatsapp/ingress.py)
+
+```mermaid
+flowchart TB
+    Vendor["Vendor on WhatsApp"] --> Twilio["Twilio sender"]
+    Twilio -->|Signed inbound webhook| Ingress["Verify signature and resolve tenant"]
+    Ingress -->|Watched contact and eligible PDF| Jobs["PostgreSQL jobs and intake worker"]
+    Jobs --> OCR["Classify, extract and check existing drafts"]
+    OCR --> Draft["Bills: human draft review"]
+    Ingress -->|Eligible vendor text| Terms["Communication Agent: extract terms"]
+    Terms --> Review["Review Hub"]
+    Hub["Authorized staff reply"] --> Policy["Outbox: consent, window and idempotency"]
+    Policy --> Twilio
+    Twilio -->|Signed status callback| Delivery["Recorded delivery state"]
+```
+
+The reply outbox checks opt-out and pause state and enforces the 24-hour reply window. WhatsApp intake checks existing email drafts for duplicates. The reverse email-to-WhatsApp draft check and outbound message templates remain open. The runbook documents sandbox setup; live delivery requires a configured sender, reachable webhook URLs and a joined test contact. [Outbox](../../backend_ocr/app/whatsapp/outbox.py) · [Implementation and deployment runbook](../whatsapp-agent/08-implementation-and-runbook.md)
 
 ## 4. Data model
 

@@ -16,6 +16,23 @@
 
 The first Windows backend run produced 41 failures. With Python UTF-8 mode, the full run took 65.19 s and returned 1,603 passes, 38 failures and 26 skips. Then 493 of 496 reconciliation and receivables tests passed against two disposable PostgreSQL databases in 39.07 s. This supplied results for 23 previously skipped database tests. The scorecard counts each Python test once by class and name. The three remaining skips require original document fixtures.
 
+## Cash flow forecast and Twilio WhatsApp evaluation
+
+Focused reruns used dev revision `46158c8`. **106 passed and 5 failed across 111 cases.** This sample has a different scope and revision from the application-wide scorecard above.
+
+| Suite | Passed / run | Evidence |
+|---|---:|---|
+| WhatsApp agent | 55 / 55 | Signed payload validation including the official Twilio SDK comparison, phone normalization, media allowlisting and account ownership, PDF triage, watched-contact and licence gates, duplicate and correction handling, delivery-status ordering, retries, and routing eligible text to the Communication Agent. [Tests](tests/test_whatsapp_agent.py) |
+| Cash forecast engine and rules | 40 / 40 | Daily balances and reserve metrics against fixture expectations, collection views, exclusions and scenario projections. [Engine cases](tests/test_cash_forecast_engine.py) · [Rule cases](tests/test_cash_forecast_rules.py) |
+| Cash forecast UI | 7 / 7 | Component-level interactions, including day drill-down and an explanation when a proposed change is refused. [UI cases](frontend/src/pages/cashforecast/CashForecastPage.test.tsx) |
+| Cash forecast PostgreSQL integration | 4 / 9 | Two fresh, disposable PostgreSQL clusters produced the same outcomes. Passed checks covered unchanged refresh/publication, tenant isolation, preview/refusal and day-detail reconciliation. [Database cases](tests/test_cash_forecast_db.py) |
+
+**Database finding.** The live-source fixture returned partial coverage where the golden case requires complete coverage. The plan workflow then blocked submissions or approvals. The four other failed cases covered self-approval and idempotency, applying approved dates, stale-plan revalidation and returning a plan with a note. The run did not establish which source first marked coverage partial. Those four downstream checks need a rerun after the source discrepancy is resolved.
+
+**Messaging boundary.** The WhatsApp rerun used local tests and the Twilio SDK signature oracle. No message was sent to a vendor. The earlier runbook separately records 49 PostgreSQL simulation checks with media and OCR stubbed, and HTTP checks for valid signatures, invalid signatures and unauthenticated tenant access. A real sandbox send, reply and delivery callback remain unverified in this run. [Prior simulation and sandbox procedure](docs/whatsapp-agent/08-implementation-and-runbook.md)
+
+**Repeat locally.** Run `python -m pytest tests/test_whatsapp_agent.py tests/test_cash_forecast_engine.py tests/test_cash_forecast_rules.py -q` with the optional Twilio SDK available. Windows needs an IANA timezone database. From `frontend`, run `npx vitest run src/pages/cashforecast/CashForecastPage.test.tsx`. Run `tests/test_cash_forecast_db.py` only with `CF_TEST_DB_URL` pointing to a disposable PostgreSQL database: its fixture recreates the public schema.
+
 ## Reckon Copilot and workspace chat
 
 **The live evaluation measured language selection, SQL-grounded answers, citation validity and a first/repeat latency pair. The focused regression rerun passed 59 backend and 3 UI tests.** The historical live run used `gpt-6-luna` and role-scoped reporting data. The fresh regression run used test fixtures. These 62 regression cases overlap the application scorecard above. [Original Copilot evaluation](docs/finance-desk/COPILOT_EVALUATION.md) and [evaluation script](scripts/eval_copilot_chat.py).
@@ -109,7 +126,8 @@ Each row identifies what was exercised and where the evidence ends. A rendered h
 | Agent Hub, independent workers and Fact Graph | Agent Hub page rendered. Callable operations for communication, compliance, verification, recon, payable, contract, TDS, GST and receivable; analytics callable separately. Nine worker advisory-lock IDs were unique. | Entrypoints checked. Continuous worker liveness, queue recovery and duplicate-event handling under load remain open. Graph timeout observed for DTL. |
 | CFO orchestrator | 6,000 evaluator runs; authenticated workflow call for one invoice under each of three brands returned all five stages in order. Chromium selection on a populated brand returned 200 and displayed four review stages and blocked payment. | KYC, vendor setup, reconciliation, approval and payment gating exercised. Thousands of evaluator calls do not measure persisted orchestration throughput. |
 | Communication/email agent and contract extraction | Communication extraction, stalled work, buyer contact, review-adapter wake-up, contract text and contract-to-bill variance suites | Boundary behavior exercised; no real mailbox burst, outbound mail or externally delivered attachment replay. |
-| WhatsApp agent | Earlier product scope specifies a Twilio-based agent. No live sandbox message, callback or end-to-end result collected here. | Unverified; excluded from deployed-feature pass totals. |
+| WhatsApp communication agent | 55 focused tests passed for the Twilio integration and communication intake. | Live sandbox delivery remains unverified. See the focused evaluation above. |
+| Cash flow forecast | 40 engine/rule and 7 UI cases passed. Four of nine database integration cases passed. | Source coverage and plan persistence require follow-up. See the database finding above. |
 | Payment Hub, disbursements, OTP and receipts | Browser route, bank status-code suites, sweeper, guard, OTP, receipt and payment-sidebar tests; targeted batch retest described below | Payment regressions remain open. Real banks, transfer execution and signed settlement callbacks were outside scope. |
 | Tax and withholding | GST breakdown and verification checks, TDS preferences and sections returned 200. Supplementary cases exercised a 91-day backdated bill and missing vendor. | Partial. Historical TDS report recorded 27/34 passing; those historical results were not upgraded by the two new cases. |
 | Currency conversion and fiscal logic | Fiscal and FX regression suites | 14 FX failures. Converted totals and missing-rate handling need a clean rerun. |

@@ -53,6 +53,7 @@ Reckon.ai helps finance teams manage accounts payable, accounts receivable, and 
 | **Vendor reconciliation** | Link bills to purchase orders, goods receipts, and delivery evidence. Compare quantities, rates, and line totals. Review discrepancies, correct evidence, and rerun cases. Vendor-specific checks can also compare bills with configured commercial terms. |
 | **Approvals and payments** | Route bills through approval and exception queues. Eligible users can initiate single or bulk IMPS payouts, confirm by OTP, track gateway status, and issue receipts. Administrative beneficiary overrides are audited. |
 | **Vendor records and tax** | Maintain GSTINs, bank accounts, contacts, and documents. Verify supported GSTIN, PAN, and bank details, and configure TDS sections, thresholds, rules, and vendor overrides. |
+| **WhatsApp communication agent** | In Agent Hub, connect a Twilio WhatsApp sender and watch vendor contacts. PDF invoices enter Bills → Drafts for review. Eligible text goes to the Communication Agent for terms extraction and Review Hub findings. Staff can reply within the vendor’s 24-hour window and track delivery. [Setup and rollout status](docs/whatsapp-agent/08-implementation-and-runbook.md) |
 | **Cash flow forecast** | Project daily bank cash over 30 days. Compare expected, downside and no-collections views, inspect the events behind a reserve breach, and submit a scenario as a plan for approval. |
 | **Receivables and cash application** | Capture sales invoices, import PDF/CSV/XLSX statements, add remittance advice, match credits to invoices, and apply or reverse allocations. The review board surfaces exceptions and cash-application KPIs. |
 | **Reporting and review** | Inspect spend, outstanding balances, and approval activity. Export expense data in XLSX or CSV and review findings across bills, vendors, and related records. |
@@ -122,9 +123,24 @@ The React workspace calls FastAPI over REST and multipart uploads. FastAPI and a
 
 ### Application architecture
 
-![Onsumm application architecture showing invoice intake, payables, vendor reconciliation, cash application, and tenant-enabled services](docs/aws-deploy/system-architecture.png)
+![Onsumm application architecture showing payables, reconciliation, cash application, Twilio WhatsApp intake and the cash flow forecast](docs/aws-deploy/system-architecture.png)
 
 [Open the interactive application diagram](docs/aws-deploy/system-architecture.html) to highlight a workflow, inspect its steps, or pause the animation.
+
+<details>
+<summary>Cash flow forecast and Twilio WhatsApp service diagrams</summary>
+
+**Cash flow forecast**
+
+![Bank and ledger inputs feed a daily cash forecast, scenario preview and plan decision](docs/aws-deploy/cash-flow-forecast.png)
+
+**WhatsApp communication**
+
+![Twilio inbound PDFs and text flow to bill review or terms extraction, with a separate reply and delivery path](docs/aws-deploy/whatsapp-communication.png)
+
+[Diagram sources and service boundaries](docs/architecture/ARCHITECTURE.md#310-cash-flow-forecast)
+
+</details>
 
 ### Finance automation workspace
 
@@ -148,6 +164,10 @@ flowchart LR
     API -->|Upload and retrieval| Files[("Document storage · local or S3")]
     API -->|Gated background tasks| Agents["Review · recon · cash application"]
     Agents -->|Jobs and findings| DB
+    Twilio["Twilio WhatsApp"] -->|Signed inbound and delivery callbacks| API
+    API --> WA["WhatsApp intake worker and reply outbox"]
+    WA -->|PDF drafts and communication claims| DB
+    WA -->|Authorized replies| Twilio
     API --> Forecast["Cash flow forecast module"]
     DB -->|Bank balances and AP/AR events| Forecast
     Forecast -->|Snapshots and plan decisions| DB
@@ -164,7 +184,7 @@ flowchart LR
     classDef data fill:#ccfbf1,stroke:#0f766e,color:#042f2e;
     classDef external fill:#ffedd5,stroke:#c2410c,color:#431407;
     class People,Web client;
-    class API,Agents,Workers,Nova,Forecast compute;
+    class API,Agents,Workers,Nova,Forecast,WA compute;
     class DB,Files data;
     class Tally,Sources,Providers,Bank,NovaUpstream external;
 ```
@@ -185,7 +205,7 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    Intake["Upload · mailbox draft · accounting feed"] --> Capture["Extract or normalize bill data"]
+    Intake["Upload · mailbox or WhatsApp draft · accounting feed"] --> Capture["Extract or normalize bill data"]
     Capture --> Stage["Validate · check duplicates · stage"]
     Stage -->|Eligible bill| Bill["Bill record"]
     Stage -->|Duplicate or anomaly| Review["Review evidence and exceptions"]
