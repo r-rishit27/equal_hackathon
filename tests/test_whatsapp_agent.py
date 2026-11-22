@@ -253,3 +253,16 @@ def test_backoff_bounded():
     from app.whatsapp.worker import backoff
     assert 20 <= backoff(1).total_seconds() <= 40
     assert backoff(20).total_seconds() <= 1800 * 1.2
+
+
+@pytest.mark.parametrize("body,num_media,expected", [
+    ("Update routing rate to 5%", 0, True),               # terms in plain text -> Communication Agent
+    ("Please pay 30% before 10 Dec, rest on delivery", 1, True),  # caption with terms
+    ("hi", 0, False),                                      # one-word ping
+    ("STOP", 0, False),                                    # opt-out keyword
+    ("26GJKMWSI15224.pdf", 1, False),                      # caption that is just the file name
+    ("", 1, False),
+])
+def test_text_handed_to_communication_agent_only_when_it_can_carry_terms(body, num_media, expected):
+    from app.whatsapp import ingress
+    assert ingress._carries_terms(body, num_media) is expected

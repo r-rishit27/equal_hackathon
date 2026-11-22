@@ -263,7 +263,7 @@ async def _propose_term_changes(conn, tenant_id: str, supplier_id: str, message_
         if isinstance(terms, str):
             terms = json.loads(terms)
         msg = await conn.fetchrow(
-            """SELECT COALESCE(m.sent_at, m.created_at) AS at, c.name
+            """SELECT COALESCE(m.sent_at, m.created_at) AS at, c.name, m.thread_id
                  FROM poc_email_messages m
                  LEFT JOIN supplier_contacts c ON c.id = m.contact_id
                 WHERE m.message_id = $1::uuid""",
@@ -272,7 +272,8 @@ async def _propose_term_changes(conn, tenant_id: str, supplier_id: str, message_
         who = (msg["name"] or "").split()[0] if msg and msg["name"] else ""
         when = msg["at"].strftime("%d %b").lstrip("0") if msg and msg["at"] else ""
         # "Email from Subhash, 19 Nov" — the subject is in the quote's company.
-        label = "Email" + (f" from {who}" if who else "") + (f", {when}" if when else "")
+        channel = "WhatsApp" if msg and (msg["thread_id"] or "").startswith("wa:") else "Email"
+        label = channel + (f" from {who}" if who else "") + (f", {when}" if when else "")
         changed = False
         for c in changes:
             changed |= propose_change(terms, str(c["field"]), c.get("new_value"), c.get("unit"),

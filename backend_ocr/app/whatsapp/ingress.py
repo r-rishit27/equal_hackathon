@@ -117,8 +117,21 @@ def handle_inbound(connection_key: str, url: str, form: list[tuple[str, str]], s
                 WHERE id=%s
             """, (consent, consent, watch["id"]))
 
+        comm_msg_id = None
+        if watch and c["inbound_enabled"] and _carries_terms(body, num_media):
+            comm_msg_id = _hand_to_communication_agent(cur, tenant_id, watch, sid, from_e164, body)
+            if comm_msg_id and outcome == "TEXT_ONLY":
+                cur.execute("UPDATE whatsapp_messages SET outcome_reason=%s WHERE id=%s",
+                            ("Sent to the Communication Agent — any terms it finds go to Review Hub", msg_id))
+
         conn.commit()
         put_conn(conn)
+        if comm_msg_id:
+            try:
+                from ..domain import fact_graph
+                fact_graph.enqueue(fact_graph.enrich_email, tenant_id, comm_msg_id)
+            except Exception:
+                log.exception("whatsapp: fact graph enqueue failed for %s", comm_msg_id)
         log.info("whatsapp inbound tenant=%s from=%s outcome=%s media=%s jobs=%s",
                  tenant_id, mask_phone(from_e164), outcome, num_media, len(jobs))
         if jobs and not held:
@@ -133,6 +146,45 @@ def handle_inbound(connection_key: str, url: str, form: list[tuple[str, str]], s
             pass
         put_conn(conn, close=True)
         return IngressResult(500, "")
+
+
+def _carries_terms(body: str, num_media: int) -> bool:
+    """Whether a message's text is worth reading for terms. Skips opt-in/out
+    keywords, one-word pings and a caption that is just the attachment's name."""
+    text = (body or "").strip()
+    if len(text) < 8 or text.lower() in _STOP_WORDS | _START_WORDS:
+        return False
+    if num_media and " " not in text and "." in text[-6:]:
+        return False  # "26GJKMWSI15224.pdf"
+    return True
+
+
+def _hand_to_communication_agent(cur, tenant_id, watch, sid, from_e164, body) -> str | None:
+    """Queue a watched vendor's WhatsApp text for the same claim extraction the
+    email agent's messages get (comm_extraction_worker reads poc_email_messages;
+    its insert trigger wakes the worker). Terms it finds — a fee, a payment
+    condition, bank details — become Review Hub findings exactly as from email.
+    Best-effort: a failure here never costs the message itself."""
+    try:
+        cur.execute("SAVEPOINT wa_comm")
+        cur.execute("""
+            INSERT INTO poc_email_messages
+                (tenant_id, supplier_id, contact_id, direction, gmail_msg_id, thread_id,
+                 from_email, subject, body, sent_at)
+            VALUES (%s,%s,%s,'inbound',%s,%s,%s,%s,%s,now())
+            ON CONFLICT (tenant_id, gmail_msg_id, direction) WHERE gmail_msg_id IS NOT NULL DO NOTHING
+            RETURNING message_id::text
+        """, (tenant_id, watch["supplier_id"], watch["contact_id"], f"wa:{sid}", f"wa:{from_e164}",
+              f"whatsapp:{from_e164}", "WhatsApp message", body))
+        row = cur.fetchone()
+        if row:
+            cur.execute("SELECT pg_notify('ch_comm_extract', %s)", (row["message_id"],))
+        cur.execute("RELEASE SAVEPOINT wa_comm")
+        return row["message_id"] if row else None
+    except Exception:
+        cur.execute("ROLLBACK TO SAVEPOINT wa_comm")
+        log.exception("whatsapp: could not queue text for the Communication Agent")
+        return None
 
 
 def _triage(cur, c, tenant_id, from_e164, body, num_media, params):
