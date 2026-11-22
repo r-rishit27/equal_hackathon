@@ -58,6 +58,8 @@ EXEMPT: dict[str, str] = {
     "/api/tally/ingest": "authenticated by the agent API key (_require_agent)",
     "/api/bills/approve-link": "email approval — its own APPROVAL_SECRET-signed token",
     "/api/oauth/email/callback": "OAuth callback — tenant carried in the signed state param",
+    "/api/webhooks/twilio/whatsapp/{connection_key}/inbound": "Twilio webhook — X-Twilio-Signature verified; tenant resolved from the opaque connection_key, never from the body",
+    "/api/webhooks/twilio/whatsapp/{connection_key}/status": "Twilio status callback — same signature check and connection_key tenant resolution as /inbound",
     # dim_fx_rates has no tenant_id: it is market reference data (INR per unit by
     # date) shared by every tenant. Note that /api/fx/agent-note is NOT here —
     # fx_agent_notes does carry tenant_id, because a note quotes the bill's own

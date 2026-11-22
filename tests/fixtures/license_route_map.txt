@@ -1,4 +1,5 @@
 DELETE  /api/agent/drafts/{draft_id}                                           agent_hub
+DELETE  /api/agent/whatsapp/connection                                         whatsapp_agent
 DELETE  /api/ar/customers/{customer_id}/aliases/{alias_id}                     receivables
 DELETE  /api/bills/{invoice_id}/attachments/{attachment_id}                    bills
 DELETE  /api/brands/{brand_id}                                                 brands
@@ -38,6 +39,9 @@ GET     /api/agent/drafts/{draft_id}/file                                      a
 GET     /api/agent/events                                                      agent_hub
 GET     /api/agent/pocs                                                        agent_hub
 GET     /api/agent/status                                                      agent_hub
+GET     /api/agent/whatsapp/contacts                                           whatsapp_agent
+GET     /api/agent/whatsapp/events                                             whatsapp_agent
+GET     /api/agent/whatsapp/status                                             whatsapp_agent
 GET     /api/agents/fact-graph                                                 fact_graph
 GET     /api/agents/fact-graph/neighbors                                       fact_graph
 GET     /api/agents/fact-graph/search                                          fact_graph
@@ -168,6 +172,7 @@ GET     /api/vendors/{supplier_id}/pan-duplicates                              v
 GET     /api/vendors/{supplier_id}/payment-profile                             disbursement
 GET     /api/vendors/{supplier_id}/recon/cases                                 recon
 GET     /api/vendors/{supplier_id}/recon/documents                             recon
+GET     /api/vendors/{supplier_id}/whatsapp/conversations                      whatsapp_agent
 GET     /docs                                                                  __unlicensed__
 GET     /docs/oauth2-redirect                                                  __unlicensed__
 GET     /health                                                                __unlicensed__
@@ -176,6 +181,7 @@ GET     /openapi.json                                                          _
 GET     /redoc                                                                 __unlicensed__
 PATCH   /api/admin/platform-users/{user_id}                                    __unlicensed__
 PATCH   /api/admin/tenants/{tenant_id}                                         __unlicensed__
+PATCH   /api/agent/whatsapp/settings                                           whatsapp_agent
 PATCH   /api/ar/customers/{customer_id}                                        receivables
 PATCH   /api/ar/invoices/{invoice_id}                                          receivables
 PATCH   /api/bills/{invoice_id}/soft-status                                    bills
@@ -185,6 +191,7 @@ PATCH   /api/recon/segments/{segment_id}                                       r
 PATCH   /api/vendors/{supplier_id}                                             vendors
 PATCH   /api/vendors/{supplier_id}/brand                                       vendors
 PATCH   /api/vendors/{supplier_id}/contacts/{contact_id}/agent                 agent_hub
+PATCH   /api/vendors/{supplier_id}/contacts/{contact_id}/whatsapp-watch        whatsapp_agent
 PATCH   /api/vendors/{supplier_id}/documents/{doc_id}/claims/{index}           vendors
 PATCH   /api/vendors/{supplier_id}/documents/{doc_id}/type                     vendors
 POST    /api/admin/auth/logout                                                 __unlicensed__
@@ -199,6 +206,9 @@ POST    /api/admin/tenants/{tenant_id}/impersonate                             _
 POST    /api/agent/drafts/{draft_id}/submitted                                 agent_hub
 POST    /api/agent/scan                                                        agent_hub
 POST    /api/agent/toggle                                                      agent_hub
+POST    /api/agent/whatsapp/jobs/{job_id}/draft-anyway                         whatsapp_agent
+POST    /api/agent/whatsapp/jobs/{job_id}/retry                                whatsapp_agent
+POST    /api/agent/whatsapp/refresh                                            whatsapp_agent
 POST    /api/agents/invoice-processing/{invoice_id}/cfo                        agent_hub
 POST    /api/agents/invoice-processing/{invoice_id}/check                      agent_hub
 POST    /api/ar/customers                                                      receivables
@@ -318,7 +328,11 @@ POST    /api/vendors/{supplier_id}/recon/documents                             r
 POST    /api/vendors/{supplier_id}/request-info                                email_sending
 POST    /api/vendors/{supplier_id}/reverify-bank                               kyc_verification
 POST    /api/vendors/{supplier_id}/verify-bank                                 kyc_verification
+POST    /api/vendors/{supplier_id}/whatsapp/reply                              whatsapp_agent
+POST    /api/webhooks/twilio/whatsapp/{connection_key}/inbound                 __unlicensed__
+POST    /api/webhooks/twilio/whatsapp/{connection_key}/status                  __unlicensed__
 PUT     /api/admin/tenants/{tenant_id}/services                                __unlicensed__
+PUT     /api/agent/whatsapp/connection                                         whatsapp_agent
 PUT     /api/ar/settings                                                       receivables
 PUT     /api/bills/{invoice_id}                                                bills
 PUT     /api/bills/{invoice_id}/attachments/{attachment_id}                    bills

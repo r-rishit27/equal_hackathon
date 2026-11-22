@@ -91,12 +91,19 @@ PUBLIC_PATHS = {
     "/api/admin/auth/logout",
 }
 
+# Prefix matches for provider webhooks. Each handler authenticates the request
+# itself (Twilio's X-Twilio-Signature against the connection's auth token).
+PUBLIC_PREFIXES = (
+    "/api/webhooks/twilio/whatsapp/",
+)
+
 
 def _is_public(request: Request) -> bool:
     # CORS preflight carries no credentials — always allow it through.
     if request.method == "OPTIONS":
         return True
-    return request.url.path in PUBLIC_PATHS
+    path = request.url.path
+    return path in PUBLIC_PATHS or path.startswith(PUBLIC_PREFIXES)
 
 
 # ── RBAC public-key fetch + cache ────────────────────────────────────────────

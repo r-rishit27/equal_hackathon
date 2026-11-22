@@ -102,6 +102,9 @@ SERVICES: tuple[ServiceDef, ...] = (
     # ── AI & automation ───────────────────────────────────────────────────────
     ServiceDef("agent_hub", "Agent Hub", "ai", False, False, "runs",
                "The email-to-bill agent: watches a mailbox and drafts bills."),
+    ServiceDef("whatsapp_agent", "WhatsApp Agent", "ai", False, False, "runs",
+               "Vendor WhatsApp invoices (PDF) become draft bills: signed Twilio webhook, "
+               "classification, OCR and cross-channel duplicate checks, plus vendor replies."),
     ServiceDef("fact_graph", "Fact Graph", "ai", False, False, None,
                "Per-tenant knowledge graph over vendors, bills and payments."),
     ServiceDef("anomaly_ai", "Anomaly & Duplicate Detection", "ai", False, False, None,

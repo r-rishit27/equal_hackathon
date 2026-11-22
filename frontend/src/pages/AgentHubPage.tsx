@@ -3,14 +3,15 @@ import { Link } from 'react-router-dom'
 import {
   Cpu, RefreshCw, FileText, Mail, XCircle, AlertTriangle, Clock, Network,
   GitCompare, ShieldCheck, Radar, Brain, Banknote, ScrollText, Percent, Landmark, HandCoins,
-  ClipboardCheck, ArrowUpRight,
+  ClipboardCheck, ArrowUpRight, MessageCircle,
 } from 'lucide-react'
 import { useAuth } from '../auth/AuthContext'
 import { useEntitlements } from '../auth/EntitlementsContext'
 import type { ServiceKey } from '../auth/services'
 import FactGraphModal from '../components/factgraph/FactGraphModal'
 import InvoiceProcessing from '../components/InvoiceProcessing'
-import { Switch, Button, useToast } from '../ui'
+import WhatsAppAgentPanel from '../components/agenthub/WhatsAppAgentPanel'
+import { Switch, Button, Badge, useToast } from '../ui'
 import { PATHS, reviewPath, settingsPath } from '../routes/paths'
 import {
   fetchAgentStatus, toggleAgent, triggerAgentScan, fetchAgentEvents, fetchAgentPocs, setContactAgent,
@@ -181,7 +182,7 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
   const watched = pocs.filter(p => p.agent_enabled)
   const mailboxEnabled = status?.enabled === true
   const plannedCount = SERVICES.filter(agent => agent.planned).length
-  const liveCount = SERVICES.length - plannedCount + 2
+  const liveCount = SERVICES.length - plannedCount + 3 /* Communication, Compliance, WhatsApp */
 
   const telemetry = [
     { key: 'Watched contacts', val: status?.watched_pocs ?? 0 },
@@ -257,6 +258,16 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
                     </div>
                   <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Live</span>
                   {has('review_hub') && <Link className="ah-shortcut" to={reviewPath()}>View findings <ArrowUpRight size={12} aria-hidden="true" /></Link>}
+                </li>
+                <li className="ah-agent">
+                    <div className="ah-roster__identity">
+                      <span className="ah-agent__icon"><MessageCircle size={16} aria-hidden="true" /></span>
+                      <div><strong>WhatsApp</strong><small>Vendor WhatsApp PDF → OCR → duplicate check → draft</small></div>
+                    </div>
+                  <span className="ah-roster__status"><span className="ah-dot ah-dot--on" aria-hidden="true" />Pilot</span>
+                  <div className="ah-agent__actions">
+                    <button type="button" className="ah-shortcut" onClick={() => focusPanel('ah-whatsapp')}>Open</button>
+                  </div>
                 </li>
                 {SERVICES.map(agent => {
                   const Icon = agent.icon
@@ -386,6 +397,9 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
                       <div className="ah-draft__name">
                         {d.vendor_name ?? 'Unknown vendor'}
                         {d.invoice_number && <span className="ah-poc__org"> · {d.invoice_number}</span>}
+                        {d.source_channel === 'whatsapp' && (
+                          <span style={{ marginLeft: 6 }}><Badge tone="success" icon={<MessageCircle size={11} />}>WhatsApp</Badge></span>
+                        )}
                       </div>
                       <div className="ah-draft__sub" title={d.subject ?? ''}>{d.subject ?? d.from_email ?? '—'}</div>
                     </div>
@@ -404,6 +418,15 @@ export default function AgentHubPage({ onReviewDraft }: Props) {
           )}
         </div>
       </div>
+
+      <section className="ah-panel" id="ah-whatsapp" tabIndex={-1} aria-label="WhatsApp Agent" style={{ marginTop: 'var(--sp-6, 24px)' }}>
+        <div className="ah-panel__head">
+          <div className="ah-panel__title"><MessageCircle size={13} aria-hidden="true" /> WhatsApp Agent · vendor invoices on WhatsApp</div>
+        </div>
+        <div className="ah-panel__body">
+          <WhatsAppAgentPanel onOpenDraft={openDraft} />
+        </div>
+      </section>
 
       {showGraph && <FactGraphModal companyId={companyId} onClose={() => setShowGraph(false)} />}
     </div>

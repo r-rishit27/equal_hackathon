@@ -128,6 +128,13 @@ _RULES: tuple[tuple[str, str, str], ...] = (
 
     # ── AI & automation ───────────────────────────────────────────────────────
     ("*", "/api/agent/", "agent_hub"),
+    # WhatsApp Agent (docs/whatsapp-agent/). Longer prefixes win over /api/agent/.
+    ("*", "/api/agent/whatsapp", "whatsapp_agent"),
+    ("*", "/api/vendors/{supplier_id}/contacts/{contact_id}/whatsapp-watch", "whatsapp_agent"),
+    ("*", "/api/vendors/{supplier_id}/whatsapp", "whatsapp_agent"),
+    # Twilio webhooks carry no tenant session; the handler verifies the signature
+    # and checks the tenant's whatsapp_agent entitlement itself.
+    ("*", "/api/webhooks/twilio/", UNLICENSED),
     # Per-contact opt-in for the mailbox agent (agent_api.py).
     ("*", "/api/vendors/{supplier_id}/contacts/{contact_id}/agent", "agent_hub"),
     ("*", "/api/agents/fact-graph", "fact_graph"),

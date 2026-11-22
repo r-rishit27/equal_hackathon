@@ -1,4 +1,5 @@
 DELETE  /api/agent/drafts/{draft_id}                                             scoped
+DELETE  /api/agent/whatsapp/connection                                           scoped
 DELETE  /api/ar/customers/{customer_id}/aliases/{alias_id}                       scoped
 DELETE  /api/bills/{invoice_id}/attachments/{attachment_id}                      scoped
 DELETE  /api/brands/{brand_id}                                                   scoped
@@ -38,10 +39,14 @@ GET     /api/agent/drafts/{draft_id}/file                                       
 GET     /api/agent/events                                                        scoped
 GET     /api/agent/pocs                                                          scoped
 GET     /api/agent/status                                                        scoped
+GET     /api/agent/whatsapp/contacts                                             scoped
+GET     /api/agent/whatsapp/events                                               scoped
+GET     /api/agent/whatsapp/status                                               scoped
 GET     /api/agents/fact-graph                                                   scoped
 GET     /api/agents/fact-graph/neighbors                                         scoped
 GET     /api/agents/fact-graph/search                                            scoped
 GET     /api/agents/fact-graph/stream                                            scoped
+GET     /api/agents/invoice-processing                                           scoped
 GET     /api/agents/payment-context                                              scoped
 GET     /api/ar/customers                                                        scoped
 GET     /api/ar/customers/{customer_id}                                          scoped
@@ -53,6 +58,7 @@ GET     /api/ar/payments/{payment_id}                                           
 GET     /api/ar/remittances                                                      scoped
 GET     /api/ar/remittances/{remittance_id}                                      scoped
 GET     /api/ar/remittances/{remittance_id}/document                             scoped
+GET     /api/ar/review-board                                                     scoped
 GET     /api/ar/settings                                                         scoped
 GET     /api/ar/statements                                                       scoped
 GET     /api/ar/statements/{statement_id}                                        scoped
@@ -71,6 +77,7 @@ GET     /api/bills/{invoice_id}/attachments/{attachment_id}/download            
 GET     /api/bills/{invoice_id}/attachments/{attachment_id}/edits                scoped
 GET     /api/bills/{invoice_id}/disbursements                                    scoped
 GET     /api/bills/{invoice_id}/export-pdf                                       scoped
+GET     /api/bills/{invoice_id}/playground-check                                 scoped
 GET     /api/bills/{invoice_id}/recon                                            scoped
 GET     /api/brands                                                              scoped
 GET     /api/brands/{brand_id}/logo                                              scoped
@@ -104,7 +111,11 @@ GET     /api/oauth/email/callback                                               
 GET     /api/recon/cases/{case_id}                                               scoped
 GET     /api/recon/cases/{case_id}/documents                                     scoped
 GET     /api/recon/cases/{case_id}/export                                        scoped
+GET     /api/recon/cases/{case_id}/fourway                                       scoped
+GET     /api/recon/cases/{case_id}/graph                                         scoped
+GET     /api/recon/cases/{case_id}/path                                          scoped
 GET     /api/recon/documents/{doc_id}/view                                       scoped
+GET     /api/recon/grn/mapping                                                   scoped
 GET     /api/recon/segments/{segment_id}/crop                                    scoped
 GET     /api/recon/segments/{segment_id}/page                                    scoped
 GET     /api/reports/activity                                                    scoped
@@ -161,6 +172,7 @@ GET     /api/vendors/{supplier_id}/pan-duplicates                               
 GET     /api/vendors/{supplier_id}/payment-profile                               scoped
 GET     /api/vendors/{supplier_id}/recon/cases                                   scoped
 GET     /api/vendors/{supplier_id}/recon/documents                               scoped
+GET     /api/vendors/{supplier_id}/whatsapp/conversations                        scoped
 GET     /docs                                                                    public
 GET     /docs/oauth2-redirect                                                    exempt
 GET     /health                                                                  public
@@ -169,6 +181,7 @@ GET     /openapi.json                                                           
 GET     /redoc                                                                   public
 PATCH   /api/admin/platform-users/{user_id}                                      exempt
 PATCH   /api/admin/tenants/{tenant_id}                                           exempt
+PATCH   /api/agent/whatsapp/settings                                             scoped
 PATCH   /api/ar/customers/{customer_id}                                          scoped
 PATCH   /api/ar/invoices/{invoice_id}                                            scoped
 PATCH   /api/bills/{invoice_id}/soft-status                                      scoped
@@ -178,6 +191,7 @@ PATCH   /api/recon/segments/{segment_id}                                        
 PATCH   /api/vendors/{supplier_id}                                               scoped
 PATCH   /api/vendors/{supplier_id}/brand                                         scoped
 PATCH   /api/vendors/{supplier_id}/contacts/{contact_id}/agent                   scoped
+PATCH   /api/vendors/{supplier_id}/contacts/{contact_id}/whatsapp-watch          scoped
 PATCH   /api/vendors/{supplier_id}/documents/{doc_id}/claims/{index}             scoped
 PATCH   /api/vendors/{supplier_id}/documents/{doc_id}/type                       scoped
 POST    /api/admin/auth/logout                                                   public
@@ -192,6 +206,11 @@ POST    /api/admin/tenants/{tenant_id}/impersonate                              
 POST    /api/agent/drafts/{draft_id}/submitted                                   scoped
 POST    /api/agent/scan                                                          scoped
 POST    /api/agent/toggle                                                        scoped
+POST    /api/agent/whatsapp/jobs/{job_id}/draft-anyway                           scoped
+POST    /api/agent/whatsapp/jobs/{job_id}/retry                                  scoped
+POST    /api/agent/whatsapp/refresh                                              scoped
+POST    /api/agents/invoice-processing/{invoice_id}/cfo                          scoped
+POST    /api/agents/invoice-processing/{invoice_id}/check                        scoped
 POST    /api/ar/customers                                                        scoped
 POST    /api/ar/customers/{customer_id}/aliases                                  scoped
 POST    /api/ar/invoices/ingest                                                  scoped
@@ -245,11 +264,13 @@ POST    /api/mapping/search                                                     
 POST    /api/mapping/vendor-code                                                 scoped
 POST    /api/nova/credentials                                                    scoped
 POST    /api/recon/cases/{case_id}/ack                                           scoped
+POST    /api/recon/cases/{case_id}/confirm                                       scoped
 POST    /api/recon/cases/{case_id}/detach                                        scoped
 POST    /api/recon/cases/{case_id}/lines/match                                   scoped
 POST    /api/recon/cases/{case_id}/rerun                                         scoped
 POST    /api/recon/documents/{doc_id}/reread                                     scoped
 POST    /api/recon/evidence/{row_id}/correct                                     scoped
+POST    /api/recon/grn/upload                                                    scoped
 POST    /api/recon/lines/{result_id}/review                                      scoped
 POST    /api/recon/segments/{segment_id}/ignore                                  scoped
 POST    /api/recon/segments/{segment_id}/link                                    scoped
@@ -292,6 +313,7 @@ POST    /api/vendors/{supplier_id}/documents/{doc_id}/claims/approve-all        
 POST    /api/vendors/{supplier_id}/documents/{doc_id}/claims/{index}/approve     scoped
 POST    /api/vendors/{supplier_id}/documents/{doc_id}/claims/{index}/discard     scoped
 POST    /api/vendors/{supplier_id}/flow/run                                      scoped
+POST    /api/vendors/{supplier_id}/flow/terms/{field}/decide                     scoped
 POST    /api/vendors/{supplier_id}/gstins                                        scoped
 POST    /api/vendors/{supplier_id}/gstins/primary/reverify                       scoped
 POST    /api/vendors/{supplier_id}/gstins/{gstin_id}/reverify                    scoped
@@ -306,7 +328,11 @@ POST    /api/vendors/{supplier_id}/recon/documents                              
 POST    /api/vendors/{supplier_id}/request-info                                  scoped
 POST    /api/vendors/{supplier_id}/reverify-bank                                 scoped
 POST    /api/vendors/{supplier_id}/verify-bank                                   scoped
+POST    /api/vendors/{supplier_id}/whatsapp/reply                                scoped
+POST    /api/webhooks/twilio/whatsapp/{connection_key}/inbound                   exempt
+POST    /api/webhooks/twilio/whatsapp/{connection_key}/status                    exempt
 PUT     /api/admin/tenants/{tenant_id}/services                                  exempt
+PUT     /api/agent/whatsapp/connection                                           scoped
 PUT     /api/ar/settings                                                         scoped
 PUT     /api/bills/{invoice_id}                                                  scoped
 PUT     /api/bills/{invoice_id}/attachments/{attachment_id}                      scoped

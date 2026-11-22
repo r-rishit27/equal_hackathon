@@ -906,7 +906,8 @@ def list_drafts(company_id: str = Query(default=None)):
         cur.execute("""
             SELECT d.id::text, d.supplier_id::text, d.contact_id::text, d.subject, d.from_email,
                    d.source_file, d.created_at, d.ocr_payload, d.analysis, d.suggestion,
-                   d.related_invoice, s.name AS supplier_name
+                   d.related_invoice, s.name AS supplier_name,
+                   d.source_channel, d.sender_masked, d.diff
             FROM agent_draft_bills d
             LEFT JOIN dim_suppliers s ON s.supplier_id = d.supplier_id
             WHERE d.tenant_id=%s AND d.status='pending'
@@ -931,6 +932,9 @@ def list_drafts(company_id: str = Query(default=None)):
                 "analysis": r["analysis"],
                 "suggestion": r["suggestion"],
                 "related_invoice": r["related_invoice"],
+                "source_channel": r["source_channel"] or "email",
+                "sender_masked": r["sender_masked"],
+                "diff": r["diff"],
             })
         put_conn(conn)
         return out
@@ -949,7 +953,7 @@ def get_draft(draft_id: str, company_id: str = Query(default=None)):
         cur = conn.cursor(cursor_factory=RealDictCursor)
         cur.execute("""
             SELECT id::text, supplier_id::text, source_file, subject, from_email, ocr_payload,
-                   analysis, suggestion, related_invoice
+                   analysis, suggestion, related_invoice, source_channel, sender_masked, diff
             FROM agent_draft_bills
             WHERE id=%s AND tenant_id=%s AND status='pending'
         """, (draft_id, company_id))
@@ -967,6 +971,9 @@ def get_draft(draft_id: str, company_id: str = Query(default=None)):
             "analysis": row["analysis"],
             "suggestion": row["suggestion"],
             "related_invoice": row["related_invoice"],
+            "source_channel": row["source_channel"] or "email",
+            "sender_masked": row["sender_masked"],
+            "diff": row["diff"],
         }
     except HTTPException:
         if conn: put_conn(conn, close=True)

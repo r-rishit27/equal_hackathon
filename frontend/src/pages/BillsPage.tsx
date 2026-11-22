@@ -3961,7 +3961,7 @@ export default function BillsPage({ initialBillId, onBillOpened, onReviewDraft }
                 {!draftsLoading && draftBills.length === 0 && (
                   <tr><td colSpan={7} style={{ textAlign: 'center', padding: '48px 0', color: 'var(--ink-500)' }}>
                     <Bot size={20} style={{ opacity: 0.5, marginBottom: 6 }} /><br />
-                    No draft bills yet. When the Vendor Bill Agent detects an invoice emailed by a watched contact, it lands here for review.
+                    No draft bills yet. When an agent detects an invoice from a watched contact — by email or WhatsApp — it lands here for review.
                   </td></tr>
                 )}
                 {!draftsLoading && draftBills.map(d => (
@@ -3972,6 +3972,10 @@ export default function BillsPage({ initialBillId, onBillOpened, onReviewDraft }
                       {d.invoice_number ?? <span style={{ color: '#d1d5db' }}>—</span>}
                       {d.analysis === 'correction' && (
                         <span style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: '#fef3c7', color: '#b45309' }}>CORRECTION</span>
+                      )}
+                      {d.source_channel === 'whatsapp' && (
+                        <span title={`Received on WhatsApp${d.sender_masked ? ` from ${d.sender_masked}` : ''}`}
+                          style={{ marginLeft: 6, fontSize: 10, fontWeight: 700, padding: '1px 6px', borderRadius: 4, background: '#dcfce7', color: '#15803d' }}>WHATSAPP</span>
                       )}
                     </td>
                     <td style={{ textAlign: 'right' }}>{d.total_amount != null ? `${d.currency} ${Number(d.total_amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}</td>

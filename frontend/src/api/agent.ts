@@ -53,6 +53,10 @@ export interface AgentDraft {
   analysis: 'new' | 'correction' | 'duplicate' | null
   suggestion: string | null
   related_invoice: string | null
+  /** Where the draft came from. Older rows have no channel and are email. */
+  source_channel?: 'email' | 'whatsapp' | string
+  sender_masked?: string | null
+  diff?: Record<string, { from: unknown; to: unknown }> | null
 }
 
 export interface AgentDraftDetail {
@@ -65,6 +69,9 @@ export interface AgentDraftDetail {
   analysis: 'new' | 'correction' | 'duplicate' | null
   suggestion: string | null
   related_invoice: string | null
+  source_channel?: 'email' | 'whatsapp' | string
+  sender_masked?: string | null
+  diff?: Record<string, { from: unknown; to: unknown }> | null
 }
 
 export async function fetchAgentStatus(companyId: string): Promise<AgentStatus> {

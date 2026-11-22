@@ -1132,6 +1132,12 @@ async def _ensure_recon_tables():
         conn.close()
 
 
+def _ensure_whatsapp_tables():
+    # After on_startup_supplier_contacts: ALTERs agent_draft_bills.
+    from .whatsapp.schema import ensure_whatsapp_tables
+    ensure_whatsapp_tables()
+
+
 # ── Manual migration plan ────────────────────────────────────────────────────
 # Order matters: some later steps assume tables an earlier one made. This tuple
 # is deliberately *not* registered with FastAPI. Run it explicitly with:
@@ -1174,4 +1180,5 @@ MIGRATION_STEPS = (
     _migrate_soft_status,
     _migrate_vendor_activity_log,
     _migrate_vendor_flows,
+    _ensure_whatsapp_tables,
 )

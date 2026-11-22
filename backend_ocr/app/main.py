@@ -172,6 +172,11 @@ app.include_router(playground_router, dependencies=[Depends(require_service("pla
 app.include_router(email_router)
 app.include_router(sso_router)
 app.include_router(agent_router)
+# WhatsApp Agent: tenant APIs (licensed per route) + public Twilio webhooks
+# (signature-authenticated, see PUBLIC_PREFIXES in security/auth.py).
+from .routers import whatsapp_agent as _wa_agent_routes, whatsapp_webhook as _wa_webhook_routes
+app.include_router(_wa_agent_routes.router)
+app.include_router(_wa_webhook_routes.router)
 app.include_router(agents_router)
 # Cross-tenant ops surface. Guarded by its own identity (PLATFORM_JWT_SECRET) in
 # auth_context, and exempt from license_gate — it belongs to us, not to a tenant.
@@ -209,6 +214,15 @@ async def _start_background_agents() -> None:
         logging.getLogger(__name__).exception(
             "[startup] Vendor Bill mailbox watcher failed to start — "
             "the API is still up, but no mailbox is being watched."
+        )
+
+    try:
+        from .whatsapp.worker import start_worker
+        start_worker()  # WhatsApp Agent: drains whatsapp_media_jobs
+    except Exception:
+        logging.getLogger(__name__).exception(
+            "[startup] WhatsApp intake worker failed to start — the API is still up and "
+            "webhooks are still recorded, but queued WhatsApp invoices won't be processed."
         )
 
     try:
