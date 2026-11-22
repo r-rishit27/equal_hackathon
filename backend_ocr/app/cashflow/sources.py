@@ -146,6 +146,25 @@ def load_books_live(cur, tenant_id: str, tz_name: str = "Asia/Kolkata") -> Sourc
             data.balances.append(dict(bank_account_id=r["bank_account_id"], balance_paise=to_paise(r["running_balance"]),
                                       as_of=as_of, source="statement"))
 
+    def payment_hub_accounts():
+        # The accounts Payment Hub pays from (one per bank, with the balance each
+        # payment draws down). Without them a tenant with no imported bank master
+        # has nothing to forecast from, and the two pages disagree about cash.
+        known = {a["account_mask"] for a in data.accounts if a.get("account_mask")}
+        cur.execute("""
+            SELECT id::text, bank_name, bank_provider, account_number, balance
+            FROM remitter_accounts WHERE tenant_id = %s ORDER BY created_at""", (tenant_id,))
+        now = datetime.now(tz)
+        for r in cur.fetchall():
+            tail = "".join(ch for ch in (r["account_number"] or "") if ch.isdigit())[-4:]
+            mask = f"XX{tail}" if tail else None
+            if mask and mask in known:
+                continue  # same account already comes from the bank master
+            data.accounts.append(dict(bank_account_id=r["id"], account_name=r["bank_name"], account_mask=mask,
+                                      account_type="CURRENT", include=True, od_limit_paise=0))
+            data.balances.append(dict(bank_account_id=r["id"], balance_paise=to_paise(r["balance"]),
+                                      as_of=now, source="payment_hub"))
+
     def payables():
         cur.execute("""
             SELECT fi.invoice_id::text, fi.stg_bill_id::text, fi.supplier_id::text, coalesce(s.name, 'Supplier') AS supplier_name,
@@ -217,6 +236,7 @@ def load_books_live(cur, tenant_id: str, tz_name: str = "Asia/Kolkata") -> Sourc
         data.unapplied = {r["invoice_id"]: dict(id=r["id"], received_on=r["received_on"]) for r in cur.fetchall()}
 
     guarded("bank", accounts)
+    guarded("payment_hub", payment_hub_accounts)
     guarded("payables", payables)
     guarded("disbursements", disbursements)
     guarded("receivables", receivables)
