@@ -419,6 +419,13 @@ def set_whatsapp_watch(supplier_id: str, contact_id: str, body: WatchBody):
         if body.enabled and not phone:
             put_conn(conn)
             raise HTTPException(422, "A valid WhatsApp number is required, e.g. +919876543210")
+        # A watch whose contact was deleted (the vendor page replaces a contact by
+        # delete + re-add) would otherwise keep holding the number and 409 here.
+        cur.execute("""
+            DELETE FROM whatsapp_contact_watches w
+            WHERE w.tenant_id=%s
+              AND NOT EXISTS (SELECT 1 FROM supplier_contacts c WHERE c.id = w.contact_id)
+        """, (tenant,))
         if body.enabled:
             cur.execute("""
                 SELECT w.contact_id::text, c.name, s.name AS supplier_name

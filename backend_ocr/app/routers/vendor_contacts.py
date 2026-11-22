@@ -114,7 +114,13 @@ async def delete_vendor_contact(supplier_id: str, contact_id: str, company_id: s
             put_conn(conn)
             raise HTTPException(status_code=404, detail="Contact not found")
         cur.execute("DELETE FROM supplier_contacts WHERE id=%s", (contact_id,))
-        who = gone.get("name") or gone.get("email") or "a contact"
+        # Drop the contact's WhatsApp watch too, so the number is free to be
+        # watched on a re-added contact. to_regclass: the table may not be migrated.
+        cur.execute("SELECT to_regclass('whatsapp_contact_watches') IS NOT NULL AS ok")
+        if cur.fetchone()["ok"]:
+            cur.execute("DELETE FROM whatsapp_contact_watches WHERE contact_id=%s AND tenant_id=%s",
+                        (contact_id, tenant_id))
+        who =gone.get("name") or gone.get("email") or "a contact"
         log_vendor_activity(
             cur, supplier_id, "contact_deleted",
             f"Removed contact {who}" + (f" ({gone['email']})" if gone.get("email") and gone.get("name") else ""),
