@@ -2,6 +2,10 @@
 
 Design package for extending Reckon.ai's `uat2` payables and receivables baseline with cash-flow forecasting, vendor and inventory optimization, and a finance assistant. The broader Finance Desk is proposed. The inventory planner is available at `/finance-desk/inventory` under Insights for users with payables viewing access and the Reports entitlement. The baseline product and its deployment constraints are documented in the [repository README](../../README.md).
 
+## Cash flow forecast on dev
+
+Open **Insights / Cash flow forecast** to see whether projected bank cash will cover the reserve over the next 30 days. Select a day to trace its inflows and outflows, compare collection assumptions, or preview a change in payment timing before submitting a plan. The forecast has its own tenant entitlement, `cash_forecast`. [Feature setup](../cashflow-forecast/README.md) · [Technical design](../cashflow-forecast/02_TECHNICAL_DESIGN.md)
+
 ## Reckon Copilot on dev
 
 Copilot detects the language of each message automatically. See the [Copilot evaluation metrics](COPILOT_EVALUATION.md) for measured results and repeatable checks.
@@ -26,7 +30,7 @@ For example, ask ?How many vendors have payment terms of at least 30 days?? or ?
 
 The planner reads the signed-in tenant's INR supplier bill lines from `onsumm_db`. Each price is tied to its bill date, quantity, unit and supplier. A planner selects a bill line and enters current stock, reserved units, daily demand, any confirmed inbound, lead time, MOQ, pack size and cash available after commitments and reserve. A confirmed landed price can replace the historical unit price for the calculation.
 
-The seven-day preview shows the pack-rounded order, projected spend, closing stock with and without the order, and unmet demand. It flags arrival delays, expired confirmed quotes and quantities constrained by the entered cash budget. The planner maximizes seven-day demand covered within available purchasing cash and chooses the least spend for that coverage. A classical single-item QUBO solver selects pack counts on the API worker thread. Its binary encoding enforces the cash cap and minimum order. Changing the vendor or bill line clears the projection. The preview is read-only. Automated demand feeds, dated cash forecasting and persisted purchase decisions remain planned.
+The seven-day preview shows the pack-rounded order, projected spend, closing stock with and without the order, and unmet demand. It flags arrival delays, expired confirmed quotes and quantities constrained by the entered cash budget. The planner maximizes seven-day demand covered within available purchasing cash and chooses the least spend for that coverage. A classical single-item QUBO solver selects pack counts on the API worker thread. Its binary encoding enforces the cash cap and minimum order. Changing the vendor or bill line clears the projection. The preview is read-only. Automated demand feeds and persisted purchase decisions remain planned for the inventory workflow. Dated cash forecasting is available through the separate Cash flow forecast screen.
 
 ## Read in this order
 

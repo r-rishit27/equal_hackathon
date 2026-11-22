@@ -171,6 +171,28 @@ flowchart LR
 - **Vendor Bill Agent mechanics**: polls each connected Gmail mailbox every `AGENT_POLL_INTERVAL` (default 600s), filters to mail from flagged POCs (`supplier_contacts.agent_enabled`) that carries an attachment, classifies bill-vs-conversation with an OpenAI model (`AGENT_CLASSIFY_MODEL`, default `gpt-4o-mini`), runs the OCR pipeline on anything classified as a bill, and drops the result into `agent_draft_bills` for human review — it never auto-submits a bill. Thread-aware, so a follow-up correction on the same email thread is detected rather than filed as a duplicate.
 - No dedicated model beyond what OCR already uses (GPT-4o / GPT-4o-mini) — Agent Hub is an orchestration and audit layer, not a separate inference stack.
 
+### 3.10 Cash flow forecast
+
+The Insights screen at `/finance-desk/cash-forecast` calls the FastAPI router at `/api/finance-desk/cash-forecast`. The existing API process hosts the forecast engine. Enable the `cash_forecast` service for each participating tenant and apply its PostgreSQL schema through the standard migration runner. The service is off by default. [Router](../../backend_ocr/app/routers/cash_forecast.py) · [Setup and verification](../cashflow-forecast/README.md)
+
+```mermaid
+flowchart LR
+    Books["Bank balances, AP bills and payouts, AR invoices and receipts"] --> Sources["Source adapters and timing rules"]
+    Inputs["Recurring items, adjustments, payment windows and collection promises"] --> Sources
+    Sources --> Snap["Tenant forecast snapshot"]
+    Snap --> Engine["Daily cash projection"]
+    Engine --> Screen["Reserve chart and daily event detail"]
+    Snap --> Scenario["Scenario overrides"]
+    Scenario --> Preview["Preview and submit plan"]
+    Preview --> Decision["Version check and approval decision"]
+    Decision --> History["Plan history and planned dates"]
+    Engine -. Expected view on eligible refresh .-> Daily["fact_cashflow_daily"]
+```
+
+The engine calculates each day's closing balance in integer paise from opening cash plus inflows less outflows. It flags a breach when closing cash falls below the tenant's reserve. A snapshot holds the inputs behind a projection, so expected, downside and no-collections views can be compared on the same basis. If daily publication is enabled, a changed live snapshot can publish the expected forecast to `fact_cashflow_daily` while preserving actual cash flows. Fixture tenants skip publication. [Engine](../../backend_ocr/app/cashflow/engine.py) · [Snapshot and plan service](../../backend_ocr/app/cashflow/service.py)
+
+Auditors can view forecasts. Accountants can also edit inputs and prepare plans. Finance controllers and admins can manage settings and decide plans. Impersonated sessions are read-only. Approval checks source coverage, the submitted version, the current forecast and the tenant's self-approval policy. An approved decision supplies planned cash dates for forecasting. Payment execution stays in the disbursement workflow. Scheduled refresh, breach notifications, the accuracy panel and the dedicated Copilot tool are listed as future work. [Access controls](../../backend_ocr/app/routers/cash_forecast.py) · [Feature scope](../cashflow-forecast/README.md)
+
 ## 4. Data model
 
 Table prefixes encode pipeline stage: `raw_` (inbound) → `stg_` (validated, pre-fact) → `fact_` (analytics-ready) → `wf_` (workflow/audit); `dim_` (masters), `int_` (external connection state), `ai_` (anomalies). Fiscal period (India's April–March year) is computed once by `utils/fiscal.py` and stored on every fact row.

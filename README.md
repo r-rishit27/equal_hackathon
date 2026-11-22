@@ -2,7 +2,7 @@
 
 > Finance operations for payables, receivables, and working capital.
 
-Reckon.ai brings invoice capture, vendor reconciliation, tax review, approvals, payouts, and cash application into one workspace. This README describes the code on `main`, including the tenant-licensed workflows and deployment configurations checked into the repository.
+Reckon.ai brings invoice capture, vendor reconciliation, tax review, approvals, payouts, cash application, and cash flow forecasting into one workspace. This README describes the code on `dev`, including the tenant-licensed workflows and deployment configurations checked into the repository.
 
 ---
 
@@ -53,6 +53,7 @@ Reckon.ai helps finance teams manage accounts payable, accounts receivable, and 
 | **Vendor reconciliation** | Link bills to purchase orders, goods receipts, and delivery evidence. Compare quantities, rates, and line totals. Review discrepancies, correct evidence, and rerun cases. Vendor-specific checks can also compare bills with configured commercial terms. |
 | **Approvals and payments** | Route bills through approval and exception queues. Eligible users can initiate single or bulk IMPS payouts, confirm by OTP, track gateway status, and issue receipts. Administrative beneficiary overrides are audited. |
 | **Vendor records and tax** | Maintain GSTINs, bank accounts, contacts, and documents. Verify supported GSTIN, PAN, and bank details, and configure TDS sections, thresholds, rules, and vendor overrides. |
+| **Cash flow forecast** | Project daily bank cash over 30 days. Compare expected, downside and no-collections views, inspect the events behind a reserve breach, and submit a scenario as a plan for approval. |
 | **Receivables and cash application** | Capture sales invoices, import PDF/CSV/XLSX statements, add remittance advice, match credits to invoices, and apply or reverse allocations. The review board surfaces exceptions and cash-application KPIs. |
 | **Reporting and review** | Inspect spend, outstanding balances, and approval activity. Export expense data in XLSX or CSV and review findings across bills, vendors, and related records. |
 | **Review Hub and Agent Hub** | Triage findings, inspect evidence, and resolve or snooze exceptions in Review Hub. Agent Hub surfaces watched contacts, mailbox activity, and vendor invoice drafts for review. |
@@ -64,6 +65,7 @@ Reckon.ai helps finance teams manage accounts payable, accounts receivable, and 
 |---|---|
 | Payables | `/dashboard`, `/upload`, `/bills`, `/vendors`, `/payments` |
 | Review and automation | `/review`, `/review/browse`, `/agent-hub`, `/nova` |
+| Insights / Cash flow forecast | `/finance-desk/cash-forecast` (requires the `cash_forecast` tenant entitlement) |
 | Receivables | `/receivables/cash-application`, `/receivables/invoices`, `/receivables/customers` |
 | Reporting and setup | `/reports`, `/data-extraction`, `/integrations`, `/settings` |
 
@@ -106,6 +108,7 @@ Vendor reconciliation and its dashboard are available from the vendor card's **D
 | Review Hub and communication agents | [Design and implementation](docs/review/HLD_LLD_COMM_COMPLIANCE_REVIEWHUB.md) |
 | Tax, COA, and FX | [TDS configuration](docs/finance-operations/TDS_SETTINGS_IMPLEMENTATION_PLAN.md) · [COA rules and reports](docs/finance-operations/COA_RULES_AND_REPORTS.md) · [FX workflows](docs/finance-operations/FX_CURRENCY_STANDARDIZATION.md) |
 | Nova billing reconciliation | [Standalone reconciliation service](docs/nova/README.md) |
+| Cash flow forecast | [Setup and tests](docs/cashflow-forecast/README.md) · [Service architecture](docs/architecture/ARCHITECTURE.md#310-cash-flow-forecast) · [User flows](docs/cashflow-forecast/05_USER_FLOWS.md) |
 | Finance Desk proposal | [PRD, requirements, architecture, and delivery plan](docs/finance-desk/README.md) |
 | Deployment, database, and API migrations | [UAT2 deployment](docs/aws-deploy/DEV_ENVIRONMENT.md) · [Database schema reference](docs/architecture/full_database_schema.md) · [Migration runner](scripts/run_api_migrations.py) |
 
@@ -145,6 +148,9 @@ flowchart LR
     API -->|Upload and retrieval| Files[("Document storage · local or S3")]
     API -->|Gated background tasks| Agents["Review · recon · cash application"]
     Agents -->|Jobs and findings| DB
+    API --> Forecast["Cash flow forecast module"]
+    DB -->|Bank balances and AP/AR events| Forecast
+    Forecast -->|Snapshots and plan decisions| DB
     DB <-->|Queries and LISTEN / NOTIFY| Workers["Python pipeline workers"]
     API --> Providers["OCR · email · KYB providers"]
     Workers --> Providers
@@ -158,7 +164,7 @@ flowchart LR
     classDef data fill:#ccfbf1,stroke:#0f766e,color:#042f2e;
     classDef external fill:#ffedd5,stroke:#c2410c,color:#431407;
     class People,Web client;
-    class API,Agents,Workers,Nova compute;
+    class API,Agents,Workers,Nova,Forecast compute;
     class DB,Files data;
     class Tally,Sources,Providers,Bank,NovaUpstream external;
 ```

@@ -11,6 +11,8 @@ copies is missing a `WHERE tenant_id`.
 It is now a composition root of ~180 lines that builds the app and mounts
 routers. Nothing else.
 
+The Cash Flow Forecast router owns the HTTP contract and capability checks. The `cashflow/` package owns source reads, snapshot persistence, daily projections, scenario previews and plan decisions. Schema changes run through the manual API migration runner. [Router](../../backend_ocr/app/routers/cash_forecast.py) · [Domain package](../../backend_ocr/app/cashflow) · [Service design](ARCHITECTURE.md#310-cash-flow-forecast)
+
 ## Layout
 
 ```

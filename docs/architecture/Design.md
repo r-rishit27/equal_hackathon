@@ -25,6 +25,10 @@ A pairing of functional UI clarity with editorial marketing impact.
 - **Interactions:** Rapid micro-interactions (150-200ms) with scroll-triggered "product assembly" animations.
 - **Data Display:** High-density tables and lists with minimal whitespace, favoring information richness.
 
+## Cash flow forecast screen
+
+The forecast chart puts projected closing cash and the reserve on the same daily axis. Switching between expected, downside and no-collections views lets the reviewer see how much the forecast depends on incoming payments. Selecting a day opens its cash movements. A missing opening balance calls for balance entry, while a partial source read needs a coverage warning before the reviewer relies on the forecast. Scenario previews and submitted plans use separate controls so a reviewer can explore a change before requesting approval. [Forecast screen](../../frontend/src/pages/cashforecast/CashForecastPage.tsx) · [Interaction design](../cashflow-forecast/06_UI_SPEC.md)
+
 ## Brand Identity
 - **Logo:** Minimalist wordmark or geometric mark in solid black/white.
 - **Imagery:** High-fidelity UI simulations and mockups featuring real-world data patterns rather than abstract illustrations.
