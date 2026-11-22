@@ -135,7 +135,10 @@ class PlaygroundChecksAdapter(FindingAdapter):
                                confirm={"title": f"Keep calculating {vendor}'s {label} at {old}",
                                         "change": {"label": label.capitalize(), "from": old, "to": old}},
                                success={"status": "ok"}),
-                    ] + ([action("open_email", "Open email", kind="navigate",
+                    ] + ([action("open_email",
+                                 # WhatsApp text rides the same queue (thread "wa:<phone>").
+                                 "Open WhatsApp" if threads[str(p["doc_id"])].startswith("wa:") else "Open email",
+                                 kind="navigate",
                                  href=links.vendor_thread(sid, threads[str(p["doc_id"])]))]
                          if by_email and threads.get(str(p.get("doc_id"))) else []),
                     audience_roles=aud.roles,

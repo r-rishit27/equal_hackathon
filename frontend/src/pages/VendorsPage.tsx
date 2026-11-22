@@ -765,13 +765,13 @@ function ClaimRow({ c, index, editing, draftValue, onDraftChange, supplierId, do
             </div>
             <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--ink-700)', marginTop: 2 }}>
               Was {termText(c.new_value, c.unit?.trim().startsWith('%') ? '%' : c.unit)} in this contract ·
-              changed by {c.amended.sender ? `${c.amended.sender}’s` : 'the vendor’s'} email
+              changed by {c.amended.sender ? `${c.amended.sender}’s` : 'the vendor’s'} {c.amended.thread_id?.startsWith('wa:') ? 'WhatsApp message' : 'email'}
               {c.amended.at ? ` of ${shortDate(c.amended.at)}` : ''}
               {c.amended.decided_by ? `, accepted by ${c.amended.decided_by}` : ''}
               {supplierId && c.amended.thread_id && (
                 <> · <a href={`${vendorPath(supplierId, 'conversations')}?thread=${encodeURIComponent(c.amended.thread_id)}`}
                   onClick={e => { e.preventDefault(); navigate(`${vendorPath(supplierId, 'conversations')}?thread=${encodeURIComponent(c.amended!.thread_id!)}`) }}
-                  style={{ color: 'var(--brand-600)', fontWeight: 'var(--fw-semibold)' }}>Open email</a></>
+                  style={{ color: 'var(--brand-600)', fontWeight: 'var(--fw-semibold)' }}>{c.amended.thread_id.startsWith('wa:') ? 'Open WhatsApp' : 'Open email'}</a></>
               )}
             </div>
             {c.amended.quote && (
@@ -787,7 +787,7 @@ function ClaimRow({ c, index, editing, draftValue, onDraftChange, supplierId, do
         )}
         {c.proposed && !c.amended && (
           <div style={{ fontSize: 'var(--fs-xs)', color: 'var(--warn-700)', marginTop: 3 }}>
-            {c.proposed.sender ? `${c.proposed.sender}’s` : 'The vendor’s'} email
+            {c.proposed.sender ? `${c.proposed.sender}’s` : 'The vendor’s'} {c.proposed.thread_id?.startsWith('wa:') ? 'WhatsApp message' : 'email'}
             {c.proposed.at ? ` of ${shortDate(c.proposed.at)}` : ''} says {termText(c.proposed.value, c.unit?.trim().startsWith('%') ? '%' : c.unit)} ·{' '}
             <a href={PATHS.review} onClick={e => { e.preventDefault(); navigate(PATHS.review) }}
               style={{ color: 'inherit', fontWeight: 'var(--fw-semibold)' }}>decide in Review Hub</a>
